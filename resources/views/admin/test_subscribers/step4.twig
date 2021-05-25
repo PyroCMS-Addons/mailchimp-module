@@ -1,0 +1,30 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+    <div id="dashboard">
+        <div class="container-fluid">
+            <h5>Contact Status</h5>
+            {% if contact %}
+                status: {{ contact.status }}<br>
+<br>
+                ID: {{ contact.id }}<br>
+                email_address: {{ contact.email_address }}<br>
+                unique_email_id: {{ contact.unique_email_id }}<br>
+                full_name: {{ contact.full_name }}<br>
+                web_id: {{ contact.web_id }}<br>
+                email_type: {{ contact.email_type }}<br>
+                status: {{ contact.status }} <code> cleaned | pending | unsubscribed | subscribed</code><br>
+                Open Rate: {{ contact.stats.avg_open_rate }}<br>
+                Click Rate: {{ contact.stats.avg_click_rate }}<br>
+                member Rating: {{ contact.member_rating }}<br>
+                last_changed: {{ contact.last_changed }}<br>
+                vip: {{ contact.vip }}<br>
+                source: {{ contact.source }}<br>
+                list_id: {{ contact.list_id }}<br>
+
+            {% endif %}
+           
+        </div>
+    </div>
+{% endblock %}
+

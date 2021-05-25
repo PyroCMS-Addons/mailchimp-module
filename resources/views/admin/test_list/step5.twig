@@ -1,0 +1,21 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+    <div id="dashboard">
+        <div class="container-fluid">
+            <h5>List Created</h5>
+
+                {% if status %}
+
+                    Response: {{ status }}<br>
+                    List ID: {{ list.id }}<br>
+                    List Name: {{ list.name }}<br>
+                {% else %}
+                    List not created
+                {% endif %}
+
+          
+        </div>
+    </div>
+{% endblock %}
+

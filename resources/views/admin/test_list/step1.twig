@@ -1,0 +1,17 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+    <div id="dashboard">
+        <div class="container-fluid">
+            <h5>Connection</h5>
+            API key: <code>{{key1}}</code><br>
+            Server prefix: <code>{{key2}}</code><br>
+        </div>   
+        <br><br> 
+        <div class="container-fluid">
+            <h5>Connection Response</h5>
+            {{ message }}
+        </div>
+    </div>
+{% endblock %}
+

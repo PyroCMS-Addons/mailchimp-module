@@ -1,0 +1,15 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+    <div id="dashboard">
+        <div class="container-fluid">
+            <h5>Mailchimp Dashboard</h5>
+
+            <a href="{{ url('admin/mailchimp/dashboard/dda')}}" class="btn btn-danger confirm">DELETE Default List</a>
+
+        </div>   
+        <br>
+
+    </div>
+{% endblock %}
+

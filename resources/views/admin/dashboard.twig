@@ -1,0 +1,165 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+
+    <div id="dashboard">
+        <div class="container-fluid">
+            <div class="card">
+                <nav class="navbar navbar-light">
+                    <div class="nav navbar-nav" style="height:100px">
+                        <h1>Mailchimp</h1>
+                    </div>
+                </nav>
+            </div>                
+        </div>
+    </div>
+
+    {% if has_stats %}
+    <div id="dashboard">
+        <div class="container-fluid">
+            <div class="card">
+                <nav class="navbar navbar-light">
+                    <div class="nav navbar-nav" style="height:200px">
+                        <h2>Subscribes</h2>
+                        <div id="" class="dash-parent">
+                            <div id="dash-content" class="">
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Members</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span>{{ stats.member_count}} </span>
+                                    </div>
+                                </div>
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Since Last Send</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span>{{ stats.member_count_since_send }} </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="" class="dash-parent">
+                            <div id="dash-content" class="">            
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Date Last Subscribed</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span class="date">{{ stats.last_sub_date}} </span>
+                                    </div>
+                                </div>
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Target Sub Rate</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span>{{ stats.target_sub_rate}} </span>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>                
+        </div>
+    </div>
+    <div id="dashboard">
+        <div class="container-fluid">
+            <div class="card">
+                <nav class="navbar navbar-light">
+                    <div class="nav navbar-nav" style="height:200px">
+                        <h2>UnSubscribes</h2>
+                        <div id="" class="dash-parent">
+                            <div id="dash-content" class="">
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Unsubscribes</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span>{{ stats.unsubscribe_count}} </span>
+                                    </div>
+                                </div>
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Unsubscribes Since Send</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span>{{ stats.unsubscribe_count_since_send }} </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="" class="dash-parent">
+                            <div id="dash-content" class="">            
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Date Last Unsubscribed</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span class="date">{{ stats.last_unsub_date }} </span>
+                                    </div>
+                                </div>
+                                <div class="dash-panel">
+                                    <div class="dash-title">
+                                        <h2>Avg Unsubscribe Rate</h2>
+                                    </div>
+                                    <div class="dash-content">
+                                        <span>{{ stats.avg_unsub_rate}} </span>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>                
+        </div>
+    </div>
+    {% endif %}  
+<style>
+#dash-parent {
+    margin-top:20px;
+    margin-bottom:20px;
+}
+.dash-panel {
+    width:250px;
+    height:150px;
+    background-color:lightgray;
+    float:left;
+    margin-left:10px;
+    margin-top:20px;
+    margin-bottom:20px;
+
+}
+.dash-title {
+    width:100%;
+    height:50px;
+    background-color:gray;
+    color:black;
+    text-align:center;
+    padding:8px;
+}
+.dash-title h2 {
+    color:black;
+    font-size:20px;
+}
+.dash-panel span.date {
+font-size:18px;
+}
+.dash-content {
+    width:100%;
+    height:100px;
+    color:purple;
+    text-align:center;
+    vertical-align:center;
+    padding:10px;
+    font-size:50px;
+}
+</style>
+  
+{% endblock %}
+

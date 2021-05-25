@@ -1,0 +1,34 @@
+
+<h2>{{ title }}</h2>
+
+{# {{ form('mailchimp::subscribe') }} #}
+{# {{ form('mailchimp' , 'subscribers') }} #}
+
+{# {{ form('mailchimp::subscribe') }} #}
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<form 
+    method="POST" 
+    action="{{ handler_url }}" 
+
+    name="mailchimp" 
+    > 
+
+    {{ csrf_field()|raw }}
+
+    <input type="email"  name="email"   placeholder="your@email.com" >
+    <input type="hidden" name="strid"   value="{{ strid }}">
+    <input type="hidden" name="action"  value="{{ action }}">
+    <input type="submit" name="submit"  value="{{ btn_text ??  'Submit'  }}" >
+
+
+</form>
+
+
+

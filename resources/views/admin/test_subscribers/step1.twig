@@ -1,0 +1,17 @@
+{% extends template.layout ?: "theme::layouts/default" %}
+
+{% block content %}
+    <div id="dashboard">
+        <div class="container-fluid">
+            <h5>addContactToList</h5>
+            {% if status %}
+                Email: {{ contact.email_address }}
+            {% else %}
+                Contact Not Added
+            {% endif %}
+        </div>   
+        <br>
+
+    </div>
+{% endblock %}
+

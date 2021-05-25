@@ -1,0 +1,12 @@
+{
+    "name": "thrive/mailchimp-module",
+    "type": "streams-addon",
+    "autoload": {
+        "psr-4": {
+            "Thrive\\MailchimpModule\\": "src/"
+        }
+    },
+    "require": {
+        "mailchimp/marketing": "^3.0"
+    }
+}
