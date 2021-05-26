@@ -1,16 +1,16 @@
 <?php namespace Thrive\MailchimpModule\Http\Controller\Admin;
 
 // Anomaly
-use Anomaly\Streams\Platform\Message\MessageBag;
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
+use Anomaly\Streams\Platform\Message\MessageBag;
 
 // Thrive
-use Thrive\MailchimpModule\Support\Harmony;
-use Thrive\MailchimpModule\Support\Mailchimp;
 use Thrive\MailchimpModule\Audience\AudienceModel;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Form\AudienceFormBuilder;
 use Thrive\MailchimpModule\Audience\Table\AudienceTableBuilder;
+use Thrive\MailchimpModule\Support\Integration\Audience;
+use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
  * AudiencesController
@@ -71,57 +71,23 @@ class AudiencesController extends AdminController
     /**
      * sync
      *
+     * @param  mixed $id
      * @param  mixed $messages
      * @param  mixed $repository
      * @return void
      */
-    public function sync(MessageBag $messages, AudienceRepository $repository)
+    public function sync($id = null, MessageBag $messages, AudienceRepository $repository)
     {
-        $mailchimp = Mailchimp::Connect();
-
-        $lists = $mailchimp->getAllLists();
-
-        //
-        // Import Lists that dont exist locally
-        //
-        foreach($lists as $list)
+        if($entry = AudienceModel::find($id))
         {
-            if(!$repository->findBy('str_id',$list->id))
-            {
-                //check if exist if deleted
-                if($repository->allWithTrashed()->findBy('str_id',$list->id))
-                {
-                    // skip
-                    $messages->error('thrive.module.mailchimp::common.error_audiences_clash');
-                }
-                else
-                {
-                    $item = new AudienceModel();
-
-                    // we dont have a list
-                    if($item = Harmony::createFromMailchimp($list,$item))
-                    {
-                        $item->save();
-                        //updated
-                        $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
-                    }
-                }
-
-            }
-
+            Audience::Sync($entry);
         }
-
-        // check if still exist online
-        foreach($repository->all() as $item)
+        else
         {
-            if(!$mailchimp->getList($item->str_id))
-            {
-                $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.not_found']);
-            }
+            Audience::SyncAll($repository);
         }
-
-        $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
 
         return redirect()->back();
-    }
+    }  
+ 
 }

@@ -88,6 +88,45 @@ class AutomationsController extends AdminController
     }
 
 
+    public function start(AutomationTableBuilder $form, $id, MessageBag $messages)
+    {
+        $automation = AutomationModel::find($id);
+
+        if(Automation::Start($automation))
+        {
+            $messages->success('thrive.module.mailchimp::message.automation_sent');
+        }
+
+        return redirect()->back();
+    }
+
+    public function pause(AutomationTableBuilder $form, $id, MessageBag $messages)
+    {
+        $automation = AutomationModel::find($id);
+
+        if(Automation::Pause($automation))
+        {
+            $messages->success('thrive.module.mailchimp::message.automation_sent');
+        }
+
+        return redirect()->back();
+    }
+
+
+
+    public function stop(AutomationTableBuilder $form, $id, MessageBag $messages)
+    {
+        $automation = AutomationModel::find($id);
+
+        if(Automation::Stop($automation))
+        {
+            $messages->success('thrive.module.mailchimp::message.automation_sent');
+        }
+
+        return redirect()->back();
+    }    
+
+
     /**
      * sync
      *

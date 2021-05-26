@@ -84,6 +84,23 @@ trait MailchimpCampaignTrait
         }
     }
     
+
+
+    public function createCampaign($settings)
+    {
+        try 
+        {             
+            $response = $this->mailchimp->campaigns->create( $settings );
+
+            return $response;
+        } 
+        catch (\Exception $e) 
+        {
+            Log::error('Unable to locate Campaign, campaign updated.');
+        }
+    }
+    
+    
     /**
      * sendCampaign
      * 
@@ -118,6 +135,45 @@ trait MailchimpCampaignTrait
     }   
 
     
+    
+    /**
+     * sendTestCampaign
+     *
+     * @param  mixed $campaign_id
+     * @return void
+     * $email_array
+     *   "test_emails" => 
+     *    [
+     *       "Enola_Morissette71@gmail.com"
+     *    ]
+     *
+     */
+    public function sendTestCampaign($campaign_id, array $email_array)
+    {
+        $response = '';
+
+        try 
+        {    
+            if($response = $this->mailchimp->campaigns->sendTestEmail($campaign_id, [
+                "test_emails" => $email_array,
+                "send_type" => "html",
+            ])) {
+
+                if($response == null)
+                    return true;
+
+            }
+        } 
+        catch (\Exception $e) 
+        {
+            Log::error('Unable to send test.');
+        }
+
+        return false;
+
+    }   
+
+
     /**
      * getAllCamapigns
      *
@@ -147,6 +203,49 @@ trait MailchimpCampaignTrait
 
         return false;
 
-    }   
+    } 
+    
+        
+    /**
+     * hasCampaign
+     *
+     * @param  mixed $str_id
+     * @return bool
+     */
+    public function hasCampaign($str_id) : bool
+    {
+        if($campaign = $this->getCampaign($str_id))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    
+    /**
+     * getCampaign
+     *
+     * @param  mixed $str_id
+     * @return mixed
+     */
+    public function getCampaign($str_id) 
+    {
+        $response = '';
+
+        try 
+        {      
+            if($response = $this->mailchimp->campaigns->get($campaign_id))
+            {
+                return $response;
+            }
+        } 
+        catch (\Exception $e) 
+        {
+            Log::error('Unable to locate Campaign, campaign not found.');
+        }
+
+        return false;
+    }
 
 }

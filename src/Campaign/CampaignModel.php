@@ -5,10 +5,30 @@ use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpCampaignsEntryModel;
 
 class CampaignModel extends MailchimpCampaignsEntryModel implements CampaignInterface
 {
-
+    
+    /**
+     * getStrId
+     *
+     * @return void
+     */
     public function getStrId()
     {
         return $this->campaign_str_id;
+    }
+    
+    /**
+     * canEdit
+     *
+     * @return void
+     */
+    public function canEdit()
+    {
+        if($this->status == 'sent')
+        {
+            return false;
+        }
+
+        return true;
     }
 
 

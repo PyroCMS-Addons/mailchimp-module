@@ -2,7 +2,7 @@
 
 use Anomaly\Streams\Platform\Message\MessageBag;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
-use Thrive\MailchimpModule\Support\Harmony;
+use Thrive\MailchimpModule\Support\Integration\Audience;
 
 /**
  * AudienceFormBuilder
@@ -154,7 +154,7 @@ class AudienceFormBuilder extends FormBuilder
 
         if($this->can_post_to_mailchimp)
         {
-            if($item = Harmony::updateOnMailchimp($entry))
+            if(Audience::Sync($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
                 $entry->update(['thrive_sync_status' => 'Updated']);
@@ -166,8 +166,6 @@ class AudienceFormBuilder extends FormBuilder
 
             }
         }
-
         //$this->setFormResponse(redirect('admin/mailchimp/audiences'));
-   
     }
 }

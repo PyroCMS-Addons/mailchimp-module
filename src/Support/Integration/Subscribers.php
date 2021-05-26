@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Log;
 
 // Thrive
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
+use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
@@ -90,6 +91,37 @@ class Subscribers
             "email_address"     => $email,
             "status"            => $subscribe_string,
             "merge_fields"      => 
+            [
+                "FNAME" => $FNAME,
+                "LNAME" => $LNAME
+            ]
+        ];
+
+        return $contact;
+    }
+
+
+    public static function LocalhasSubscriber($email,$audience_id)
+    {
+        if($subscriber = SubscriberModel::where('email',$email)->where('audience',$audience_id)->first())
+        {
+            return $subscriber;
+        }
+
+        return false;
+    }
+
+
+    public static function PrepareContact($email, $subscribe = true, $FNAME = '', $LNAME = '')
+    {
+
+        $subscribe_string = ($subscribe) ? 'subscribed' : 'unsubscribed';
+
+        $contact = 
+        [
+            "email_address" => $email,
+            "status" => $subscribe_string,
+            "merge_fields" => 
             [
                 "FNAME" => $FNAME,
                 "LNAME" => $LNAME

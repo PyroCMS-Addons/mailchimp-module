@@ -2,6 +2,7 @@
 
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Message\MessageBag;
+use Illuminate\Support\Facades\Log;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;

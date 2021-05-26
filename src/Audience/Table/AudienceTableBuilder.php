@@ -37,9 +37,7 @@ class AudienceTableBuilder extends TableBuilder
         ],
         'thrive_sync_status',
         'str_id' => [
-            'wrapper' => '<a href="{{ url("admin/mailchimp/audiences/edit/{entry.id}") }}"
-                            data-toggle="modal"
-                            data-target="#modal">{entry.str_id}</a>',
+            'wrapper' => '<span class="tag tag-default">{entry.str_id}</span>',
         ]
     ];
 

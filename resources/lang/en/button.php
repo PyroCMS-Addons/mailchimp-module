@@ -10,6 +10,8 @@ return [
     'copy'                     => 'Copy',
     'start'                    => 'Start',
     'stop'                     => 'Stop',
+    'pause'                    => 'Pause',
     'push'                     => 'Push',
     'sync'                     => 'Sync',  
+    'send_test'                => 'Send Test',  
 ];

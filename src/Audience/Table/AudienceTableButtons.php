@@ -19,8 +19,8 @@ class AudienceTableButtons extends TableBuilder
             ],
             'sync' => 
             [
-                'type' => 'primary',
-                'attributes' => [
+                'type'          => 'primary',
+                'attributes'    => [
                     'data-toggle'  => 'confirm',
                     'data-message' => 'Are you sure ?'
                 ],

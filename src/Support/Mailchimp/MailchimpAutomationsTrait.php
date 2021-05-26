@@ -46,6 +46,15 @@ trait MailchimpAutomationsTrait
         try
         {
             $response = $this->mailchimp->automations->pauseAllEmails($workflow_id);
+            
+            // null is a successfull response
+            if($response == null)
+            {
+                if($automation = $this->getAutomation($workflow_id))
+                {
+                    return $automation;
+                }
+            }
 
             return $response;
         }
@@ -77,6 +86,34 @@ trait MailchimpAutomationsTrait
         {
             $response = $this->mailchimp->automations->startAllEmails($workflow_id);
 
+            // null is a successfull response
+            if($response == null)
+            {
+                if($automation = $this->getAutomation($workflow_id))
+                {
+                    return $automation;
+                }
+            }
+        }
+        catch (\Exception $e)
+        {
+            $status = false;
+        }
+
+        return false;
+    }
+
+
+    public function stopAutomation($workflow_id)
+    {
+        $response = null;
+
+        $status = true;
+
+        try
+        {
+            $response = $this->mailchimp->automations->archive($workflow_id);
+
             return $response;
         }
         catch (\Exception $e)
@@ -88,10 +125,10 @@ trait MailchimpAutomationsTrait
     }
 
 
-
     /**
      * hasAutomation
      *
+     * 
      * @param  mixed $workflow_id
      * @return bool
      */

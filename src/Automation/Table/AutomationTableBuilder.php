@@ -28,13 +28,14 @@ class AutomationTableBuilder extends TableBuilder
      *
      * @var array|string
      */
-    protected $columns = [
-        'automation_title',
-        'automation_workflow_id',
-        'automation_status',
-        'automation_start_time',
-        'automation_list_id',
-    ];
+    protected $columns = \Thrive\MailchimpModule\Automation\Table\AutomationTableColumns::class;
+    // [
+    //     'automation_title',
+    //     'automation_workflow_id',
+    //     'automation_status',
+    //     'automation_start_time',
+    //     'automation_list_id',
+    // ];
 
     /**
      * The table buttons.

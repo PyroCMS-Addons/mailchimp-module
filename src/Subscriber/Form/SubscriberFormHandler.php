@@ -1,14 +1,15 @@
 <?php namespace Thrive\MailchimpModule\Subscriber\Form;
 
+// Laravel
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+
+// Thrive
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
-use Thrive\MailchimpModule\Support\Harmony;
+use Thrive\MailchimpModule\Support\Integration\Subscribers;
 use Thrive\MailchimpModule\Support\Mailchimp;
-
-
 
 /**
  * Class SubscriberFormHandler
@@ -79,13 +80,11 @@ class SubscriberFormHandler
 
         if($this->testUserInput( $email, $strid, $action, $subscribe_flag ))
         {
-
             // Step 1: Update local Value
             $this->addUpdateLocalValue($strid, $email, $action_bool);
 
             // Step 2: Update Remote Value
             $this->pushToMailchimp($strid, $email, $action_bool);
-
         }
 
         return redirect()->back();
@@ -103,7 +102,7 @@ class SubscriberFormHandler
 
         Log::debug('  » 02 Local Entry         : BEGIN ');
 
-        if($subscriber = Harmony::hasSubscriber($email_adddress,$strid))
+        if($subscriber = Subscribers::LocalhasSubscriber($email_adddress, $strid))
         {
             Log::debug('        » Has Local        : YES');
             $subscriber->subscribed     = $subscribe;
@@ -124,7 +123,6 @@ class SubscriberFormHandler
         return true;
 
     }
-
 
 
     /**
@@ -166,7 +164,7 @@ class SubscriberFormHandler
         }
         else
         {
-            $contact = Harmony::prepareContact2($email_adddress, $subscribe );
+            $contact = Subscribers::PrepareContact($email_adddress, $subscribe );
 
             if($mailchimp->addContactToList($strid, $contact))
             {
@@ -182,8 +180,16 @@ class SubscriberFormHandler
 
     }
 
-
-
+    
+    /**
+     * testUserInput
+     *
+     * @param  mixed $email
+     * @param  mixed $strid
+     * @param  mixed $action
+     * @param  mixed $subscribe_flag
+     * @return void
+     */
     private function testUserInput( $email, $strid, $action, $subscribe_flag )
     {
         // dd($builder);
@@ -196,7 +202,7 @@ class SubscriberFormHandler
         Log::debug('        » Pass Email       : '. $pass_email);
 
         // Check to see if the strid is valid
-        $pass_strid = Harmony::hasAudience($strid);
+        $pass_strid = Audience::LocalHasAudience($strid);
         Log::debug('        » StrId            : '. $strid);
         Log::debug('        » Pass StrId       : '. $pass_strid);
 

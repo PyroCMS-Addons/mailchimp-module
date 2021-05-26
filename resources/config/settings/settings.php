@@ -23,6 +23,8 @@ return [
     "mailchimp_api_key" => [
         "type"   => "anomaly.field_type.text",
     ],
-   
+    "mailchimp_test_email" => [
+        "type"   => "anomaly.field_type.email",
+    ],
 ];
 

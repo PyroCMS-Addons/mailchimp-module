@@ -1,14 +1,17 @@
 <?php namespace Thrive\MailchimpModule\Automation\Table;
 
+// Anomaly
 use Anomaly\Streams\Platform\Entry\Contract\EntryInterface;
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
+
+// Thrive
 use Thrive\MailchimpModule\Automation\Table\AutomationTableBuilder;
 
 /**
  * AutomationTableButtons
  */
 class AutomationTableButtons extends TableBuilder
-{    
+{
     /**
      * handle
      *
@@ -17,42 +20,63 @@ class AutomationTableButtons extends TableBuilder
      */
     public function handle(AutomationTableBuilder $builder)
     {
-           
-        $builder->setButtons([  
-            'edit' => 
+        $builder->setButtons([
+            'edit' =>
             [
-                'type' => 'success',
+                'type'      => 'success',
+                'disabled'  => 'disabled', // while not developed lets keep it disabled
             ],
-            'start' => 
+            'start' =>
             [
                 'type' => 'info',
+                'icon' => 'fa fa-play',
                 'attributes' => [
                     'data-toggle'       => 'confirm',
                     'data-title'        => 'thrive.module.mailchimp::common.are_you_sure',
                     'data-message'      => 'thrive.module.mailchimp::common.are_you_sure_start_automation'
                 ],
                 'enabled'    => function (EntryInterface $entry) {
-                    if ($entry->status == 'sent') {
-                        return false;
+                    // true if
+                        // paused| save
+                    if (($entry->automation_status == 'save') || ($entry->automation_status == 'paused')) {
+                        return true;
                     }
-                    return true;
-                },                
+                    return false;
+                },
             ],
-            'stop' => 
+            'pause' =>
             [
-                'type' => 'danger',
+                'type' => 'warning',
+                'icon' => 'fa fa-pause',
                 'attributes' => [
                     'data-toggle'       => 'confirm',
                     'data-title'        => 'thrive.module.mailchimp::common.are_you_sure',
-                    'data-message'      => 'thrive.module.mailchimp::common.are_you_sure_stop_automation'
+                    'data-message'      => 'thrive.module.mailchimp::common.are_you_sure_start_automation'
                 ],
                 'enabled'    => function (EntryInterface $entry) {
-                    if ($entry->status == 'sent') {
-                        return false;
+                    // true if
+                        // sending
+                    if (($entry->automation_status == 'sending')) {
+                        return true;
                     }
-                    return true;
+                    return false;
                 },
-            ],            
+            ],
+            // 'delete' =>
+            // [
+            //     'type' => 'danger',
+            //     'attributes' => [
+            //         'data-toggle'       => 'confirm',
+            //         'data-title'        => 'thrive.module.mailchimp::common.are_you_sure',
+            //         'data-message'      => 'thrive.module.mailchimp::common.are_you_sure_stop_automation'
+            //     ],
+            //     'enabled'    => function (EntryInterface $entry) {
+            //         if (($entry->automation_status == 'paused') || ($entry->automation_status == 'save')) {
+            //             return true;
+            //         }
+            //         return false;
+            //     },
+            // ],
         ]);
 
     }

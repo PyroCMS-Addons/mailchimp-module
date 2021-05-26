@@ -19,7 +19,7 @@ return [
         'placeholder' => 'My Audience',
     ],
     'str_id' => [
-        'name' => 'String ID',
+        'name' => 'List-ID',
         'instructions' => 'The ID of the Audience',
         'placeholder' => 'You do not set this.',
     ],    

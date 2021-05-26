@@ -2,6 +2,7 @@
 
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
 use Thrive\MailchimpModule\Campaign\Table\CampaignTableButtons;
+use Thrive\PortfolioModule\Gallery\Table\CampaignTableColumns;
 
 class CampaignTableBuilder extends TableBuilder
 {
@@ -25,19 +26,8 @@ class CampaignTableBuilder extends TableBuilder
      *
      * @var array|string
      */
-    protected $columns = [
-        'campaign_name' => [
-            //'heading' => 'MC ID',
-            'wrapper' => '<a href="{{ url("admin/mailchimp/audiences/edit/{entry.id}") }}"
-                            data-toggle="modal"
-                            data-target="#modal">{entry.campaign_name}</a>',
-        ],
-        'campaign_type',
-        'list_id',
-        'campaign_str_id',
-        'campaign_sync_status',
-        'status',
-    ];
+    protected $columns = \Thrive\MailchimpModule\Campaign\Table\CampaignTableColumns::class;
+    
 
     /**
      * The table buttons.

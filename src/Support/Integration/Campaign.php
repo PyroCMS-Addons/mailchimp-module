@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Log;
 
 // Thrive
+use Thrive\MailchimpModule\Campaign\CampaignModel;
 use Thrive\MailchimpModule\Campaign\CampaignRepository;
 use Thrive\MailchimpModule\Campaign\Contract\CampaignInterface;
 use Thrive\MailchimpModule\Support\Mailchimp;
@@ -38,7 +39,35 @@ class Campaign
      * @param  mixed $entry
      * @return void
      */
-    public static function Sync(CampaignInterface $entry, CampaignRepository $repository )
+    public static function Sync(CampaignInterface $entry )
+    {
+        // Connect to Mailchimp
+        if($mailchimp = Mailchimp::Connect())
+        {
+            if($settings = self::PrepareCampaign($entry))
+            {
+                if($mailchimp->hasCampaign($entry->str_id))
+                {
+                    return $mailchimp->updateCampaign($entry->str_id, $settings);
+                }
+                else
+                {
+                    $mailchimp->createCampaign($settings);
+                }
+            }
+        }
+
+        return false;
+    }
+    
+
+    /**
+     * SyncAll
+     *
+     * @param  mixed $repository
+     * @return void
+     */
+    public static function SyncAll(CampaignRepository $repository )
     {
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
@@ -77,7 +106,7 @@ class Campaign
                             $item = new CampaignModel();
                             $item->campaign_name        = $campaign->settings->title;
                             $item->campaign_type        = $campaign->type;
-                            $item->list_id              =  $campaign->recipients->list_id;  
+                            $item->list_id              = $campaign->recipients->list_id;  
                             $item->campaign_sync_status = 'Synched';
                             $item->status               = $campaign->status;
                             $item->campaign_str_id      = $campaign->id;
@@ -85,17 +114,56 @@ class Campaign
                             // $item->update(['thrive_sync_status' => 'Just Created']);
                         }                
                     }
-    
                 }            
             }
         }
 
         return false;
+    }
+    
+        
+    /**
+     * Post local Campaig  to Mailchimp
+     * Override remote
+     *
+     * @param  mixed $entry
+     * @return void
+     */
+    public static function Post(CampaignInterface $entry )
+    {
+        // Connect to Mailchimp
+        if($mailchimp = Mailchimp::Connect())
+        {
+            if($settings = self::PrepareCampaign($entry))
+            {
+                if($mailchimp->hasCampaign($entry->str_id))
+                {
+                    return $mailchimp->updateCampaign($entry->str_id, $settings);
+                }
+                else
+                {
+                    $mailchimp->createCampaign($settings);
+                }
+            }
+        }
 
+        return false;
+    }
+
+    public static function PostAll(CampaignRepository $repository )
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+
+        }
+
+        return false;
     }
 
     /**
      * PostLocalEntryToMailchimp
+     * 
+     * @deprecated - use self::Post
      *
      * @param  mixed $entry
      * @return void
@@ -148,11 +216,24 @@ class Campaign
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            return $mailchimp->copyCampaign($entry->campaign_str_id);
+            if($newcampaign = $mailchimp->copyCampaign($entry->campaign_str_id))
+            {
+                // create local
+                $newcampaign = new CampaignModel;
+                $newcampaign->campaign_name             = $remote_campaign->settings->title;
+                $newcampaign->campaign_type             = $remote_campaign->type;
+                $newcampaign->list_id                   = $remote_campaign->recipients->list_id;
+                $newcampaign->campaign_sync_status      = 'Synchronized';
+                $newcampaign->status                    = $remote_campaign->status;
+                $newcampaign->campaign_str_id           = $remote_campaign->id;
+                $newcampaign->campaign_subject_line     = $remote_campaign->settings->subject_line;
+                $newcampaign->campaign_from_name        = $remote_campaign->settings->from_name;
+                $newcampaign->campaign_reply_to         = $remote_campaign->settings->reply_to;
+                $newcampaign->save();
+            }
         }
 
         return false;
-
     }
 
     
@@ -171,6 +252,69 @@ class Campaign
         }
 
         return false;
+
+    }
+    
+        
+    /**
+     * SendTest
+     *
+     * @param  mixed $entry
+     * @param  mixed $email_array
+     * @return void
+     */
+    public static function SendTest(CampaignInterface $entry, array $email_array)
+    {
+        // Connect to Mailchimp
+        if($mailchimp = Mailchimp::Connect())
+        {
+            return $mailchimp->sendTestCampaign($entry->campaign_str_id, $email_array);
+        }
+
+        return false;
+    }
+    
+
+
+    
+    /**
+     * PrepareCampaign
+     *
+     * @param  mixed $entry
+     * @return void
+     */
+    public static function PrepareCampaign(CampaignInterface $entry)
+    {
+
+        $settings = [];
+
+        // required for create
+        if(isset($entry->campaign_type) && $entry->campaign_type != "")
+        {
+            $settings["type"] = $entry->campaign_type;
+        }
+
+        if(isset($entry->campaign_subject_line) && $entry->campaign_subject_line != "")
+        {
+            $settings["subject_line"] = $entry->campaign_subject_line;
+        }
+
+        if(isset($entry->campaign_from_name) && $entry->campaign_from_name != "")
+        {
+            $settings["from_name"] = $entry->campaign_from_name;
+        }
+
+        if(isset($entry->campaign_reply_to) && $entry->campaign_reply_to != "")
+        {
+            $settings["reply_to"] = $entry->campaign_reply_to;
+        }
+
+        if(isset($entry->campaign_name) && $entry->campaign_name != "")
+        {
+            $settings["title"] = $entry->campaign_name;
+        }
+
+        return $settings;
 
     }    
 }

@@ -3,7 +3,6 @@
 use Anomaly\Streams\Platform\Message\MessageBag;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 use Illuminate\Support\Facades\Log;
-use Thrive\MailchimpModule\Support\Harmony;
 use Thrive\MailchimpModule\Support\Integration\Content;
 
 class ContentFormBuilder extends FormBuilder

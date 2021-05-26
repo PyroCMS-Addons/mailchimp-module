@@ -5,17 +5,17 @@ use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
 use Thrive\MailchimpModule\Campaign\Table\CampaignTableBuilder;
 
 class CampaignTableButtons extends TableBuilder
-{
+{    
+    /**
+     * handle
+     *
+     * @param  mixed $builder
+     * @return void
+     */
     public function handle(CampaignTableBuilder $builder)
     {
-           
-        // $buttons = [
-        //     'copy',
-        //     'edit',
-        // ];
-
-        $builder->setButtons([  
-            'send' => 
+        $builder->setButtons([
+            'send' =>
             [
                 'type' => 'info',
                 'attributes' => [
@@ -28,12 +28,32 @@ class CampaignTableButtons extends TableBuilder
                     }
                     return true;
                 },
-            ],            
-            'edit' => 
-            [
-                'type'      => 'success',            
             ],
-            'copy' => 
+            // 'send_test' =>
+            // [
+            //     'type' => 'info',
+            //     'attributes' => [
+            //         'data-toggle'  => 'confirm',
+            //         'data-message' => 'Are you sure ?'
+            //     ],
+            //     'enabled'    => function (EntryInterface $entry) {
+            //         if ($entry->status == 'sent') {
+            //             return false;
+            //         }
+            //         return true;
+            //     },
+            // ],
+            'edit' =>
+            [
+                'type'      => 'success',
+                'disabled'    => function (EntryInterface $entry) {
+                    if ($entry->status == 'sent') {
+                        return true;
+                    }
+                    return false;
+                },
+            ],
+            'copy' =>
             [
                 'type' => 'primary',
                 'attributes' => [

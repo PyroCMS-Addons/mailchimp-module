@@ -60,11 +60,19 @@ class CampaignsController extends AdminController
      * @param  mixed $id
      * @return void
      */
-    public function edit(CampaignFormBuilder $form, $id)
+    public function edit(CampaignFormBuilder $form, $id, MessageBag $messages)
     {
-
         if($campaign = CampaignModel::find($id))
         {
+            if(!$campaign->canEdit())
+            {
+                // @todo: add to lang files
+                $messages->error('This is locked');
+
+                //redirect away
+                return redirect()->back();
+            }
+
             if($result = Content::Get($campaign->campaign_str_id))
             {
                 return $form->render( $id , ['html' => $result->html]);
@@ -83,28 +91,13 @@ class CampaignsController extends AdminController
      * @param  mixed $id
      * @return void
      */
-    public function copy($id)
+    public function copy($id, MessageBag $messages)
     {
         if($campaign = CampaignModel::find($id))
         {
             if($remote_campaign = Campaign::Copy($campaign))
             {
-
-                // dd($remote_campaign);
-                // create local
-                $newcampaign = new CampaignModel;
-                $newcampaign->campaign_name     = $remote_campaign->settings->title;
-                $newcampaign->campaign_type     = $remote_campaign->type;
-                $newcampaign->list_id           = $remote_campaign->recipients->list_id;
-                $newcampaign->campaign_sync_status = 'Synched';
-                $newcampaign->status            = $remote_campaign->status;
-                $newcampaign->campaign_str_id   = $remote_campaign->id;
-
-                $newcampaign->campaign_subject_line     = $remote_campaign->settings->subject_line;
-                $newcampaign->campaign_from_name        = $remote_campaign->settings->from_name;
-                $newcampaign->campaign_reply_to         = $remote_campaign->settings->reply_to;
-                $newcampaign->save();
-
+                $messages->success('thrive.module.mailchimp::message.campaigns_sent');
             }
         }
 
@@ -121,7 +114,6 @@ class CampaignsController extends AdminController
      */
     public function send(CampaignFormBuilder $form, $id, MessageBag $messages)
     {
-        
         if($campaign = CampaignModel::find($id))
         {
             if(Campaign::Send($campaign))
@@ -132,8 +124,32 @@ class CampaignsController extends AdminController
 
         return redirect()->back();
     }
-
     
+    /**
+     * send_test
+     *
+     * @param  mixed $id
+     * @param  mixed $messages
+     * @return void
+     */
+    public function send_test($id, MessageBag $messages)
+    {
+        $settings = app(\Anomaly\SettingsModule\Setting\Contract\SettingRepositoryInterface::class);
+
+        if($campaign = CampaignModel::find($id))
+        {
+            $email = $settings->value('thrive.module.mailchimp::mailchimp_test_email');
+
+            if(Campaign::SendTest($campaign, [$email] ))
+            {
+                $messages->success('thrive.module.mailchimp::message.campaigns_sent');
+            }
+        }
+
+        return redirect()->back();
+    }
+    
+
     /**
      * sync
      *
@@ -141,12 +157,18 @@ class CampaignsController extends AdminController
      * @param  mixed $repository
      * @return void
      */
-    public function sync( MessageBag $messages, CampaignRepository $repository )
+    public function sync( $id = null, MessageBag $messages, CampaignRepository $repository )
     {
-
         if($campaign = CampaignModel::find($id))
         {
-            if(Campaign::Sync($campaign, $repository))
+            if(Campaign::Sync($campaign))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_campaigns');
+            }
+        }
+        else
+        {
+            if(Campaign::SyncAll($repository))
             {
                 $messages->success('thrive.module.mailchimp::common.now_synched_campaigns');
             }
