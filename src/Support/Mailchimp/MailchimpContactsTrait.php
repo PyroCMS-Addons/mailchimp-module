@@ -177,18 +177,26 @@ trait MailchimpContactsTrait
     }
 
 
+    
     /**
-     * add + subscribe
+     * addContactToList
+     *
+     * @param  mixed $list_id
+     * @param  mixed $contact
+     * @param  mixed $tags
+     * @return void
      */
-    public function addContactToList($list_id, $contact)
+    public function addContactToList($list_id, $contact, $tags = [])
     {
         $status = true;
+
+        $contact["tags"]              = $tags;
 
         try
         {
             $response = $this->mailchimp->lists->addListMember(
                 $list_id,
-                $contact
+                $contact,
             );
         }
         catch (\Exception $e)

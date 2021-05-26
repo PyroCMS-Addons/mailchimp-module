@@ -1,13 +1,14 @@
 <?php namespace Thrive\MailchimpModule\Subscriber\Form;
 
 // Laravel
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 // Thrive
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
+use Thrive\MailchimpModule\Support\Integration\Audience;
 use Thrive\MailchimpModule\Support\Integration\Subscribers;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
@@ -76,15 +77,15 @@ class SubscriberFormHandler
         $action             = $request->input('action');
         $action_bool        = ($action == 'subscribe') ? true : false ;
         $subscribe_flag     = ($action_bool) ? 'subscribed' : 'unsubscribed' ;
+        $tags               = $request->input('mc_tags');
 
-
-        if($this->testUserInput( $email, $strid, $action, $subscribe_flag ))
+        if($this->testUserInput( $email, $strid, $action, $subscribe_flag, $tags ))
         {
             // Step 1: Update local Value
-            $this->addUpdateLocalValue($strid, $email, $action_bool);
+            $this->addUpdateLocalValue($strid, $email, $action_bool, $tags);
 
             // Step 2: Update Remote Value
-            $this->pushToMailchimp($strid, $email, $action_bool);
+            $this->pushToMailchimp($strid, $email, $action_bool, $tags);
         }
 
         return redirect()->back();
@@ -97,7 +98,7 @@ class SubscriberFormHandler
      * @param $email_adddress   - @required     - Email address of user
      * @param $subscribe        - @required     - Should we subscribe or unsubscribe
      */
-    private function addUpdateLocalValue( $strid, $email_adddress, $subscribe)
+    private function addUpdateLocalValue( $strid, $email_adddress, $subscribe, $tags = null)
     {
 
         Log::debug('  » 02 Local Entry         : BEGIN ');
@@ -128,14 +129,12 @@ class SubscriberFormHandler
     /**
      * Step 2: add or Update the remote / MailChimp value
      */
-    private function pushToMailchimp( $strid, $email_adddress, $subscribe)
+    private function pushToMailchimp( $strid, $email_adddress, $subscribe, $tags = null)
     {
 
         Log::debug('  » 03 Remote Entry        : BEGIN ');
 
-
         $mailchimp = Mailchimp::Connect();
-
 
         // Step 1
         if($contact = $mailchimp->checkContactStatus($strid, $email_adddress))
@@ -160,13 +159,12 @@ class SubscriberFormHandler
                 //unexpected error
                 Log::debug('        » Unexpected Error : 3.2');
             }
-
         }
         else
         {
             $contact = Subscribers::PrepareContact($email_adddress, $subscribe );
 
-            if($mailchimp->addContactToList($strid, $contact))
+            if($mailchimp->addContactToList($strid, $contact, $tags))
             {
                 Log::debug('        » Push Status      : Added Success');
             }
@@ -190,7 +188,7 @@ class SubscriberFormHandler
      * @param  mixed $subscribe_flag
      * @return void
      */
-    private function testUserInput( $email, $strid, $action, $subscribe_flag )
+    private function testUserInput( $email, $strid, $action, $subscribe_flag, $tags = null )
     {
         // dd($builder);
         Log::debug('  » 01 Request Tests       : BEGIN   ');
@@ -218,6 +216,21 @@ class SubscriberFormHandler
         Log::debug('        » Sub Flag         : '. $subscribe_flag);
         Log::debug('        » Pass Sub Flag    : '. $pass_subflag);
 
+
+        // Check to see if we have any tags
+        if($tags && is_string($tags))
+        {
+            Log::debug('        » Tags Is String   : '. $tags);
+        }
+
+        if($tags && is_array($tags))
+        {
+            Log::debug('        » Tags Is Array    : ');
+            foreach($tags as $tag)
+            {
+                Log::debug('        » Tag              : '. $tag);
+            }
+        }
 
         if($pass_email && $pass_strid && $pass_action && $pass_subflag)
         {

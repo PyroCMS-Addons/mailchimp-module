@@ -1,5 +1,6 @@
 # Mailchimp for PyroCMS
 `thrive/mailchimp-module`
+
 [TOC]
 
 
@@ -33,14 +34,39 @@ THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
  3. Run install `php artisan addon:install thrive.module.mailchimp`
 
 
+# Plugin Usage
 
-## Subscribe Users
-In your view files, add the plugin ``` {{ subscribe('list-id') }}```
-Replace 'list-id' with the list/audience you would like users subscribed to.
+The plugin is very powerful however for the minimalist usage, use the below
 
-## Unsubscribe
-If yuou want to provide a unsubscribe widget on your site, add the following ``` {{ unsubscribe('list-id') }}```
+### Subscribe Form
+```
+	{{ mailchimp('subscribe').list('list-id')|raw }}
+```
 
+### Unsubscribe Form
+This works exactly the same way, just set the action to unsubscribe.
 
+```
+	{{ mailchimp('unsubscribe').list('list-id')|raw }}
+```
+
+### Advanced Usage
+With advanced plugin you can set the `tags` to be posted to Mailchimp,
+A title for the form, a complete seperate view file, or even require 
+a FNAME for mailchimp.
+```
+{{ mailchimp('subscribe')
+        .list('list-id')
+        .tag('single tag')
+        .tags(['more tags', 'third-tag string', 'of arrays'])
+        .title('Newsletter Signup')
+        .view('thrive.module.mailchimp::public.subscribe')
+        .useFname(false)|raw }}
+
+```
+
+### Plugin Limitation
+The plugin can send `tags` to Mailchimp during a subscribe, however these tags will not be stored on the local system. Development is planned to integrate the tags locally, however its not yet baked.
+Check back soon.
 
 

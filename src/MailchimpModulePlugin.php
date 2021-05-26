@@ -1,16 +1,19 @@
 <?php namespace Thrive\MailchimpModule;
 
 // Laravel
+use Anomaly\Streams\Platform\Addon\Plugin\Plugin;
+use Anomaly\Streams\Platform\Support\Collection;
+use Anomaly\Streams\Platform\Support\Decorator;
+
+// Anomaly
+use Anomaly\Streams\Platform\Support\Presenter;
 use Illuminate\Support\Str;
 use Illuminate\View\Factory;
 
-// Anomaly
-use Anomaly\Streams\Platform\Support\Decorator;
-use Anomaly\Streams\Platform\Support\Presenter;
-use Anomaly\Streams\Platform\Addon\Plugin\Plugin;
-
 // Thrive
 use Thrive\MailchimpModule\Audience\Contract\AudienceRepositoryInterface;
+use Thrive\MailchimpModule\MailchimpModuleCriteria;
+use Thrive\MailchimpModule\Plugin\RenderPlugin;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormHandler;
 
@@ -33,43 +36,7 @@ use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormHandler;
  */
 class MailchimpModulePlugin extends Plugin
 {
-
-    /**
-     * audiences
-     *
-     * @var mixed
-     */
-    protected $audiences;
-
-
-
-    /**
-     * decorator
-     *
-     * @var mixed
-     */
-    protected $decorator;
-
-
-
-    /**
-     * __construct
-     *
-     * @return void
-     */
-    public function __construct(
-            AudienceRepositoryInterface $audiences,
-            Decorator $decorator,
-            Factory $view)
-            {
-
-        $this->view             = $view;
-        $this->audiences        = $audiences;
-        $this->decorator        = $decorator;
-    }
-
-
-
+ 
     /**
      * getFunctions
      *
@@ -81,95 +48,30 @@ class MailchimpModulePlugin extends Plugin
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('subscribe',   [$this, 'subscribe'],   ['is_safe' => ['html']]),
-            new \Twig_SimpleFunction('unsubscribe', [$this, 'unsubscribe'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('mailchimp_version',   [$this, 'mc_version'],   ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction(
+                'mailchimp',
+                function ($root = null) {
+                    return (new MailchimpModuleCriteria(
+                        'render',
+                        function (Collection $options) use ($root) {
+
+                            if ($root) {
+                                //add subscribe or unsubscribe
+                                $options->put('action', $root);
+                            }
+
+                            return $this->dispatch(new RenderPlugin($options));
+                        }
+                    ));
+                }
+            ),            
         ];
     }
 
-
-
-    /**
-     * subscribe
-     *
-     * @param  mixed $str_id
-     * @return null|string
-     *
-     * Currently the plugin works like so;
-     *      <code>{{ subscribe('list-id') }}</code>
-     *
-     * However we want it to work like this..
-     * More research is needed.
-     *      <code>{{ mailchimp().subscribe('list-id') }}</code>
-     */
-    public function subscribe($str_id)
+    public function mc_version()
     {
-
-        //
-        // if its not a valid Audience
-        // Then we need to abort
-        //
-        if (!$audience = $this->audiences->findByStrId($str_id)) {
-            // return '[Not Found]';
-            return null;
-        }
-
-        return $this->decorator->decorate(
-            $this
-                ->view
-                ->make(
-                    'thrive.module.mailchimp::public.subscribe',
-                    [
-                        'strid'             => $audience->getStrid(),
-                        'title'             => 'Subscribe',
-                        'action'            => 'subscribe',
-                        'btn_text'          => 'Subscribe',
-                        'handler_url'       => 'mailchimp/handler/subscribe',
-                    ]
-                )->render()
-            );
-
+        return 'Version';
     }
 
-
-    /**
-     * unsubscribe
-     *
-     * @param  mixed $str_id
-     * @return null|string
-     *
-     * Currently the plugin works like so;
-     *      <code>{{ unsubscribe('list-id') }}</code>
-     *
-     * However we want it to work like this..
-     * More research is needed.
-     *      <code>{{ mailchimp().unsubscribe('list-id') }}</code>
-     */
-    public function unsubscribe($str_id)
-    {
-
-        //
-        // if its not a valid Audience
-        // Then we need to abort
-        //
-        if (!$audience = $this->audiences->findByStrId($str_id)) {
-            // return '[Not Found]';
-            return null;
-        }
-
-        return $this->decorator->decorate(
-            $this
-                ->view
-                ->make(
-                    'thrive.module.mailchimp::public.subscribe',
-                    [
-                        'strid'             => $audience->getStrid(),
-                        'title'             => 'Un Subscribe',
-                        'action'            => 'unsubscribe',
-                        'btn_text'          => 'Unsubscribe',
-                        'handler_url'       => 'mailchimp/handler/subscribe',
-                    ]
-                )->render()
-            );
-
-    }
 }
