@@ -75,13 +75,15 @@ class CampaignsController extends AdminController
 
             if($result = Content::Get($campaign->campaign_str_id))
             {
-                return $form->render( $id , ['html' => $result->html]);
+                // $form->getForm()->addData('email_template',$result->html);
+                $form->addFormData('email_template',$result->html);
+                // $form->getForm()->addData('id',$id);
+                $form->addFormData('id',$id);
+
+                return $form->render( $id );
             }
         }
-
-        // the following view is a good for a popup
-        // return view('thrive.module.mailchimp::admin.content.view')->withContent($html->result);
-            
+  
         return $form->render( $id );
     } 
     

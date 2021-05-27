@@ -1,10 +1,24 @@
 # Mailchimp for PyroCMS
+##### PyroCMS Mailchimp Integration Module
+
+
 `thrive/mailchimp-module`
 
 [TOC]
 
 
-PyroCMS Mailchimp Integration Module
+#### Version 1.0.0
+
+*thrive.module.subscriptions*
+
+
+### Requirements
+
+- PyroCMS 3.9 
+- PHP 7.2^
+
+
+
 
 ## About
 The Mailchimp Module integrates your Mailchimp Campaigns and allows you to Update campaign, send, and duplicate campaigns all within PyroCMS admin. It also has a Plugin so you can directly subscribe users and keep your subscribers in sync with Mailchimps Audience/List.
@@ -70,3 +84,10 @@ The plugin can send `tags` to Mailchimp during a subscribe, however these tags w
 Check back soon.
 
 
+
+### Task Scheduling
+Mailchimp Module uses Laravel + Pyro task scheduler to keep data in sync autoamtically, (depending on your time frequence).
+
+We recomend a single Weekly Sync. This sync pulls infor down from MC and merges with existing data. No data is Pushed to MC.
+
+You can set the interval in the ServiceProvider.

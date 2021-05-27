@@ -16,7 +16,14 @@ return [
         'instructions' => 'The email address to use for test emails',
         'placeholder' => '',
     ],  
+    'mailchimp_sync_interval' => [
+        'name' => 'Sync Interval',
+        'instructions' => 'How frequent do you want to Auto-Sync data',
+        'placeholder' => '',
+    ],  
 
+
+    
     
     
 ];

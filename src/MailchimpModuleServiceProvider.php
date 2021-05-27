@@ -60,14 +60,30 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 *
 	 * @type array|null
 	 */
-	protected $commands = [];
-
+    protected $commands = [
+		\Thrive\MailchimpModule\Tasks\HouseKeeping::class,       
+    ];
 	/**
 	 * The addon's scheduled commands.
+	 * 
+	 * @see https://laravel.com/docs/8.x/scheduling#preventing-task-overlaps
+	 * 
+	 * Depending on your needs
+	 * ----------------------
+	 * everyMinute
+	 * everySixHours
+	 * monthly
+	 * quarterly
+	 * weekly
+	 * yearly
 	 *
 	 * @type array|null
 	 */
-	protected $schedules = [];
+    protected $schedules = [
+        'everySixHours' => [ 
+            \Thrive\MailchimpModule\Tasks\HouseKeeping::class,
+        ],        				     
+    ];
 
 	/**
 	 * The addon API routes.

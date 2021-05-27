@@ -216,7 +216,7 @@ class Campaign
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            if($newcampaign = $mailchimp->copyCampaign($entry->campaign_str_id))
+            if($remote_campaign = $mailchimp->copyCampaign($entry->campaign_str_id))
             {
                 // create local
                 $newcampaign = new CampaignModel;

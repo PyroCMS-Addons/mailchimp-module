@@ -26,5 +26,25 @@ return [
     "mailchimp_test_email" => [
         "type"   => "anomaly.field_type.email",
     ],
+    'mailchimp_sync_interval' => [
+        "type"   => "anomaly.field_type.select",
+        "config" => [
+            "options"       =>
+            [
+                "everyMinute"   => "Every Minute",
+                "everySixHours" => "Every Six Hours",
+                "daily"         => "Daily",
+                "weekly"        => "Weekly",
+                "monthly"       => "Monthly",
+                "quarterly"     => "Quarterly",
+                "yearly"        => "Yearly",
+            ],
+            "separator"     => ":",
+            "default_value" => 'weekly',
+            "button_type"   => "info",
+            "handler"       => "options",
+            "mode"          => "dropdown",
+        ]
+    ],    
 ];
 

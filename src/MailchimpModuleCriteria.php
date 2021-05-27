@@ -2,11 +2,8 @@
 
 use Anomaly\Streams\Platform\Addon\Plugin\PluginCriteria;
 
-
 class MailchimpModuleCriteria extends PluginCriteria
 {
-
-
     public function list($list_id)
     {
         $this->options['action']            = 'subscribe'; // subscribe || unsubscribe

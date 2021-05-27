@@ -121,7 +121,7 @@ class Audience
                     {
                         // Local List not found, so lets create 
                         // one to keep it in sync.
-                        if(self::createLocalFromRemote($remote_list))
+                        if($item = self::createLocalFromRemote($remote_list))
                         {
                             $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
                         }
@@ -153,6 +153,8 @@ class Audience
                 }
 
             }
+
+            return true;
         }
 
         return false;
