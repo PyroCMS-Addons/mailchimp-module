@@ -54,6 +54,66 @@ class CampaignsController extends AdminController
 
     
     /**
+     * option
+     * @todo    Will need to rename this method to 
+     *          choose for best practice.
+     *
+     * @param  mixed $method
+     * @param  mixed $id
+     * @param  mixed $messages
+     * @return void
+     */
+    public function option($method = 'edit', $id, MessageBag $messages)
+    {
+        // create a method that resolves
+        //which function the campaign \
+        // can perform to replace
+        // the below code.
+        $actions = 
+        [
+            'edit' =>
+            [
+                'name'          => 'Edit Camapign',
+                'slug'          => 'edit',
+                'description'   => 'Edit the Camapign',
+                'url'           => 'admin/mailchimp/campaigns/edit/' . $id,
+            ],
+            'send' =>
+            [
+                'slug'          => 'send',
+                'name'          => 'Send Camapign',
+                'description'   => 'Send the Camapign',
+                'url'           => 'admin/mailchimp/campaigns/send/' . $id,
+            ],
+            'send_test' =>
+            [
+                'slug'          => 'send_test',
+                'name'          => 'Send a Test',
+                'description'   => 'Send a test to the Camapign Test email address',
+                'url'           => 'admin/mailchimp/campaigns/send_test/' . $id,
+            ],            
+            'copy' =>
+            [
+                'slug'          => 'copy',
+                'name'          => 'Duplicate Camapign',
+                'description'   => 'Duplicate/Copy the Camapign',
+                'url'           => 'admin/mailchimp/campaigns/copy/' . $id,
+            ],            
+        ];
+
+        return $this->view->make(
+            'module::admin/campaigns/preview',
+            [
+                'id'            => $id,
+                'method'        => $method,
+                'actions'       => $actions,
+            ]
+        );
+    } 
+
+
+    
+    /**
      * edit
      *
      * @param  mixed $form

@@ -49,14 +49,15 @@ class CampaignTableColumns
                         {
                             case 'sent':
                                 $status_color = 'danger';
-                                $status_text  = 'Completed';
-
+                                $status_text  = 'Completed (Sent)';
                                 break;
-                            case 'saved':
+                            case 'save':
                                 $status_color = 'success';
+                                $status_text  = 'Active (Saved)';
                                 break; 
                             default:                               
-                                $status_color = 'info';
+                                $status_color = 'success';
+                                $status_text  = 'Active (Draft)' . $entry->status;
                         }
 
                         return "<span class='tag tag-{$status_color}'>{$status_text}</span>";

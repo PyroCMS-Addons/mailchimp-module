@@ -68,6 +68,7 @@ class MailchimpModule extends Module
                     'type' => 'primary',
                     'icon' => 'refresh',
                     'attributes' => [
+                        'data-icon'     => 'warning',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
                         'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_automations'
@@ -83,6 +84,7 @@ class MailchimpModule extends Module
                     'type' => 'primary',
                     'icon' => 'refresh',
                     'attributes' => [
+                        'data-icon'     => 'warning',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
                         'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_campaigns'
@@ -97,6 +99,7 @@ class MailchimpModule extends Module
                     'type' => 'success',
                     'icon' => 'fa fa-user',
                     'attributes' => [
+                        'data-icon'     => 'warning',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
                         'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_add_subscribers'
@@ -107,6 +110,7 @@ class MailchimpModule extends Module
                     'type' => 'primary',
                     'icon' => 'refresh',
                     'attributes' => [
+                        'data-icon'     => 'warning',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
                         'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_pull_subscribers'
@@ -117,6 +121,7 @@ class MailchimpModule extends Module
                     'type' => 'danger',
                     'icon' => 'fa fa-server',
                     'attributes' => [
+                        'data-icon'     => 'warning',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
                         'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_push_subscribers'

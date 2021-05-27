@@ -53,6 +53,34 @@ class CampaignTableButtons extends TableBuilder
                     return false;
                 },
             ],
+            'actions' =>
+            [
+                'text'    => 'Actions',
+                'data-toggle' => 'modal',
+                'data-target' => '#modal',
+                'href'        => 'admin/mailchimp/campaigns/option/edit/{entry.id}',                
+                'type'       => 'info',
+                'enabled'    => function (EntryInterface $entry) {
+                    if ($entry->status == 'save') {
+                        return true;
+                    }
+                    return false;
+                },
+            ],    
+            // 'preview' =>
+            // [
+            //     'text'    => 'Preview',
+            //     'data-toggle' => 'modal',
+            //     'data-target' => '#modal',
+            //     'href'        => 'admin/mailchimp/campaigns/option/edit/{entry.id}',                
+            //     'type'       => 'info',
+            //     'enabled'    => function (EntryInterface $entry) {
+            //         if ($entry->status == 'save') {
+            //             return true;
+            //         }
+            //         return false;
+            //     },
+            // ],                       
             'copy' =>
             [
                 'type' => 'primary',

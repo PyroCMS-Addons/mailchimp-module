@@ -116,6 +116,7 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 		'admin/mailchimp/campaigns'                 => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@index',
 		'admin/mailchimp/campaigns/create'          => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@create',
 		'admin/mailchimp/campaigns/edit/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@edit',
+		'admin/mailchimp/campaigns/option/{option}/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@option',
 
 		// Settings
 		'admin/mailchimp/settings'                  => 'Thrive\MailchimpModule\Http\Controller\Admin\SettingsController@edit',
