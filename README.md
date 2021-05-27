@@ -1,5 +1,5 @@
 # Mailchimp for PyroCMS
-##### PyroCMS Mailchimp Integration Module
+PyroCMS Mailchimp Integration Module
 
 
 `thrive/mailchimp-module`
@@ -7,31 +7,25 @@
 [TOC]
 
 
-#### Version 1.0.0
+#### Version 1.0.0 (Alpha-2)
 
 *thrive.module.subscriptions*
 
 
-### Requirements
+#### Requirements
 
 - PyroCMS 3.9 
 - PHP 7.2^
 
-### Build Status
+#### Build Status
 Please note, while this module is still in alpha, any code updates you receive, please uninstall and reinstall the module. There will be no upgrade path while under heavy development.
 
 
-## About
+#### About
 The Mailchimp Module integrates your Mailchimp Campaigns and allows you to Update campaign, send, and duplicate campaigns all within PyroCMS admin. It also has a Plugin so you can directly subscribe users and keep your subscribers in sync with Mailchimps Audience/List.
 
 
-## Development
-Please not, this module is currently in `alpha` and undergoing some refactoring. 
-Current version is 1.0.0.
-
-We are also working on Template & Content integration so you can create ytour newsletters and email templates all within Pyro, so you can perform all major tasks within the Pyro inteface.
-
-## Quick Start
+# Quick Start
 1. You need to get your API key from Mailchimp, you can read about it here [https://mailchimp.com/help/about-api-keys/]
 2. You also need to get the Server Prefix which looks like this `us19`, when you log into Mailchimp it will be the first part of the domain.
 3. Update your ENV File with these details.
@@ -47,9 +41,10 @@ THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
  1. Add to your addons directory as `/addons/default/thrive/mailchimp-module/*`
  2. Dump Autoloader `composer dump-autoload`
  3. Run install `php artisan addon:install thrive.module.mailchimp`
+ 4. Once you have connected your API key, run this command: `php artisan mailchimp:sync`
 
 
-# Plugin Usage
+## Plugin Usage
 
 The plugin is very powerful however for the minimalist usage, use the below
 
@@ -86,11 +81,12 @@ Check back soon.
 
 
 
-### Task Scheduling
-Mailchimp Module uses Laravel + Pyro task scheduler to keep data in sync autoamtically, (depending on your time frequence).
+# Task Scheduling
 
-We recomend a single Weekly Sync. This sync pulls infor down from MC and merges with existing data. No data is Pushed to MC.
+`php artisan mailchimp:tidy`
 
-You can set the interval in the ServiceProvider.
+Mailchimp Module uses Laravel + Pyro task scheduler to keep data in sync autoamtically.
 
-To Start the Schedule, type in the Command console: `php artisan mailchimp:tidy`
+To Start the Schedule, run the above command.
+
+Future builds will allow you to set the frequence within the command and also via the settins.
