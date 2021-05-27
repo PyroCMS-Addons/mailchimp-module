@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Log;
 
 // Thrive
 use Thrive\MailchimpModule\Audience\AudienceRepository;
+use Thrive\MailchimpModule\Audience\Contract\AudienceInterface;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
@@ -36,7 +37,7 @@ class Subscribers
 
     const MEMBER_SUBSCRIBED     = 'subscribed';
     const MEMBER_UNSUBSCRIBED   = 'unsubscribed';
-    
+
     /**
      * Sync
      * @todo Needs implementastion
@@ -57,10 +58,11 @@ class Subscribers
 
     /**
      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     * 
+     *
      * This is a mess, but better than back in the controller class
      * Needs rework!
-     * 
+     * Still a wip
+     *
      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      */
     public static function SyncAll( AudienceRepository $repository )
@@ -90,35 +92,15 @@ class Subscribers
                             foreach($lists->members as $member)
                             {
                                 // Do we have on in our table ?
-                                // remember it has to match the EMAIL and List/Audience to be a match
-                                if($model = SubscriberModel::where('audience',$local->str_id)->where('email',$member->email_address)->first())
+                                if($subscriber = SubscriberModel::where('audience',$local->str_id)->where('email',$member->email_address)->first())
                                 {
-                                    // update
-                                    $model->email                   = $member->email_address;
-                                    $model->thrive_contact_synced   = true;
-                                    $model->audience                = $local->str_id;
-                                    $model->subscribed              = ($member->status == 'subscribed') ? true: false ;
-                                    $model->audience_name           = $local->name ;
-
-                                    // dd($member);
-                                    $model->fname                   = $member->merge_fields->FNAME ;
-                                    $model->lname                   = $member->merge_fields->LNAME ;
-                                    $model->save();
+                                    self::UpdateLocalSubscriberFromRemote( $subscriber, $member, $local )
                                 }
                                 else
                                 {
                                     // create
-                                    $model = new SubscriberModel();
-                                    $model->email                   = $member->email_address;
-                                    $model->thrive_contact_synced   = true;
-                                    $model->audience                = $local->str_id;
-                                    $model->subscribed              = ($member->status == 'subscribed') ? true: false ;
-                                    $model->audience_name           = $local->name ;
-                                    $model->fname                   = $member->merge_fields->FNAME ;
-                                    $model->lname                   = $member->merge_fields->LNAME ;
-                                    $model->save();
+                                    self::CreateLocalSubscriberFromRemote( $member, $local );
                                 }
-
                             }
                         }
                         else
@@ -132,9 +114,7 @@ class Subscribers
                         //oops we did not expect this.
                         //report issue and rediurect away
                     }
-
                 }
-
             }
 
             return true;
@@ -143,7 +123,7 @@ class Subscribers
         return false;
     }
 
-        
+
     /**
      * Post
      *
@@ -155,7 +135,7 @@ class Subscribers
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            // Check to ensure mailchimp still 
+            // Check to ensure mailchimp still
             // has this list.
             if($mailchimp->hasList($entry->audience))
             {
@@ -165,9 +145,9 @@ class Subscribers
 
                 //Log::info('Pushing Contact: '. $entry->fname);
                 return $mailchimp->setListMemberWithMergeFields(
-                                                        $entry->audience, 
-                                                        $entry->email, 
-                                                        $entry->subscribed, 
+                                                        $entry->audience,
+                                                        $entry->email,
+                                                        $entry->subscribed,
                                                         $fname,
                                                         $lname);
             }
@@ -191,26 +171,26 @@ class Subscribers
 
             // this is not an effecient way to iterate
             $local = $repository->all();
-    
+
             // dd($local);
             foreach($local as $subscriber)
             {
                 Log::debug('  » 00 Pushing User        : ' . $subscriber->email);
-    
+
                 self::PostSubscriberToMailchimp($subscriber);
             }
 
             return true;
-            
+
         }
 
         return false;
     }
 
-    
+
     /**
      * PostSubscriberToMailchimp
-     * 
+     *
      * @deprecated Post() and PostAll() has replaced this method
      * @see self::Post()
      *
@@ -222,7 +202,7 @@ class Subscribers
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            // Check to ensure mailchimp still 
+            // Check to ensure mailchimp still
             // has this list.
             if($mailchimp->hasList($entry->audience))
             {
@@ -232,9 +212,9 @@ class Subscribers
 
                 //Log::info('Pushing Contact: '. $entry->fname);
                 return $mailchimp->setListMemberWithMergeFields(
-                                                        $entry->audience, 
-                                                        $entry->email, 
-                                                        $entry->subscribed, 
+                                                        $entry->audience,
+                                                        $entry->email,
+                                                        $entry->subscribed,
                                                         $fname,
                                                         $lname);
             }
@@ -243,7 +223,7 @@ class Subscribers
         return false;
 
     }
-    
+
     /**
      * FormatContact
      *
@@ -262,11 +242,11 @@ class Subscribers
 
         $subscribe_string = ($subscribe) ? self::MEMBER_SUBSCRIBED : self::MEMBER_UNSUBSCRIBED;
 
-        $contact = 
+        $contact =
         [
             "email_address"     => $email,
             "status"            => $subscribe_string,
-            "merge_fields"      => 
+            "merge_fields"      =>
             [
                 "FNAME" => $FNAME,
                 "LNAME" => $LNAME
@@ -293,11 +273,11 @@ class Subscribers
 
         $subscribe_string = ($subscribe) ? 'subscribed' : 'unsubscribed';
 
-        $contact = 
+        $contact =
         [
             "email_address" => $email,
             "status" => $subscribe_string,
-            "merge_fields" => 
+            "merge_fields" =>
             [
                 "FNAME" => $FNAME,
                 "LNAME" => $LNAME
@@ -306,4 +286,72 @@ class Subscribers
 
         return $contact;
     }
+
+    /**
+     * CreateLocalSubscriberFromRemote
+     *
+     * @param  mixed $remote
+     * @param  mixed $list
+     * @return void
+     */
+    public static function CreateLocalSubscriberFromRemote( $remote, AudienceInterface $list )
+    {
+        try
+        {
+            // create
+            $local = new SubscriberModel();
+            $local->email                   = $remote->email_address;
+            $local->thrive_contact_synced   = true;
+            $local->audience                = $list->str_id;
+            $local->subscribed              = ($remote->status == 'subscribed') ? true: false ;
+            $local->audience_name           = $list->name ;
+            $local->fname                   = $remote->merge_fields->FNAME ;
+            $local->lname                   = $remote->merge_fields->LNAME ;
+            $local->save();
+
+            return true;
+        }
+        catch(\Exceeption $e)
+        {
+            //can we delete what we created ?
+        }
+
+        return false;
+    }
+
+    
+    /**
+     * UpdateLocalSubscriberFromRemote
+     *
+     * @param  mixed $subscriber
+     * @param  mixed $remote
+     * @param  mixed $list
+     * @return void
+     */
+    public static function UpdateLocalSubscriberFromRemote( SubscriberInterface $subscriber, $remote, AudienceInterface $list )
+    {
+        try
+        {
+            // update
+            $subscriber->email                   = $remote->email_address;
+            $subscriber->thrive_contact_synced   = true;
+            $subscriber->audience                = $list->str_id;
+            $subscriber->subscribed              = ($remote->status == 'subscribed') ? true: false ;
+            $subscriber->audience_name           = $list->name ;
+
+            $subscriber->fname                   = $remote->merge_fields->FNAME ;
+            $subscriber->lname                   = $remote->merge_fields->LNAME ;
+            $subscriber->save();
+
+            return true;
+        }
+        catch(\Exceeption $e)
+        {
+            //can we delete what we created ?
+        }
+
+        return false;
+    }
+
+
 }
