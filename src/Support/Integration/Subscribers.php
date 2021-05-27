@@ -8,6 +8,7 @@ use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
+use Thrive\MailchimpModule\Support\Integration\Subscribers;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
@@ -62,7 +63,7 @@ class Subscribers
      * 
      * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      */
-    public static function SyncAll(AudienceRepository $repository )
+    public static function SyncAll( AudienceRepository $repository )
     {
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
@@ -141,10 +142,77 @@ class Subscribers
 
         return false;
     }
+
+        
+    /**
+     * Post
+     *
+     * @param  mixed $entry
+     * @return void
+     */
+    public static function Post(SubscriberInterface $entry)
+    {
+        // Connect to Mailchimp
+        if($mailchimp = Mailchimp::Connect())
+        {
+            // Check to ensure mailchimp still 
+            // has this list.
+            if($mailchimp->hasList($entry->audience))
+            {
+                // update contact
+                $fname = ($entry->fname != "") ? $entry->fname : null ;
+                $lname = ($entry->lname != "") ? $entry->lname : null ;
+
+                //Log::info('Pushing Contact: '. $entry->fname);
+                return $mailchimp->setListMemberWithMergeFields(
+                                                        $entry->audience, 
+                                                        $entry->email, 
+                                                        $entry->subscribed, 
+                                                        $fname,
+                                                        $lname);
+            }
+        }
+
+        return false;
+
+    }
+
+
+    /**
+     * PostAll
+     *
+     * @return void
+     */
+    public static function PostAll( SubscriberRepository $repository )
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            Log::debug('--- [ Begin ] ---  Subscribers::PostAll ');
+
+            // this is not an effecient way to iterate
+            $local = $repository->all();
     
+            // dd($local);
+            foreach($local as $subscriber)
+            {
+                Log::debug('  » 00 Pushing User        : ' . $subscriber->email);
+    
+                self::PostSubscriberToMailchimp($subscriber);
+            }
+
+            return true;
+            
+        }
+
+        return false;
+    }
+
     
     /**
      * PostSubscriberToMailchimp
+     * 
+     * @deprecated Post() and PostAll() has replaced this method
+     * @see self::Post()
      *
      * @param  mixed $entry
      * @return void
