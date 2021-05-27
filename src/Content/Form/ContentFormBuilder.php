@@ -14,19 +14,7 @@ class ContentFormBuilder extends FormBuilder
      * @var array|string
      */
     protected $fields = [
-        '*',
-        'campaign_str_id' => [
-            'disabled' => 'edit',
-        ],
-        'campaign_sync_status' => [
-            'disabled' => 'edit',
-        ],
-        'campaign_type' => [
-            'disabled' => 'edit',
-        ],
-        'list_id' => [
-            'disabled' => 'edit',
-        ],    
+        '*'
     ];
 
     /**
@@ -72,52 +60,10 @@ class ContentFormBuilder extends FormBuilder
      *
      * @var array
      */
-    protected $sections = [
-        'metafield'   => [
-            'stacked' => false,
-            'tabs' => [
-                'general' => [
-                    'title'  => 'Content',
-                    'fields' => [
-                        'campaign_name',
-                        'campaign_subject_line',
-                    ],
-                ],   
-                'details2' => [
-                    'title'  => 'Reply To',
-                    'fields' => [
-                        'campaign_reply_to',
-                    ],
-                ],   
-                'details' => [
-                    'title'  => 'From',
-                    'fields' => [
-                        'campaign_from_name',
-                    ],
-                ],                  
-                'locked_fields' => [
-                    'title'  => 'Locked Details',                  
-                    'fields' => [
-                        'campaign_str_id',
-                        'campaign_sync_status',
-                        'thrive_sync_status',
-                        'campaign_type',
-                        'list_id',
-                    ],
-                ],                 
-                'viewtab' => [
-                    'title'  => 'Actions',
-                    'view' => [
-                        'module::admin.tabs.campaign-actions',
-                    ],
-                ],                                                                               
-            ],
-        ],        
-    ];
+    protected $sections = [];
 
 
     //protected $handler = \Thrive\MailchimpModule\Content\Form\ContentFormHandler::class;
-
 
 
     /**
@@ -130,45 +76,5 @@ class ContentFormBuilder extends FormBuilder
 
     protected $can_post_to_mailchimp;
 
-
-   
-    /**
-     * Push to Mailchimp
-     */
-    public function onSaving(MessageBag $messages)
-    {
-        Log::debug('--- [ Begin ] ---  ContentFormBuilder::onSaving ');
-
-        // $new_name    = $this->getRequestValue('thrive_sync_status');
-
-        $this->can_post_to_mailchimp = true;
-
-    }
-
-
-    public function onSaved(MessageBag $messages)
-    {
-        $entry = $this->getFormEntry();
-
-        Log::debug('--- [ Begin ] ---  ContentFormBuilder::onSaved ');
-
-        Log::debug('  » 00 Pushing Content    : ' . $entry->campaign_name . ' || '. $entry->campaign_str_id );
-
-
-        if($this->can_post_to_mailchimp)
-        {
-             if($item = Content::PostLocalEntryToMailchimp($entry))
-            {
-                $messages->info('Successfully POSTED to Mailchimp');
-                $entry->update(['campaign_sync_status' => 'Updated']);
-            }
-            else 
-            {
-                $messages->error('Failed to POST to Mailchimp');
-                $entry->update(['campaign_sync_status' => 'Post Failed']);
-            }
-        }
-
-    }
 
 }

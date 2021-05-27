@@ -17,7 +17,8 @@
 - PyroCMS 3.9 
 - PHP 7.2^
 
-
+### Build Status
+Please note, while this module is still in alpha, any code updates you receive, please uninstall and reinstall the module. There will be no upgrade path while under heavy development.
 
 
 ## About

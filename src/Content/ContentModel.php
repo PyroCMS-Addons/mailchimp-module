@@ -21,14 +21,6 @@ use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpContentsEntryModel;
 class ContentModel extends MailchimpContentsEntryModel implements ContentInterface
 {
     
-    /**
-     * getStrId
-     *
-     * @return void
-     */
-    public function getStrId()
-    {
-        return $this->campaign_str_id;
-    }
+
 
 }
