@@ -7,6 +7,7 @@ use Thrive\MailchimpModule\Campaign\CampaignModel;
 use Thrive\MailchimpModule\Campaign\CampaignRepository;
 use Thrive\MailchimpModule\Campaign\Form\CampaignFormBuilder;
 use Thrive\MailchimpModule\Campaign\Table\CampaignTableBuilder;
+use Thrive\MailchimpModule\Content\Form\ContentFormBuilder;
 use Thrive\MailchimpModule\Support\Integration\Campaign;
 use Thrive\MailchimpModule\Support\Integration\Content;
 use Thrive\MailchimpModule\Support\Mailchimp;
@@ -98,7 +99,14 @@ class CampaignsController extends AdminController
                 'name'          => 'Duplicate Camapign',
                 'description'   => 'Duplicate/Copy the Camapign',
                 'url'           => 'admin/mailchimp/campaigns/copy/' . $id,
-            ],            
+            ],  
+            'preview' =>
+            [
+                'slug'          => 'preview',
+                'name'          => 'Preview Newsletter',
+                'description'   => 'Views the Email Newsletter Template.',
+                'url'           => 'admin/mailchimp/campaigns/preview/' . $id,
+            ],                                        
         ];
 
         return $this->view->make(
@@ -146,6 +154,35 @@ class CampaignsController extends AdminController
   
         return $form->render( $id );
     } 
+
+    
+    /**
+     * preview
+     *
+     * @param  mixed $form
+     * @param  mixed $id    This is the Campaign id, not the content id. 
+     * @param  mixed $messages
+     * @return void
+     */
+    public function preview(ContentFormBuilder $form, $id, MessageBag $messages)
+    {
+        if($campaign = CampaignModel::find($id))
+        {
+            if($result = Content::GetPreview($campaign))
+            {
+                $form->addFormData('email_template',$result->html);
+                $form->addFormData('id', $id);
+
+                return $form->render( $id );
+            }
+        }
+
+        $messages->info('oops, this message needs updating.');
+
+        return redirect()->back();
+
+    } 
+
     
     /**
      * copy

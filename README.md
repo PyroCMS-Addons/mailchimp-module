@@ -92,3 +92,5 @@ Mailchimp Module uses Laravel + Pyro task scheduler to keep data in sync autoamt
 We recomend a single Weekly Sync. This sync pulls infor down from MC and merges with existing data. No data is Pushed to MC.
 
 You can set the interval in the ServiceProvider.
+
+To Start the Schedule, type in the Command console: `php artisan mailchimp:tidy`

@@ -1,30 +1,39 @@
 <?php namespace Thrive\MailchimpModule;
 
-use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
-use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpAudiencesEntryModel;
-use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpCampaignsEntryModel;
-use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpSubscribersEntryModel;
-
+// Laravel
 use Illuminate\Routing\Router;
 
-// Campaign
-use Thrive\MailchimpModule\Campaign\CampaignModel;
-use Thrive\MailchimpModule\Campaign\CampaignRepository;
-use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
+// Anomaly
+use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpContentsEntryModel;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpCampaignsEntryModel;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpAudiencesEntryModel;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpSubscribersEntryModel;
 
-// Audience
+// Thrive Campaign
 use Thrive\MailchimpModule\Audience\AudienceModel;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Contract\AudienceRepositoryInterface;
 
-// Subscriber
+// Thrive Audience
+use Thrive\MailchimpModule\Campaign\CampaignModel;
+use Thrive\MailchimpModule\Campaign\CampaignRepository;
+use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
+
+// Thrive Content
+use Thrive\MailchimpModule\Content\ContentModel;
+use Thrive\MailchimpModule\Content\ContentRepository;
+use Thrive\MailchimpModule\Content\Contract\ContentRepositoryInterface;
+
+// Thrive Subscriber
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberRepositoryInterface;
 
 
-// Plugin
+// Thrive Plugin
 use Thrive\MailchimpModule\MailchimpModulePlugin;
+
 
 
 /**
@@ -61,8 +70,11 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 * @type array|null
 	 */
     protected $commands = [
+		\Thrive\MailchimpModule\Tasks\Sync::class,       
 		\Thrive\MailchimpModule\Tasks\HouseKeeping::class,       
     ];
+
+	
 	/**
 	 * The addon's scheduled commands.
 	 * 
@@ -183,6 +195,7 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 		MailchimpSubscribersEntryModel::class   => SubscriberModel::class,
 		MailchimpAudiencesEntryModel::class     => AudienceModel::class,
 		MailchimpCampaignsEntryModel::class     => CampaignModel::class,
+		MailchimpContentsEntryModel::class 		=> ContentModel::class,
 		// Automation
 		// Content
 	];
@@ -196,6 +209,7 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 		SubscriberRepositoryInterface::class    => SubscriberRepository::class,
 		AudienceRepositoryInterface::class      => AudienceRepository::class,
 		CampaignRepositoryInterface::class      => CampaignRepository::class,
+		ContentRepositoryInterface::class      	=> ContentRepository::class,
 	];
 
 	/**

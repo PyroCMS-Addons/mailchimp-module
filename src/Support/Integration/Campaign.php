@@ -116,6 +116,8 @@ class Campaign
                     }
                 }            
             }
+
+            return true;
         }
 
         return false;

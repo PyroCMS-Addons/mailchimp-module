@@ -95,6 +95,8 @@ class SubscribersController extends AdminController
 
     /**
      * doPull
+     * 
+     * @deprecated - Please use Subscriber Integration
      *
      * @param  string                   $list_id
      * @param  SubscriberInterface      $repo

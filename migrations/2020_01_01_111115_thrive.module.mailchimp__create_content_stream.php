@@ -19,7 +19,7 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
      * @var array
      */
     protected $stream = [
-        'slug' => 'content',
+        'slug' => 'contents',
         'title_column' => 'content_name',
         'translatable'  => false,
         'versionable'   => false,
@@ -36,7 +36,10 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
     protected $fields = [
         "content_name" => [
             "type"   => "anomaly.field_type.text",
-        ],
+        ], 
+        "content_campaign_id" => [
+            "type"   => "anomaly.field_type.text",
+        ],            
         'content_plain_text' => [
             "type"   => "anomaly.field_type.text",
         ],    
@@ -74,6 +77,11 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
+        ],
+        "content_campaign_id" => [
+            'translatable'      => false,
+            'unique'            => true,
+            'required'          => true,
         ],
         'content_plain_text' => [
             'translatable'      => false,

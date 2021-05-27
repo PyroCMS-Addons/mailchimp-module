@@ -2,7 +2,7 @@
 
 use Anomaly\Streams\Platform\Database\Migration\Migration;
 
-class ThriveModuleMailchimpCreateMergeFieldsStream extends Migration
+class ThriveModuleMailchimpCreateTemplatesStream extends Migration
 {
 
     /**

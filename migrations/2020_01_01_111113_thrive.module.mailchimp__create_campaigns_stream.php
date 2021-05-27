@@ -92,7 +92,12 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
         'campaign_reply_to' => [
             "type"   => "anomaly.field_type.email",
         ],    
-                                      
+        'campaign_template_id' => [
+            "type"   => "anomaly.field_type.text",
+            "config" => [
+                "default_value" => null,
+            ]
+        ],                     
     ];
 
     /**
@@ -146,7 +151,15 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             'unique'            => false,
             'required'          => false,
         ],
-            
+        // have considered this as unique
+        // but perhaps during alpha lets 
+        // leave this loosy.
+        'campaign_template_id' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+           
     ];
 
 }

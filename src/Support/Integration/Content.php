@@ -1,15 +1,20 @@
 <?php namespace Thrive\MailchimpModule\Support\Integration;
 
+// Laravel
 use Illuminate\Support\Facades\Log;
-use Thrive\MailchimpModule\Audience\AudienceModel;
-use Thrive\MailchimpModule\Audience\AudienceRepository;
-use Thrive\MailchimpModule\Automation\AutomationModel;
-use Thrive\MailchimpModule\Automation\AutomationRepository;
-use Thrive\MailchimpModule\Automation\Contract\AutomationInterface;
-use Thrive\MailchimpModule\Campaign\Contract\CampaignInterface;
-use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
-use Thrive\MailchimpModule\Subscriber\SubscriberModel;
+
+// Thrive
+// use Thrive\MailchimpModule\Audience\AudienceModel;
+// use Thrive\MailchimpModule\Audience\AudienceRepository;
+// use Thrive\MailchimpModule\Automation\AutomationModel;
+// use Thrive\MailchimpModule\Automation\AutomationRepository;
 use Thrive\MailchimpModule\Support\Mailchimp;
+use Thrive\MailchimpModule\Content\ContentModel;
+use Thrive\MailchimpModule\Campaign\Contract\CampaignInterface;
+use Thrive\MailchimpModule\Automation\Contract\AutomationInterface;
+use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
+// use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
+// use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 
 /**
  * Content
@@ -56,5 +61,54 @@ class Content
 
         return false;
     }
+
+    
+    /**
+     * GetPreview
+     * 
+     * Check status of local repository, and then Check if we 
+     * need to go online for an update if need to update 
+     * from remote, then we download and update local.
+     * Once local if updated we can return the 
+     * content record.
+     * 
+     * Otherwise, if all good from local copy, deliver local
+     * copy to user.
+     *
+     * @param  mixed $campaign
+     * @return void
+     */
+    public static function GetPreview(CampaignInterface $campaign)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            // 1. Do we have it locally
+            if($content = ContentModel::where('content_campaign_id', $campaign->campaign_str_id)->first())
+            {
+                return $content;
+            }
+            else
+            {
+                // 2. ok, well if not then lets download the content
+                if($remote = $mailchimp->getCampaignContent( $campaign->campaign_str_id ))
+                {
+                    // Now store the content
+                    $local = new ContentModel;
+                    $local->content_name            = 'Template for ' . $campaign->campaign_name;
+                    $local->content_campaign_id     = $remote->campaign_str_id;
+                    $local->content_plain_text      = $remote->plain_text;
+                    $local->content_html            = $remote->html;
+                    $local->content_archive_html    = $remote->archive_html;
+                    $local->content_fields          = '';
+                    $local->save();
+
+                    return $local;
+                }
+            }
+
+        }
+
+        return false;
+    }    
 
 }
