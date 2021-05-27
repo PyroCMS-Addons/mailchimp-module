@@ -43,48 +43,21 @@ class Automation
         {
             if($automations = $mailchimp->getAllAutomations())
             {
-
-
                 foreach($automations as $automation)
                 {
                     // check to see if we have the automation
                     if($local_entry = $repository->findBy('automation_workflow_id',$automation->id ))
                     {
-                        $local_entry->automation_workflow_id      = $automation->id;
-                        $local_entry->automation_title            = $automation->settings->title;
-                        $local_entry->automation_status           = $automation->status;
-                        $local_entry->automation_start_time       = $automation->start_time;
-                        $local_entry->automation_create_time      = $automation->create_time;
-                        $local_entry->automation_emails_sent      = $automation->emails_sent;
-                        $local_entry->automation_list_id          = $automation->recipients->list_id;
-                        $local_entry->automation_from_name        = $automation->settings->from_name;
-                        $local_entry->automation_reply_to         = $automation->settings->reply_to;
-                        $local_entry->save();
+                        self::UpdateLocalAutomationFromRemote( $local_entry, $automation );
                     }
                     else
                     {
-                        if($automation->status == 'archived')
+                        // we dont create archived
+                        if($automation->status != 'archived')
                         {
-                            // do we download this ?
-                        }   
-                        else
-                        {
-                            $m = new AutomationModel;
-                            $m->automation_workflow_id      = $automation->id;
-                            $m->automation_title            = $automation->settings->title;
-                            $m->automation_status           = $automation->status;
-                            $m->automation_start_time       = $automation->start_time;
-                            $m->automation_create_time      = $automation->create_time;
-                            $m->automation_emails_sent      = $automation->emails_sent;
-                            $m->automation_list_id          = $automation->recipients->list_id;
-                            $m->automation_from_name        = $automation->settings->from_name;
-                            $m->automation_reply_to         = $automation->settings->reply_to;
-                            $m->save();
+                            self::CreateLocalAutomationFromRemote( $automation );
                         }
-
                     }
-
-
                 }
 
                 return true;
@@ -161,4 +134,49 @@ class Automation
 
         return false;
     }    
+
+        
+    /**
+     * CreateLocalAutomationFromRemote
+     *
+     * @param  mixed $remote
+     * @return void
+     */
+    public static function CreateLocalAutomationFromRemote( $remote )
+    {
+        $local = new AutomationModel;
+        $local->automation_workflow_id      = $remote->id;
+        $local->automation_title            = $remote->settings->title;
+        $local->automation_status           = $remote->status;
+        $local->automation_start_time       = $remote->start_time;
+        $local->automation_create_time      = $remote->create_time;
+        $local->automation_emails_sent      = $remote->emails_sent;
+        $local->automation_list_id          = $remote->recipients->list_id;
+        $local->automation_from_name        = $remote->settings->from_name;
+        $local->automation_reply_to         = $remote->settings->reply_to;
+        $local->save();
+        return true;
+    }
+
+    /**
+     * UpdateLocalAutomationFromRemote
+     *
+     * @param  mixed $automation
+     * @param  mixed $remote
+     * @return void
+     */
+    public static function UpdateLocalAutomationFromRemote( AutomationInterface $automation, $remote )
+    {
+        $automation->automation_workflow_id      = $remote->id;
+        $automation->automation_title            = $remote->settings->title;
+        $automation->automation_status           = $remote->status;
+        $automation->automation_start_time       = $remote->start_time;
+        $automation->automation_create_time      = $remote->create_time;
+        $automation->automation_emails_sent      = $remote->emails_sent;
+        $automation->automation_list_id          = $remote->recipients->list_id;
+        $automation->automation_from_name        = $remote->settings->from_name;
+        $automation->automation_reply_to         = $remote->settings->reply_to;
+        $automation->save();
+        return true;
+    }
 }

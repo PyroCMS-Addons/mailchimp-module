@@ -52,7 +52,7 @@ class Campaign
                 }
                 else
                 {
-                    $mailchimp->createCampaign($settings);
+                    return $mailchimp->createCampaign($settings);
                 }
             }
         }
