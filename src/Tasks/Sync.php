@@ -112,7 +112,7 @@ class Sync extends Command implements ShouldQueue
             $this->info('Audiences have been Synchronised.');
         }
         
-        if(Automation::Sync($this->automationRepository))
+        if(Automation::SyncAll($this->automationRepository))
         {
             Log::info('Automation Now Synchronised.');
 
@@ -126,7 +126,7 @@ class Sync extends Command implements ShouldQueue
             $this->info('Campaigns have been Synchronised.');
         }
 
-        if(Subscribers::SyncAll($this->audienceRepository))
+        if(Subscriber::SyncAll($this->audienceRepository))
         {
             Log::info('Subscribers Now Synchronised.');
 

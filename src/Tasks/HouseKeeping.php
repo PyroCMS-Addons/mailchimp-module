@@ -12,6 +12,8 @@ use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Automation\AutomationRepository;
 use Thrive\MailchimpModule\Support\Integration\Audience;
 use Thrive\MailchimpModule\Support\Integration\Automation;
+use Thrive\MailchimpModule\Support\Integration\Campaign;
+use Thrive\MailchimpModule\Support\Integration\Subscribers;
 
 
 /**
@@ -100,11 +102,25 @@ class Housekeeping extends Command implements ShouldQueue
             $this->info('Audiences have been Synchronised.');
         }
         
-        if(Automation::Sync($this->automationRepository))
+        if(Automation::SyncAll($this->automationRepository))
         {
             Log::info('Automation Now Synchronised.');
 
             $this->info('Automations have been Synchronised.');
+        }
+
+        if(Campaign::SyncAll($this->campaignRepository))
+        {
+            Log::info('Campaigns Now Synchronised.');
+
+            $this->info('Campaigns have been Synchronised.');
+        }
+
+        if(Subscriber::SyncAll($this->audienceRepository))
+        {
+            Log::info('Subscribers Now Synchronised.');
+
+            $this->info('Subscribers have been Synchronised.');
         }
 
     }

@@ -77,7 +77,7 @@ class SubscribersController extends AdminController
      */
     public function sync_pull(MessageBag $messages, AudienceRepository $repository) 
     {
-        if(Subscribers::SyncAll($repository))
+        if(Subscriber::SyncAll($repository))
         {
             $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
         }
@@ -96,7 +96,7 @@ class SubscribersController extends AdminController
      */
     public function sync_push(MessageBag $messages, SubscriberRepository $subscribers)
     {
-        if(Subscribers::PostAll($subscribers))
+        if(Subscriber::PostAll($subscribers))
         {
             $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
         }

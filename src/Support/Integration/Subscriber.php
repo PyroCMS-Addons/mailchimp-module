@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Log;
 
 // Thrive
+use Illuminate\Support\Str;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Contract\AudienceInterface;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
@@ -13,7 +14,7 @@ use Thrive\MailchimpModule\Support\Integration\Subscribers;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
- * Subscribers
+ * Subscriber
  *
  * Business Logic Connecter to the api.
  *
@@ -32,7 +33,7 @@ use Thrive\MailchimpModule\Support\Mailchimp;
  * @since      	Class available since Release 1.0.0
  *
  */
-class Subscribers
+class Subscriber
 {
 
 	const MEMBER_SUBSCRIBED     = 'subscribed';
@@ -176,7 +177,7 @@ class Subscribers
 	{
 		if($mailchimp = Mailchimp::Connect())
 		{
-			Log::debug('--- [ Begin ] ---  Subscribers::PostAll ');
+			Log::debug('--- [ Begin ] ---  Subscriber::PostAll ');
 
 			// this is not an effecient way to iterate
 			$local = $repository->all();
@@ -233,8 +234,33 @@ class Subscribers
 
 	}
 
+
+	/**
+	 * LocalhasSubscriber
+	 * 
+	 * @comment		Need to asses if we really need this function
+	 * 				It seems this would be much better served 
+	 * 				on the Model! 
+	 *
+	 * @param  mixed $email
+	 * @param  mixed $audience_id
+	 * @return void
+	 */
+	public static function LocalhasSubscriber($email,$audience_id)
+	{
+		if($subscriber = SubscriberModel::where('email',$email)->where('audience',$audience_id)->first())
+		{
+			return $subscriber;
+		}
+
+		return false;
+	}
+
+
 	/**
 	 * FormatContact
+	 * Simialr to PrepareContact however FormatContact will be continue to evolve.
+	 * It currently assumes first name if not provided.
 	 *
 	 * @param  mixed $email
 	 * @param  mixed $subscribe
@@ -265,32 +291,12 @@ class Subscribers
 		return $contact;
 	}
 
-	
-	/**
-	 * LocalhasSubscriber
-	 * 
-	 * @comment		Need to asses if we really need this function
-	 * 				It seems this would be much better served 
-	 * 				on the Model! 
-	 *
-	 * @param  mixed $email
-	 * @param  mixed $audience_id
-	 * @return void
-	 */
-	public static function LocalhasSubscriber($email,$audience_id)
-	{
-		if($subscriber = SubscriberModel::where('email',$email)->where('audience',$audience_id)->first())
-		{
-			return $subscriber;
-		}
-
-		return false;
-	}
-
-
 	/**
 	 * PrepareContact
 	 *
+	 * @deprecated - 
+	 * @see FormatContact.
+	 * 
 	 * @param  mixed $email
 	 * @param  mixed $subscribe
 	 * @param  mixed $FNAME

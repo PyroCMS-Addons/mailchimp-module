@@ -152,11 +152,23 @@ class Campaign
         return false;
     }
 
-    public static function PostAll(CampaignRepository $repository )
+    public static function PostAll(CampaignRepository $repository) : bool
     {
         if($mailchimp = Mailchimp::Connect())
         {
+            foreach($repository->all() as $campaign)
+            {
+                if(self::Post($campaign))
+                {
+                    //ok
+                }
+                else
+                {
+                    //report log
+                }
+            }
 
+            return true;
         }
 
         return false;

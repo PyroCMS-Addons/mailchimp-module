@@ -31,21 +31,105 @@ use Thrive\MailchimpModule\Support\Mailchimp;
  */
 class Audience
 {
-    
+
     /**
      * Sync
-     * 
-     * Sync will attempt upload to Mailchimp either a; 
-     *          - newley created Audience; or
-     *          - an Updated Audience
-     * 
-     * It will NOT download any Audience/List found on Mailchimp.
-     * 
+     *
      *
      * @param  mixed $entry
      * @return void
      */
     public static function Sync(AudienceInterface $entry)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            // is there a remote list
+            if($remote = $mailchimp->getList($entry->str_id))
+            {
+                if(self::updateLocalFromRemote($entry, $remote))
+                {
+                    $local_list->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
+                }
+            }
+            else
+            {
+                // nope, no remote
+                // we could just flag the local status that
+                // this list does not exist remotly.
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * SyncAll
+     *
+     *
+     * @param  mixed $repository
+     * @return void
+     */
+    public static function SyncAll(AudienceRepository $repository)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            $all_remote_lists = $mailchimp->getAllLists();
+
+            foreach($all_remote_lists as $remote)
+            {
+                // check if we have a local copy
+                if($local_list = $repository->findBy('str_id',$remote->id))
+                {
+                    self::Sync($local_list);
+                }
+                else
+                {
+                    // check if we have a deleted copy loally
+                    if($repository->allWithTrashed()->findBy('str_id',$remote->id))
+                    {
+                        // skip as we have a clash and deleted locally
+                        // we can check to see if its deleted remotely
+                        // but allList() is returning this for
+                        // some reason.
+                    }
+                    else
+                    {
+                        // Local List not found, so lets create
+                        // one to keep it in sync.
+                        if($item = self::createLocalFromRemote($remote))
+                        {
+                            $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
+                        }
+                    }
+
+                }
+
+            }
+
+            // Now Check for vagrant lists
+            // List that no longer exist
+            // on the remote Mailchimp.
+            // self::CleanVagrantLists($repository);
+
+            return true;
+        }
+
+        return false;
+
+    }
+    
+    
+    /**
+     * Push
+     *
+     * @param  mixed $entry
+     * @param  mixed $repository
+     * @return void
+     */
+    public static function Push(AudienceInterface $entry)
     {
         if($mailchimp = Mailchimp::Connect())
         {
@@ -69,77 +153,34 @@ class Audience
                 }
             }
         }
-
-        return false;
     }
+
+    public static function PushAll(AudienceRepository $repository)
+    {
+        foreach($repository->all() as $audience)
+        {
+            self::Push($audience);
+        }
+    }
+
 
     
     /**
-     * SyncAll
-     * 
-     * SyncAll will attempt to download from Mailchimp. Its tasks are to 
-     *          - update any existing.
-     *          - Add any new found on remote
-     *          - Anything new found locally will be pushed to Mailchimp
-     * 
-     * This differs from Sync Push, as everything locally will be pushed
-     * to mailchimp overwriting anything on the remote and
-     * will create new items on the remote.
+     * CleanVagrantLists
      *
-     * @param  mixed $repository
      * @return void
      */
-    public static function SyncAll(AudienceRepository $repository)
+    public static function CleanVagrantLists(AudienceRepository $repository)
     {
         if($mailchimp = Mailchimp::Connect())
         {
-            $lists = $mailchimp->getAllLists();
+            $all_remote_lists = $mailchimp->getAllLists();
 
-            // Update
-            foreach($lists as $remote_list)
-            {
-                if($local_list = $repository->findBy('str_id',$remote_list->id))
-                {
-                    // If we have found locally, lets update local details
-                    if(self::updateLocalFromRemote($local_list, $remote_list))
-                    {
-                        $local_list->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
-                    }
-                }
-                else
-                {
-                    //check if exist if deleted
-                    if($repository->allWithTrashed()->findBy('str_id',$remote_list->id))
-                    {
-                        // skip as we have a clash and deleted locally
-                        // we can check to see if its deleted remotely 
-                        // but allList() is returning this for
-                        // some reason.
-                        $messages->error('thrive.module.mailchimp::common.error_audiences_clash');
-                    }
-                    else
-                    {
-                        // Local List not found, so lets create 
-                        // one to keep it in sync.
-                        if($item = self::createLocalFromRemote($remote_list))
-                        {
-                            $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
-                        }
-                    }
-    
-                }
-
-            }
-    
-            // Now Check for vagrant lists
-            // List that no longer exist 
-            // on the remote Mailchimp.
-            // We will delete these.
             foreach($repository->all() as $local_list)
             {
                 $found = false;
 
-                foreach($lists as $remote_list)
+                foreach($all_remote_lists as $remote_list)
                 {
                     if( $local_list->str_id == $remote_list->id )
                     {
@@ -158,18 +199,8 @@ class Audience
         }
 
         return false;
-
     }
 
-    public static function Push(AudienceInterface $entry, AudienceRepository $repository)
-    {
-
-    }
-
-    public static function PushAll(AudienceRepository $repository)
-    {
-
-    }
 
     /**
      * PrepareList
@@ -181,7 +212,7 @@ class Audience
      *
      * @param  mixed $entry
      * @return void
-     */    
+     */
     public static function PrepareList(AudienceInterface $entry)
     {
         $status         = true;
@@ -189,12 +220,12 @@ class Audience
 
         try
         {
-            $list_values = 
+            $list_values =
             [
                 "name"                  => $entry->name,
                 "permission_reminder"   => $entry->permission_reminder,
                 "email_type_option"     => $entry->email_type_option,
-                "contact"           => 
+                "contact"           =>
                 [
                     "company"           => $entry->contact_company_name,
                     "address1"          => $entry->contact_address1,
@@ -203,7 +234,7 @@ class Audience
                     "zip"               => $entry->contact_zip,
                     "country"           => $entry->contact_country,
                 ],
-                "campaign_defaults" => 
+                "campaign_defaults" =>
                 [
                     "from_name"         => $entry->campaign_from_name,
                     "from_email"        => $entry->campaign_from_email,
@@ -228,8 +259,8 @@ class Audience
     }
 
 
-    
-    
+
+
     /**
      * updateLocalFromRemote
      *
@@ -239,25 +270,35 @@ class Audience
      */
     public static function updateLocalFromRemote($local, $remote)
     {
-        // try catch ?
-        $local->name                     = $remote->name;
-        $local->str_id                   = $remote->id;
-        $local->permission_reminder      = $remote->permission_reminder;
-        $local->email_type_option        = $remote->email_type_option;
-        $local->contact_company_name     = $remote->contact->company;
-        $local->contact_address1         = $remote->contact->address1;
-        $local->contact_state            = $remote->contact->state;
-        $local->contact_zip              = $remote->contact->zip;
-        $local->contact_country          = $remote->contact->country;
-        $local->contact_city             = $remote->contact->city;
-        $local->campaign_from_name       = $remote->campaign_defaults->from_name;
-        $local->campaign_from_email      = $remote->campaign_defaults->from_email;
-        $local->campaign_subject         = $remote->campaign_defaults->subject;
-        $local->campaign_language        = $remote->campaign_defaults->language;
-        $local->save();
+        try
+        {
+            $local->name                     = $remote->name;
+            $local->str_id                   = $remote->id;
+            $local->permission_reminder      = $remote->permission_reminder;
+            $local->email_type_option        = $remote->email_type_option;
+            $local->contact_company_name     = $remote->contact->company;
+            $local->contact_address1         = $remote->contact->address1;
+            $local->contact_state            = $remote->contact->state;
+            $local->contact_zip              = $remote->contact->zip;
+            $local->contact_country          = $remote->contact->country;
+            $local->contact_city             = $remote->contact->city;
+            $local->campaign_from_name       = $remote->campaign_defaults->from_name;
+            $local->campaign_from_email      = $remote->campaign_defaults->from_email;
+            $local->campaign_subject         = $remote->campaign_defaults->subject;
+            $local->campaign_language        = $remote->campaign_defaults->language;
+            $local->save();
 
-        return $local;
+            return $local;
+        }
+        catch(\Exception $e)
+        {
+            //
+        }
+
+        return false;
     }
+
+
     /**
      * createLocalFromRemote
      *
@@ -266,29 +307,45 @@ class Audience
      */
     public static function createLocalFromRemote($remote)
     {
-        $local = new AudienceModel();
+        try
+        {
+            $local = new AudienceModel();
 
-        // try catch ?
-        $local->name                     = $remote->name;
-        $local->str_id                   = $remote->id;
-        $local->permission_reminder      = $remote->permission_reminder;
-        $local->email_type_option        = $remote->email_type_option;
-        $local->contact_company_name     = $remote->contact->company;
-        $local->contact_address1         = $remote->contact->address1;
-        $local->contact_state            = $remote->contact->state;
-        $local->contact_zip              = $remote->contact->zip;
-        $local->contact_country          = $remote->contact->country;
-        $local->contact_city             = $remote->contact->city;
-        $local->campaign_from_name       = $remote->campaign_defaults->from_name;
-        $local->campaign_from_email      = $remote->campaign_defaults->from_email;
-        $local->campaign_subject         = $remote->campaign_defaults->subject;
-        $local->campaign_language        = $remote->campaign_defaults->language;
-        $local->save();
+            $local->name                     = $remote->name;
+            $local->str_id                   = $remote->id;
+            $local->permission_reminder      = $remote->permission_reminder;
+            $local->email_type_option        = $remote->email_type_option;
+            $local->contact_company_name     = $remote->contact->company;
+            $local->contact_address1         = $remote->contact->address1;
+            $local->contact_state            = $remote->contact->state;
+            $local->contact_zip              = $remote->contact->zip;
+            $local->contact_country          = $remote->contact->country;
+            $local->contact_city             = $remote->contact->city;
+            $local->campaign_from_name       = $remote->campaign_defaults->from_name;
+            $local->campaign_from_email      = $remote->campaign_defaults->from_email;
+            $local->campaign_subject         = $remote->campaign_defaults->subject;
+            $local->campaign_language        = $remote->campaign_defaults->language;
 
-        return $local;
+            $local->save();
+
+            return $local;
+        }
+        catch(\Exception $e)
+        {
+            //
+        }
+
+        return false;
     }
 
-
+    
+    /**
+     * LocalHasAudience
+     * 
+     * 
+     * @param  mixed $str_id
+     * @return void
+     */
     public static function LocalHasAudience($str_id)
     {
         if($a = AudienceModel::where('str_id',$str_id)->first())

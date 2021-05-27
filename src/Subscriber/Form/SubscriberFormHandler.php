@@ -103,7 +103,7 @@ class SubscriberFormHandler
 
         Log::debug('  » 02 Local Entry         : BEGIN ');
 
-        if($subscriber = Subscribers::LocalhasSubscriber($email_adddress, $strid))
+        if($subscriber = Subscriber::LocalhasSubscriber($email_adddress, $strid))
         {
             Log::debug('        » Has Local        : YES');
             $subscriber->subscribed     = $subscribe;
@@ -162,7 +162,7 @@ class SubscriberFormHandler
         }
         else
         {
-            $contact = Subscribers::PrepareContact($email_adddress, $subscribe );
+            $contact = Subscriber::PrepareContact($email_adddress, $subscribe );
 
             if($mailchimp->addContactToList($strid, $contact, $tags))
             {

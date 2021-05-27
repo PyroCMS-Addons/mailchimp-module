@@ -123,7 +123,7 @@ class SubscriberFormBuilder extends FormBuilder
 
         if($this->can_post_to_mailchimp)
         {
-            if($item = Subscribers::PostSubscriberToMailchimp($entry))
+            if($item = Subscriber::PostSubscriberToMailchimp($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
                 $entry->update(['thrive_contact_synced' => 'thrive.module.mailchimp::common.sync_success']);

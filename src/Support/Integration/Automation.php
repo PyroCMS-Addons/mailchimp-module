@@ -1,12 +1,13 @@
 <?php namespace Thrive\MailchimpModule\Support\Integration;
 
-use Illuminate\Support\Facades\Log;
+use Exception;
 
 // Thrive
-use Thrive\MailchimpModule\Support\Mailchimp;
+use Illuminate\Support\Facades\Log;
 use Thrive\MailchimpModule\Automation\AutomationModel;
 use Thrive\MailchimpModule\Automation\AutomationRepository;
 use Thrive\MailchimpModule\Automation\Contract\AutomationInterface;
+use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
  * Automation
@@ -31,13 +32,39 @@ use Thrive\MailchimpModule\Automation\Contract\AutomationInterface;
 class Automation
 {
     
+        
     /**
-     * Sync Automations to the PyroCMS system
+     * Sync
+     * 
+     * There is no UpdateAutomation on MC, however there is a 
+     * AddAutomation . So we look for any created locally, 
+     * that need to be added remotely.
+     * 
+     * @see https://mailchimp.com/developer/marketing/api/automation/add-automation/
      *
-     * @param  mixed $repository
+     * @param  mixed $automation
      * @return void
-     */
-    public static function Sync(AutomationRepository $repository)
+     * @throws Exception
+     */    
+
+    public static function Sync(AutomationInterface $automation)
+    {
+        throw new \Exception('Not Yet Implemented');
+        
+        if($mailchimp = Mailchimp::Connect())
+        {
+            // $remote-list = get a list of all remote automations
+            //foreach local automations
+                // is there a copy in the $remote-list
+                // if not, push new automation
+            //end
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function SyncAll(AutomationRepository $repository)
     {
         if($mailchimp = Mailchimp::Connect())
         {
@@ -65,6 +92,29 @@ class Automation
         }
 
         return false;
+    }
+
+    
+    /**
+     * Post
+     *
+     * @param  mixed $automation
+     * @return void
+     */
+    public static function Post(AutomationInterface $automation)
+    {
+        throw new \Exception('Not Yet Implemented');
+    }
+	
+	/**
+	 * PostAll
+	 *
+	 * @param  mixed $repository
+	 * @return void
+	 */
+	public static function PostAll(AutomationRepository $repository)
+    {
+        throw new \Exception('Not Yet Implemented');
     }
 
 
@@ -112,7 +162,6 @@ class Automation
             {
                 Log::error('failed return');
             }
-            // dd('here');
         }
 
         return false;
@@ -144,18 +193,27 @@ class Automation
      */
     public static function CreateLocalAutomationFromRemote( $remote )
     {
-        $local = new AutomationModel;
-        $local->automation_workflow_id      = $remote->id;
-        $local->automation_title            = $remote->settings->title;
-        $local->automation_status           = $remote->status;
-        $local->automation_start_time       = $remote->start_time;
-        $local->automation_create_time      = $remote->create_time;
-        $local->automation_emails_sent      = $remote->emails_sent;
-        $local->automation_list_id          = $remote->recipients->list_id;
-        $local->automation_from_name        = $remote->settings->from_name;
-        $local->automation_reply_to         = $remote->settings->reply_to;
-        $local->save();
-        return true;
+        try
+        {
+            $local = new AutomationModel;
+            $local->automation_workflow_id      = $remote->id;
+            $local->automation_title            = $remote->settings->title;
+            $local->automation_status           = $remote->status;
+            $local->automation_start_time       = $remote->start_time;
+            $local->automation_create_time      = $remote->create_time;
+            $local->automation_emails_sent      = $remote->emails_sent;
+            $local->automation_list_id          = $remote->recipients->list_id;
+            $local->automation_from_name        = $remote->settings->from_name;
+            $local->automation_reply_to         = $remote->settings->reply_to;
+            $local->save();
+            return true;
+        }
+        catch(\Exception $e)
+        {
+            // do-stuff
+        }
+
+        return false;
     }
 
     /**
@@ -167,16 +225,25 @@ class Automation
      */
     public static function UpdateLocalAutomationFromRemote( AutomationInterface $automation, $remote )
     {
-        $automation->automation_workflow_id      = $remote->id;
-        $automation->automation_title            = $remote->settings->title;
-        $automation->automation_status           = $remote->status;
-        $automation->automation_start_time       = $remote->start_time;
-        $automation->automation_create_time      = $remote->create_time;
-        $automation->automation_emails_sent      = $remote->emails_sent;
-        $automation->automation_list_id          = $remote->recipients->list_id;
-        $automation->automation_from_name        = $remote->settings->from_name;
-        $automation->automation_reply_to         = $remote->settings->reply_to;
-        $automation->save();
-        return true;
+        try
+        {
+            $automation->automation_workflow_id      = $remote->id;
+            $automation->automation_title            = $remote->settings->title;
+            $automation->automation_status           = $remote->status;
+            $automation->automation_start_time       = $remote->start_time;
+            $automation->automation_create_time      = $remote->create_time;
+            $automation->automation_emails_sent      = $remote->emails_sent;
+            $automation->automation_list_id          = $remote->recipients->list_id;
+            $automation->automation_from_name        = $remote->settings->from_name;
+            $automation->automation_reply_to         = $remote->settings->reply_to;
+            $automation->save();
+            return true;
+        }
+        catch(\Exception $e)
+        {
+            // do-stuff
+        }
+
+        return false;
     }
 }
