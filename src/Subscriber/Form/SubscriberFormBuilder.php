@@ -5,7 +5,7 @@ use Anomaly\Streams\Platform\Ui\Form\Form;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 use Illuminate\Support\Facades\Log;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormHandler;
-use Thrive\MailchimpModule\Support\Integration\Subscribers;
+use Thrive\MailchimpModule\Support\Integration\Subscriber;
 
 /**
  * Class SubscriberFormBuilder

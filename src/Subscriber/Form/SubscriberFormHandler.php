@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Support\Integration\Audience;
-use Thrive\MailchimpModule\Support\Integration\Subscribers;
+use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
@@ -19,6 +19,22 @@ use Thrive\MailchimpModule\Support\Mailchimp;
  */
 class SubscriberFormHandler
 {
+
+    protected $mailchimp;
+    
+    /**
+     * __construct
+     *
+     * @param  mixed $mailchimp
+     * @return void
+     */
+    public function __construct(Mailchimp $mailchimp)
+    {
+        $this->mailchimp = $mailchimp;
+
+        parent::__construct();
+    }
+
 
     /**
      * Handle the form.
@@ -131,13 +147,10 @@ class SubscriberFormHandler
      */
     private function pushToMailchimp( $strid, $email_adddress, $subscribe, $tags = null)
     {
-
         Log::debug('  » 03 Remote Entry        : BEGIN ');
 
-        $mailchimp = Mailchimp::Connect();
-
         // Step 1
-        if($contact = $mailchimp->checkContactStatus($strid, $email_adddress))
+        if($contact = $this->mailchimp->checkContactStatus($strid, $email_adddress))
         {
             if(isset($contact->status))
             {
@@ -145,7 +158,7 @@ class SubscriberFormHandler
                 Log::debug('        » Remote Status    : '. $contact->status);
                 Log::debug('        » New Status       : '. (($subscribe)?'subscribed':'unsubscribed') );
 
-                if($mailchimp->setListMember($strid, $email_adddress, $subscribe))
+                if($this->mailchimp->setListMember($strid, $email_adddress, $subscribe))
                 {
                     Log::debug('        » Remote Updated   : YES');
                 }
@@ -164,7 +177,7 @@ class SubscriberFormHandler
         {
             $contact = Subscriber::PrepareContact($email_adddress, $subscribe );
 
-            if($mailchimp->addContactToList($strid, $contact, $tags))
+            if($this->mailchimp->addContactToList($strid, $contact, $tags))
             {
                 Log::debug('        » Push Status      : Added Success');
             }

@@ -10,7 +10,7 @@ use Thrive\MailchimpModule\Audience\Contract\AudienceInterface;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
-use Thrive\MailchimpModule\Support\Integration\Subscribers;
+use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**

@@ -13,7 +13,7 @@ use Thrive\MailchimpModule\Automation\AutomationRepository;
 use Thrive\MailchimpModule\Support\Integration\Audience;
 use Thrive\MailchimpModule\Support\Integration\Automation;
 use Thrive\MailchimpModule\Support\Integration\Campaign;
-use Thrive\MailchimpModule\Support\Integration\Subscribers;
+use Thrive\MailchimpModule\Support\Integration\Subscriber;
 
 
 /**

@@ -1,14 +1,14 @@
 <?php namespace Thrive\MailchimpModule;
 
 // Laravel
-use Illuminate\Routing\Router;
+use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
 
 // Anomaly
-use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
-use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpContentsEntryModel;
-use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpCampaignsEntryModel;
 use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpAudiencesEntryModel;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpCampaignsEntryModel;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpContentsEntryModel;
 use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpSubscribersEntryModel;
+use Illuminate\Routing\Router;
 
 // Thrive Campaign
 use Thrive\MailchimpModule\Audience\AudienceModel;
@@ -26,13 +26,14 @@ use Thrive\MailchimpModule\Content\ContentRepository;
 use Thrive\MailchimpModule\Content\Contract\ContentRepositoryInterface;
 
 // Thrive Subscriber
-use Thrive\MailchimpModule\Subscriber\SubscriberModel;
-use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
+use Thrive\MailchimpModule\MailchimpModulePlugin;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberRepositoryInterface;
+use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 
 
 // Thrive Plugin
-use Thrive\MailchimpModule\MailchimpModulePlugin;
+use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
+use Thrive\MailchimpModule\Support\Mailchimp;
 
 
 
@@ -254,7 +255,10 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 
 	public function boot()
 	{
-
+		// binding a class to the service container 
+		$this->app->bind(Mailchimp::class, function ($app) {
+			return new Mailchimp();
+		});
 
 	}
 

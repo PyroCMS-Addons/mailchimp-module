@@ -8,7 +8,7 @@ use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Subscriber\Table\SubscriberTableBuilder;
-use Thrive\MailchimpModule\Support\Integration\Subscribers;
+use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**

@@ -23,18 +23,36 @@ use Thrive\MailchimpModule\Support\Mailchimp;
 class DashboardController extends AdminController
 {
 
+    protected $mailchimp;
+    
+    /**
+     * __construct
+     *
+     * @param  mixed $mailchimp
+     * @return void
+     */
+    public function __construct(Mailchimp $mailchimp)
+    {
+        $this->mailchimp = $mailchimp;
+
+        parent::__construct();
+    }
+    
+    /**
+     * index
+     *
+     * @return void
+     */
     public function index()
     {
-        $mailchimp = Mailchimp::Connect();
-
-        $list = $mailchimp->getDefaultList();
+        $list = $this->mailchimp->getDefaultList();
 
         $stats = [];
         $has_stats = false;
 
 
         // get the total count
-        $stats = $mailchimp->getList( $list->id); 
+        $stats = $this->mailchimp->getList( $list->id); 
 
         if(isset($stats->stats))
         {
@@ -56,16 +74,13 @@ class DashboardController extends AdminController
     {
         if($option == "dda")
         {
-            $mailchimp = Mailchimp::Connect();
-
-            if($list = $mailchimp->getDefaultList())
+            if($list = $this->mailchimp->getDefaultList())
             {
-                if($response = $mailchimp->deleteList($list->id))
+                if($response = $this->mailchimp->deleteList($list->id))
                 {
                     $messages->info('Audience Removed');
                 }
             }
-
         }
 
         return redirect()->back();

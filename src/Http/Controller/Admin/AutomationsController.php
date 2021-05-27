@@ -67,27 +67,15 @@ class AutomationsController extends AdminController
         return $form->render($id );
     }
 
-
+    
     /**
-     * send
+     * start
      *
      * @param  mixed $form
      * @param  mixed $id
      * @param  mixed $messages
      * @return void
      */
-    public function send(AutomationFormBuilder $form, $id, MessageBag $messages)
-    {
-        $mailchimp = Mailchimp::Connect();
-
-        $campaign = AutomationModel::find($id);
-
-        $messages->success('thrive.module.mailchimp::message.automation_sent');
-
-        return redirect()->back();
-    }
-
-
     public function start(AutomationTableBuilder $form, $id, MessageBag $messages)
     {
         $automation = AutomationModel::find($id);
@@ -99,7 +87,15 @@ class AutomationsController extends AdminController
 
         return redirect()->back();
     }
-
+    
+    /**
+     * pause
+     *
+     * @param  mixed $form
+     * @param  mixed $id
+     * @param  mixed $messages
+     * @return void
+     */
     public function pause(AutomationTableBuilder $form, $id, MessageBag $messages)
     {
         $automation = AutomationModel::find($id);
@@ -113,7 +109,15 @@ class AutomationsController extends AdminController
     }
 
 
-
+    
+    /**
+     * stop
+     *
+     * @param  mixed $form
+     * @param  mixed $id
+     * @param  mixed $messages
+     * @return void
+     */
     public function stop(AutomationTableBuilder $form, $id, MessageBag $messages)
     {
         $automation = AutomationModel::find($id);
@@ -137,7 +141,7 @@ class AutomationsController extends AdminController
     public function sync( MessageBag $messages, AutomationRepository $repository )
     {
 
-        if(Automation::sync($repository))
+        if(Automation::SyncAll($repository))
         {
             $messages->success('thrive.module.mailchimp::common.now_synched_automations');
         }

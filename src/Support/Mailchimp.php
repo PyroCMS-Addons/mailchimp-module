@@ -1,11 +1,11 @@
 <?php namespace Thrive\MailchimpModule\Support;
 
 // Laravel
+use Anomaly\SettingsModule\Setting\Contract\SettingRepositoryInterface;
 use app;
-use Illuminate\Support\Facades\Log;
 
 // Anomaly
-use Anomaly\SettingsModule\Setting\Contract\SettingRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 // Mailchimp
 use MailchimpMarketing;
@@ -13,6 +13,7 @@ use MailchimpMarketing\ApiException;
 //use MailchimpTransactional\ApiException;
 
 // Thrive
+use Thrive\MailchimpModule\Support\Mailchimp;
 use Thrive\MailchimpModule\Support\Mailchimp\MailchimpAudiencesTrait;
 use Thrive\MailchimpModule\Support\Mailchimp\MailchimpAutomationsTrait;
 use Thrive\MailchimpModule\Support\Mailchimp\MailchimpCampaignTrait;
@@ -152,7 +153,8 @@ class Mailchimp
     /**
      * Connect
      *
-     * A simple way to get you client started!
+     * This does not implemnt singleton.
+     * This will return a new instance.
      *
      * <code>
      *  $chimp = Mailchimp::Connect();
@@ -162,7 +164,8 @@ class Mailchimp
      */
     public static function Connect()
     {
-        return new self();
+        return app('Thrive\MailchimpModule\Support\Mailchimp');
+        // return new self();
     }
 
 
