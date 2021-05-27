@@ -29,20 +29,6 @@ class CampaignTableButtons extends TableBuilder
                     return true;
                 },
             ],
-            // 'send_test' =>
-            // [
-            //     'type' => 'info',
-            //     'attributes' => [
-            //         'data-toggle'  => 'confirm',
-            //         'data-message' => 'Are you sure ?'
-            //     ],
-            //     'enabled'    => function (EntryInterface $entry) {
-            //         if ($entry->status == 'sent') {
-            //             return false;
-            //         }
-            //         return true;
-            //     },
-            // ],
             'edit' =>
             [
                 'type'      => 'success',
@@ -59,36 +45,22 @@ class CampaignTableButtons extends TableBuilder
                 'data-toggle' => 'modal',
                 'data-target' => '#modal',
                 'href'        => 'admin/mailchimp/campaigns/option/edit/{entry.id}',                
-                'type'       => 'info',
+                'type'       => 'default',
                 'enabled'    => function (EntryInterface $entry) {
                     if ($entry->status == 'save') {
                         return true;
                     }
-                    return false;
+                    return true;
                 },
-            ],    
-            // 'preview' =>
+            ],                         
+            // 'copy' =>
             // [
-            //     'text'    => 'Preview',
-            //     'data-toggle' => 'modal',
-            //     'data-target' => '#modal',
-            //     'href'        => 'admin/mailchimp/campaigns/option/edit/{entry.id}',                
-            //     'type'       => 'info',
-            //     'enabled'    => function (EntryInterface $entry) {
-            //         if ($entry->status == 'save') {
-            //             return true;
-            //         }
-            //         return false;
-            //     },
-            // ],                       
-            'copy' =>
-            [
-                'type' => 'primary',
-                'attributes' => [
-                    'data-toggle'  => 'confirm',
-                    'data-message' => 'Are you sure ?'
-                ]
-            ],
+            //     'type' => 'primary',
+            //     'attributes' => [
+            //         'data-toggle'  => 'confirm',
+            //         'data-message' => 'Are you sure ?'
+            //     ]
+            // ],
 
         ]);
 

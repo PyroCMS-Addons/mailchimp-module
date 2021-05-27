@@ -20,22 +20,6 @@ use Thrive\MailchimpModule\Support\Mailchimp;
 class SubscriberFormHandler
 {
 
-    protected $mailchimp;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $mailchimp
-     * @return void
-     */
-    public function __construct(Mailchimp $mailchimp)
-    {
-        $this->mailchimp = $mailchimp;
-
-        parent::__construct();
-    }
-
-
     /**
      * Handle the form.
      *
@@ -149,46 +133,48 @@ class SubscriberFormHandler
     {
         Log::debug('  » 03 Remote Entry        : BEGIN ');
 
-        // Step 1
-        if($contact = $this->mailchimp->checkContactStatus($strid, $email_adddress))
+        if($mailchimp = Mailchimp::Connect())
         {
-            if(isset($contact->status))
+            // Step 1
+            if($contact = $mailchimp->checkContactStatus($strid, $email_adddress))
             {
-                Log::debug('        » Has Remote       : YES');
-                Log::debug('        » Remote Status    : '. $contact->status);
-                Log::debug('        » New Status       : '. (($subscribe)?'subscribed':'unsubscribed') );
-
-                if($this->mailchimp->setListMember($strid, $email_adddress, $subscribe))
+                if(isset($contact->status))
                 {
-                    Log::debug('        » Remote Updated   : YES');
+                    Log::debug('        » Has Remote       : YES');
+                    Log::debug('        » Remote Status    : '. $contact->status);
+                    Log::debug('        » New Status       : '. (($subscribe)?'subscribed':'unsubscribed') );
+
+                    if($mailchimp->setListMember($strid, $email_adddress, $subscribe))
+                    {
+                        Log::debug('        » Remote Updated   : YES');
+                    }
+                    else
+                    {
+                        Log::debug('        » Remote Updated   : NO');
+                    }
                 }
                 else
                 {
-                    Log::debug('        » Remote Updated   : NO');
+                    //unexpected error
+                    Log::debug('        » Unexpected Error : 3.2');
                 }
             }
             else
             {
-                //unexpected error
-                Log::debug('        » Unexpected Error : 3.2');
+                $contact = Subscriber::PrepareContact($email_adddress, $subscribe );
+
+                if($mailchimp->addContactToList($strid, $contact, $tags))
+                {
+                    Log::debug('        » Push Status      : Added Success');
+                }
+                else
+                {
+                    Log::debug('        » Push Status      : Add Error' );
+                    Log::debug('        » Contact Variable : ');
+                    Log::debug( print_r($contact,true) );
+                }
             }
         }
-        else
-        {
-            $contact = Subscriber::PrepareContact($email_adddress, $subscribe );
-
-            if($this->mailchimp->addContactToList($strid, $contact, $tags))
-            {
-                Log::debug('        » Push Status      : Added Success');
-            }
-            else
-            {
-                Log::debug('        » Push Status      : Add Error' );
-                Log::debug('        » Contact Variable : ');
-                Log::debug( print_r($contact,true) );
-            }
-        }
-
     }
 
     

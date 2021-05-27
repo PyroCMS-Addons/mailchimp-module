@@ -67,10 +67,16 @@ class Housekeeping extends Command implements ShouldQueue
 
     public function __construct(
         AutomationRepository $automationRepository,
+        ContentRepository $contentRepository,
+        CampaignRepository $campaignRepository,
+        SubscriberRepository $subscriberRepository,
         AudienceRepository $audienceRepository)
     {
         $this->automationRepository = $automationRepository;
         $this->audienceRepository = $audienceRepository;
+        $this->contentRepository = $contentRepository;
+        $this->campaignRepository = $campaignRepository;
+        $this->subscriberRepository = $subscriberRepository;
 
         parent::__construct();
     }

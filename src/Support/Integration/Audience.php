@@ -31,7 +31,6 @@ use Thrive\MailchimpModule\Support\Mailchimp;
  */
 class Audience
 {
-
     /**
      * Sync
      *
@@ -48,7 +47,7 @@ class Audience
             {
                 if(self::updateLocalFromRemote($entry, $remote))
                 {
-                    $local_list->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
+                    $entry->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
                 }
             }
             else
@@ -154,7 +153,13 @@ class Audience
             }
         }
     }
-
+    
+    /**
+     * PushAll
+     *
+     * @param  mixed $repository
+     * @return void
+     */
     public static function PushAll(AudienceRepository $repository)
     {
         foreach($repository->all() as $audience)
@@ -162,7 +167,6 @@ class Audience
             self::Push($audience);
         }
     }
-
 
     
     /**
@@ -259,8 +263,6 @@ class Audience
     }
 
 
-
-
     /**
      * updateLocalFromRemote
      *
@@ -354,6 +356,5 @@ class Audience
         }
 
         return false;
-
     }
 }

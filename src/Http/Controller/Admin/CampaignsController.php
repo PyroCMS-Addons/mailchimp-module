@@ -8,9 +8,11 @@ use Thrive\MailchimpModule\Campaign\CampaignRepository;
 use Thrive\MailchimpModule\Campaign\Form\CampaignFormBuilder;
 use Thrive\MailchimpModule\Campaign\Table\CampaignTableBuilder;
 use Thrive\MailchimpModule\Content\Form\ContentFormBuilder;
+use Thrive\MailchimpModule\Content\Form\PreviewContentFormBuilder;
 use Thrive\MailchimpModule\Support\Integration\Campaign;
 use Thrive\MailchimpModule\Support\Integration\Content;
 use Thrive\MailchimpModule\Support\Mailchimp;
+use Thrive\MailchimpModule\Support\Ui\Chooser;
 
 /**
  * CampaignsController
@@ -66,57 +68,22 @@ class CampaignsController extends AdminController
      */
     public function option($method = 'edit', $id, MessageBag $messages)
     {
-        // create a method that resolves
-        //which function the campaign \
-        // can perform to replace
-        // the below code.
-        $actions = 
-        [
-            'edit' =>
-            [
-                'name'          => 'Edit Camapign',
-                'slug'          => 'edit',
-                'description'   => 'Edit the Camapign',
-                'url'           => 'admin/mailchimp/campaigns/edit/' . $id,
-            ],
-            'send' =>
-            [
-                'slug'          => 'send',
-                'name'          => 'Send Camapign',
-                'description'   => 'Send the Camapign',
-                'url'           => 'admin/mailchimp/campaigns/send/' . $id,
-            ],
-            'send_test' =>
-            [
-                'slug'          => 'send_test',
-                'name'          => 'Send a Test',
-                'description'   => 'Send a test to the Camapign Test email address',
-                'url'           => 'admin/mailchimp/campaigns/send_test/' . $id,
-            ],            
-            'copy' =>
-            [
-                'slug'          => 'copy',
-                'name'          => 'Duplicate Camapign',
-                'description'   => 'Duplicate/Copy the Camapign',
-                'url'           => 'admin/mailchimp/campaigns/copy/' . $id,
-            ],  
-            'preview' =>
-            [
-                'slug'          => 'preview',
-                'name'          => 'Preview Newsletter',
-                'description'   => 'Views the Email Newsletter Template.',
-                'url'           => 'admin/mailchimp/campaigns/preview/' . $id,
-            ],                                        
-        ];
+        if($campaign = CampaignModel::find($id))
+        {
+            $actions = Chooser::CampaignActions($campaign);
 
-        return $this->view->make(
-            'module::admin/campaigns/preview',
-            [
-                'id'            => $id,
-                'method'        => $method,
-                'actions'       => $actions,
-            ]
-        );
+            return $this->view->make(
+                'module::admin/campaigns/choose',
+                [
+                    'id'            => $id,
+                    'method'        => $method,
+                    'actions'       => $actions,
+                ]
+            );
+        }
+
+        // errr
+        return redirect()->back();
     } 
 
 
@@ -141,10 +108,10 @@ class CampaignsController extends AdminController
                 return redirect()->back();
             }
 
-            if($result = Content::Get($campaign->campaign_str_id))
+            if($result = Content::GetPreview($campaign))
             {
                 // $form->getForm()->addData('email_template',$result->html);
-                $form->addFormData('email_template',$result->html);
+                $form->addFormData('email_template',$result->content_html);
                 // $form->getForm()->addData('id',$id);
                 $form->addFormData('id',$id);
 
@@ -164,7 +131,25 @@ class CampaignsController extends AdminController
      * @param  mixed $messages
      * @return void
      */
-    public function preview(ContentFormBuilder $form, $id, MessageBag $messages)
+    public function preview(PreviewContentFormBuilder $form, $id, MessageBag $messages)
+    {
+        if($campaign = CampaignModel::find($id))
+        {
+            if($result = Content::GetPreview($campaign))
+            {
+                $form->addFormData('email_template',$result->content_html);
+                $form->addFormData('id', $id);
+
+                return $form->render( $id );
+            }
+        }
+
+        $messages->info('oops, this message needs updating.');
+
+        return redirect()->back();
+    } 
+
+    public function template(ContentFormBuilder $form, $id, MessageBag $messages)
     {
         if($campaign = CampaignModel::find($id))
         {
@@ -180,10 +165,7 @@ class CampaignsController extends AdminController
         $messages->info('oops, this message needs updating.');
 
         return redirect()->back();
-
-    } 
-
-    
+    }  
     /**
      * copy
      *

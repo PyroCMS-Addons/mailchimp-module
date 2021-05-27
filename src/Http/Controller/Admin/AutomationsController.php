@@ -140,7 +140,6 @@ class AutomationsController extends AdminController
      */
     public function sync( MessageBag $messages, AutomationRepository $repository )
     {
-
         if(Automation::SyncAll($repository))
         {
             $messages->success('thrive.module.mailchimp::common.now_synched_automations');

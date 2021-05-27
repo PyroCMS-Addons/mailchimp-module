@@ -252,7 +252,6 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	}
 
 
-
 	public function boot()
 	{
 		// binding a class to the service container 

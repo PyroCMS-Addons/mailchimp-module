@@ -37,11 +37,11 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
         "content_name" => [
             "type"   => "anomaly.field_type.text",
         ], 
-        "content_campaign_id" => [
+        "content_campaign_id" => [ 
             "type"   => "anomaly.field_type.text",
         ],            
         'content_plain_text' => [
-            "type"   => "anomaly.field_type.text",
+            "type"   => "anomaly.field_type.textarea",
         ],    
         'content_html' => [
             "type"   => "anomaly.field_type.editor",

@@ -32,7 +32,6 @@ use Thrive\MailchimpModule\Support\Mailchimp;
  */
 class Campaign
 {
-    
     /**
      * Sync
      *
@@ -86,7 +85,7 @@ class Campaign
                         $local->campaign_name        = $campaign->settings->title;
                         $local->campaign_type        = $campaign->type;
                         $local->list_id              =  $campaign->recipients->list_id;  
-                        $local->campaign_sync_status = 'Synched';
+                        $local->campaign_sync_status = 'Synchronised';
                         $local->status               = $campaign->status;
                         $local->campaign_str_id      = $campaign->id;
                         $local->save();
@@ -102,7 +101,6 @@ class Campaign
                         }
                         else
                         {
-                            // dd($campaign);
                             $item = new CampaignModel();
                             $item->campaign_name        = $campaign->settings->title;
                             $item->campaign_type        = $campaign->type;
@@ -151,20 +149,22 @@ class Campaign
 
         return false;
     }
-
+    
+    /**
+     * PostAll
+     *
+     * @param  mixed $repository
+     * @return bool
+     */
     public static function PostAll(CampaignRepository $repository) : bool
     {
         if($mailchimp = Mailchimp::Connect())
         {
             foreach($repository->all() as $campaign)
             {
-                if(self::Post($campaign))
+                if(!self::Post($campaign))
                 {
-                    //ok
-                }
-                else
-                {
-                    //report log
+                    Log::info('Unable to Post ' . $campaign->campaign_name . ' [' . $campaign_name->id . ']' );
                 }
             }
 
@@ -266,7 +266,6 @@ class Campaign
         }
 
         return false;
-
     }
     
         
@@ -299,7 +298,6 @@ class Campaign
      */
     public static function PrepareCampaign(CampaignInterface $entry)
     {
-
         $settings = [];
 
         // required for create
@@ -329,6 +327,5 @@ class Campaign
         }
 
         return $settings;
-
     }    
 }

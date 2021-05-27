@@ -13,7 +13,8 @@
         <ul class="nav nav-pills nav-stacked">
             {% for action in actions %}
                 <li class="nav-item">
-                    <a href="{{ url_to( action.url ) }}" class="nav-link">
+                    <a href="{{ url_to( action.url ) }}" class="nav-link" 
+                    data-icon="warning">
                         <strong>{{ action.name }}</strong>
                         <br>
                         <small>{{ action.description }}</small>

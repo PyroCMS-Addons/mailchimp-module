@@ -144,8 +144,6 @@ class CampaignFormBuilder extends FormBuilder
     {
         Log::debug('--- [ Begin ] ---  CampaignFormBuilder::onSaving ');
 
-        // $new_name    = $this->getRequestValue('thrive_sync_status');
-
         $this->can_post_to_mailchimp = true;
 
     }
@@ -168,6 +166,7 @@ class CampaignFormBuilder extends FormBuilder
 
         if($this->can_post_to_mailchimp)
         {
+            // Change this to Campaign::Post(xx);
              if($item = Campaign::PostLocalEntryToMailchimp($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');

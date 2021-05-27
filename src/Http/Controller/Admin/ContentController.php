@@ -31,10 +31,6 @@ class ContentController extends AdminController
 
         $html = Content::Get($campaign->campaign_str_id);
 
-        // dd($html->archive_html);
-        // dd($html->html);
-        // dd($html->plain_text);
-
         return view('thrive.module.mailchimp::admin.content.view')->withContent($html->html);
     }
 }

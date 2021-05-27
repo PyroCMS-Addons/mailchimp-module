@@ -31,8 +31,6 @@ use Thrive\MailchimpModule\Support\Mailchimp;
  */
 class Automation
 {
-    
-        
     /**
      * Sync
      * 
@@ -46,7 +44,6 @@ class Automation
      * @return void
      * @throws Exception
      */    
-
     public static function Sync(AutomationInterface $automation)
     {
         throw new \Exception('Not Yet Implemented');
@@ -63,7 +60,13 @@ class Automation
 
         return false;
     }
-
+    
+    /**
+     * SyncAll
+     *
+     * @param  mixed $repository
+     * @return void
+     */
     public static function SyncAll(AutomationRepository $repository)
     {
         if($mailchimp = Mailchimp::Connect())

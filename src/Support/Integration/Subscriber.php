@@ -386,6 +386,4 @@ class Subscriber
 
 		return false;
 	}
-
-
 }

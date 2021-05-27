@@ -226,10 +226,10 @@ trait MailchimpCampaignTrait
     /**
      * getCampaign
      *
-     * @param  mixed $str_id
+     * @param  mixed $campaign_id
      * @return mixed
      */
-    public function getCampaign($str_id) 
+    public function getCampaign($campaign_id) 
     {
         $response = '';
 

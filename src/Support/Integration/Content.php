@@ -4,17 +4,11 @@
 use Illuminate\Support\Facades\Log;
 
 // Thrive
-// use Thrive\MailchimpModule\Audience\AudienceModel;
-// use Thrive\MailchimpModule\Audience\AudienceRepository;
-// use Thrive\MailchimpModule\Automation\AutomationModel;
-// use Thrive\MailchimpModule\Automation\AutomationRepository;
 use Thrive\MailchimpModule\Support\Mailchimp;
 use Thrive\MailchimpModule\Content\ContentModel;
 use Thrive\MailchimpModule\Campaign\Contract\CampaignInterface;
 use Thrive\MailchimpModule\Automation\Contract\AutomationInterface;
 use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
-// use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
-// use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 
 /**
  * Content
@@ -95,10 +89,10 @@ class Content
                     // Now store the content
                     $local = new ContentModel;
                     $local->content_name            = 'Template for ' . $campaign->campaign_name;
-                    $local->content_campaign_id     = $remote->campaign_str_id;
-                    $local->content_plain_text      = $remote->plain_text;
-                    $local->content_html            = $remote->html;
-                    $local->content_archive_html    = $remote->archive_html;
+                    $local->content_campaign_id     = $campaign->campaign_str_id;
+                    $local->content_plain_text      = (isset($remote->plain_text)) ? $remote->plain_text : '' ;
+                    $local->content_html            = (isset($remote->html)) ? $remote->html : '' ; 
+                    $local->content_archive_html    = (isset($remote->archive_html)) ? $remote->archive_html : '' ;
                     $local->content_fields          = '';
                     $local->save();
 

@@ -3,12 +3,15 @@
 use Anomaly\Streams\Platform\Message\MessageBag;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 use Illuminate\Support\Facades\Log;
+use Thrive\MailchimpModule\Content\ContentModel;
 use Thrive\MailchimpModule\Support\Integration\Content;
 
-class ContentFormBuilder extends FormBuilder
+class PreviewContentFormBuilder extends FormBuilder
 {
 
-    // protected $model = UserModel::class;
+    protected $model = ContentModel::class;
+
+
     /**
      * The form fields.
      *
@@ -72,42 +75,18 @@ class ContentFormBuilder extends FormBuilder
     protected $sections = [
         'metafield'   => [
             'stacked' => false,
-            'tabs' => [
-                'details' => [
-                    'title'  => 'Details',
-                    'fields' => [
-                        'content_name',
-                        'content_campaign_id',
-                    ],
-                ],                  
+            'tabs' => [                
                 'html' => [
-                    'title'  => 'HTML',
-                    'fields' => [
-                        'content_html',
+                    'title'  => 'Email Preview',
+                    'view' => [
+                        'module::admin/tabs/campaign-actions',
                     ],
-                ],                     
-                'plain_text' => [
-                    'title'  => 'Plain Text',
                     'fields' => [
-                        'content_plain_text',
-                    ],
-                ],                                                                 
+                        '*'
+                    ]
+                ],                                                                                    
             ],
         ],        
     ];
-
-    //protected $handler = \Thrive\MailchimpModule\Content\Form\ContentFormHandler::class;
-
-
-    /**
-     * The form assets.
-     *
-     * @var array
-     */
-    protected $assets = [];
-
-
-    protected $can_post_to_mailchimp;
-
 
 }
