@@ -87,7 +87,7 @@ class Subscriber
 				$offset         = self::START_COUNT;
 				$count          = self::MAX_RECORDS;
 				$fields         = null;
-				$fields         = 'members.email_address,members.status,members.merge_fields';
+				$fields         = 'members.id,members.email_address,members.status,members.merge_fields';
 				$exfields       = null; //'members.email_address,members.vip,full_name,total_items';
 
 				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
@@ -161,6 +161,10 @@ class Subscriber
 														$fname,
 														$lname);
 			}
+			else
+			{
+				Log::debug('  » List does not exist on remote. List/Audience Id [ ' . $entry->subscriber_audience_id . ' ]' );
+			}
 		}
 
 		return false;
@@ -194,43 +198,6 @@ class Subscriber
 		}
 
 		return false;
-	}
-
-
-	/**
-	 * PostSubscriberToMailchimp
-	 *
-	 * @deprecated Post() and PostAll() has replaced this method
-	 * @see self::Post()
-	 *
-	 * @param  mixed $entry
-	 * @return void
-	 */
-	public static function PostSubscriberToMailchimp(SubscriberInterface $entry)
-	{
-		// Connect to Mailchimp
-		if($mailchimp = Mailchimp::Connect())
-		{
-			// Check to ensure mailchimp still
-			// has this list.
-			if($mailchimp->hasList($entry->subscriber_audience_id))
-			{
-				// update contact
-				$fname = ($entry->subscriber_fname != "") ? $entry->subscriber_fname : null ;
-				$lname = ($entry->subscriber_lname != "") ? $entry->subscriber_lname : null ;
-
-				//Log::info('Pushing Contact: '. $entry->subscriber_fname);
-				return $mailchimp->setListMemberWithMergeFields(
-														$entry->subscriber_audience_id,
-														$entry->subscriber_email,
-														$entry->subscriber_subscribed,
-														$fname,
-														$lname);
-			}
-		}
-
-		return false;
-
 	}
 
 
@@ -354,12 +321,19 @@ class Subscriber
 		return false;
 	}
 
-
+	
+	/**
+	 * CreateLocalSubscriber
+	 *
+	 * @param  mixed $email_address
+	 * @param  mixed $list_id
+	 * @return void
+	 */
 	public static function CreateLocalSubscriber( $email_address, $list_id )
 	{
 		try
 		{
-			if(SubscriberModel::where('subscriber_audience_id',$list_id)->where('email',$email_address)->first())
+			if(SubscriberModel::where('subscriber_audience_id',$list_id)->where('subscriber_email',$email_address)->first())
 			{
 				Log::debug('Subscriber Already exist in Mailchimp');
 				return false;

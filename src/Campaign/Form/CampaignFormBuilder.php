@@ -106,7 +106,7 @@ class CampaignFormBuilder extends FormBuilder
                     ],
                 ],                 
                 'viewtab' => [
-                    'title'  => 'Actions',
+                    'title'  => 'Template',
                     'view' => [
                         'module::admin/tabs/campaign-actions',
                     ],

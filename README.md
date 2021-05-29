@@ -44,19 +44,19 @@ THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
  4. Once you have connected your API key, run this command: `php artisan mailchimp:sync`
 
 
-### Plugin
+## Plugin 
 
 Mailchimp comes with a `Plugin` that is very easy to use and integrate into your themes.
 
 ### Subscribe Form
-```
+```php
 	{{ mailchimp('subscribe').list('list-id')|raw }}
 ```
 
 ### Unsubscribe Form
 This works exactly the same way, just set the action to unsubscribe.
 
-```
+```php
 	{{ mailchimp('unsubscribe').list('list-id')|raw }}
 ```
 
@@ -64,7 +64,8 @@ This works exactly the same way, just set the action to unsubscribe.
 With advanced plugin you can set the `tags` to be posted to Mailchimp,
 A title for the form, a complete seperate view file, or even require 
 a FNAME for mailchimp.
-```
+
+```php
 {{ mailchimp('subscribe')
         .list('list-id')
         .tag('single tag')
@@ -75,9 +76,41 @@ a FNAME for mailchimp.
 
 ```
 
-### Plugin Limitation
+
+### Ping `:)`
+The ping function is a wip, not yet developed but will test the api connection and return a string from Mailchimp if all good to go. This could be a good user case for front end development.
+
+```php
+Code:
+	{{ mailchimp('ping') }}
+
+Output:
+        "Everythings chimpy"
+```
+
+
+
+#### Plugin Limitation
 The plugin can send `tags` to Mailchimp during a subscribe, however these tags will not be stored on the local system. Development is planned to integrate the tags locally, however its not yet baked.
 Check back soon.
+
+
+
+        
+## Using Forms Module
+Using all three extensions below, you can link the Forms Module with Mailchimp. Just use the `Mailchimp-Form-Extension` and add the `MCAudience` field-type. You can choose to have a hidden field for the Audience or a Select list.
+
+#### Supported Forms Modules
+- `Anomaly\Forms` (PyroCMS Pro Feature)
+- `Thrive\Forms` (Private Repository)
+
+What                              | Why                                                                                 
+--------------------------------- | ---------------
+`thrive.field_type.mcaudience`    | Field Type Listing Available Audiences/List.
+`thrive.extension.mailchimp`      | Linking the Forms Module with Mailchimp Module. This allos you to Subscribe Users using the Forms Module. This will post data to the `MailchimpModule.`
+`thrive.module.mailchimp`         | The Core Mailchimp Integration for PyroCMS  
+
+
 
 
 
@@ -85,16 +118,5 @@ Check back soon.
 
 What                       | Command
 -------------------------- | -------------------------------
-Start the Task Scheduler   | `php artisan mailchimp:tidy`  
+Starts the Task Scheduler  | `php artisan mailchimp:tidy`  
 Sync All Libraries (once)  | `php artisan mailchimp:sync`  
-
-        
-## @todos
-
-What                      | Why                                                                                 
--------------------------- | ---------------
-`Rename Stream Fields`    | For consistancy and ability to expand on module development in future  
-`Rename Stream Fields`    | For consistancy and ability to expand on module development in future  
-`Rename Stream Fields`    | For consistancy and ability to expand on module development in future  
-
-

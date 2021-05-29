@@ -6,14 +6,12 @@
 <form 
     method="POST" 
     action="{{ options.handler }}" 
-
     name="{{ options.form_name }}" 
     > 
 
     {{ csrf_field()|raw }}
 
-    {# <input class="{{ options.input_class }}" type="email"               name="email"   placeholder="your@email.com" > #}
-    <input class="{{ options.input_class }}" type="subscriber_email"    name="email"   placeholder="your@email.com" >
+    <input class="{{ options.input_class }}" type="email"    name="subscriber_email"   placeholder="your@email.com" >
 
     {% if options.use_fname  %}
         <input class="{{ options.input_class }}"  type="text" name="fname" value="" placeholder="Name">
@@ -26,7 +24,7 @@
     {% endfor %}
 
     <input type="hidden" name="action"  value="{{ options.action }}">
-    <input type="submit" name="submit"  value="{{ options.button_text ??  'Submit'  }}" >
+    <input type="submit" name="submit"  value="{{ options.button_text ??  'Submit' }}" >
 
 </form>
 

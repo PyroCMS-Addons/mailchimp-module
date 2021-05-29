@@ -129,16 +129,22 @@ class Automation
      */
     public static function Start(AutomationInterface $entry)
     {
+        Log::debug('--- [ Begin ] ---  Automation::Start ');
+
         if($mailchimp = Mailchimp::Connect())
         {
+            Log::debug('  » 00 Start Automation    : [ ' . $entry->automation_workflow_id . ' ]' );
+
             if($automation = $mailchimp->startAutomation($entry->automation_workflow_id))
             {
+                Log::debug('  » 00 Start Status        : Success' );
+
                 $entry->automation_status = $automation->status;
                 $entry->save();
             }
             else
             {
-                Log::error('failed return');
+                Log::debug('  » 00 Start Status        : Failed' );
             }
         }
 
@@ -154,16 +160,22 @@ class Automation
      */
     public static function Pause(AutomationInterface $entry)
     {
+        Log::debug('--- [ Begin ] ---  Automation::Pause ');
+
         if($mailchimp = Mailchimp::Connect())
         {
+            Log::debug('  » 00 Pause Automation    : [ ' . $entry->automation_workflow_id . ' ]' );
+
             if($automation = $mailchimp->pauseAutomation($entry->automation_workflow_id))
             {
+                Log::debug('  » 00 Pause Status        : Success' );
+
                 $entry->automation_status = $automation->status;
                 $entry->save();
             }
             else
             {
-                Log::error('failed return');
+                Log::debug('  » 00 Pause Status        : Failed' );
             }
         }
 

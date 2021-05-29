@@ -44,6 +44,7 @@ class SubscriberFormFields
             ];
         }
 
+
         // before working on this,
         // need to check how it will affect
         // {{ forms(mailchimp) }}
@@ -60,7 +61,6 @@ class SubscriberFormFields
                 'subscriber_lname',
             ];
         }
-
 
         $builder->setFields(
             $fields

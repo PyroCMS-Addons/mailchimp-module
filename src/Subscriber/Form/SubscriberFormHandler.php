@@ -53,7 +53,7 @@ class SubscriberFormHandler
         // Mode
         $create_or_edit = $stream->getMode();
 
-        if(  $builder->canSave() )
+        if( $builder->canSave() )
         {
             Log::debug('  » 00 Admin Handle        : ');
             Log::debug('  » 00 Admin Mode          : ' . $create_or_edit );
@@ -217,19 +217,16 @@ class SubscriberFormHandler
 
 
         // Check to see if we have any tags
-        if($tags && is_string($tags))
-        {
-            Log::debug('        » Tags Is String   : '. $tags);
-        }
-
+        $tags_found = '';
         if($tags && is_array($tags))
         {
-            Log::debug('        » Tags Is Array    : ');
             foreach($tags as $tag)
             {
-                Log::debug('        » Tag              : '. $tag);
+                $tags_found .= $tag . ' | ';
             }
         }
+        Log::debug('        » Tags Is Array    : ' . $tags_found);
+
 
         if($pass_email && $pass_strid && $pass_action && $pass_subflag)
         {
