@@ -10,14 +10,13 @@ class AudienceModel extends MailchimpAudiencesEntryModel implements AudienceInte
 {
     
     /**
-     * getStrId
+     * getAudienceId
      *
      * @return void
      */
-    public function getStrId()
+    public function getAudienceId()
     {
-        return $this->str_id;
+        return $this->audience_remote_id;
     }
-
 
 }

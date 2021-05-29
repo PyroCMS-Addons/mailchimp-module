@@ -18,7 +18,7 @@ class SubscriberTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $filters = [
-        'email'
+        'subscriber_email'
     ];
 
     /**
@@ -27,10 +27,10 @@ class SubscriberTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $columns = [
-        'email',
-        'fname',    
-        'lname',    
-        'entry.subscribed.toggle' => [
+        'subscriber_email',
+        'subscriber_fname',    
+        'subscriber_lname',    
+        'entry.subscriber_subscribed.toggle' => [
             'is_safe' => true,
         ], 
     ];

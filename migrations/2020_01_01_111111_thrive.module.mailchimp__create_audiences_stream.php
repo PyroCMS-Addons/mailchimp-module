@@ -19,8 +19,8 @@ class ThriveModuleMailchimpCreateAudiencesStream extends Migration
      * @var array
      */
     protected $stream = [
-        'slug' => 'audiences',
-        'title_column' => 'name',
+        'slug'          => 'audiences',
+        'title_column'  => 'audience_name',
         'translatable'  => false,
         'versionable'   => false,
         'trashable'     => true,
@@ -34,37 +34,37 @@ class ThriveModuleMailchimpCreateAudiencesStream extends Migration
      * @var array
      */
     protected $fields = [
-        "name" => [
+        "audience_name" => [
             "type"   => "anomaly.field_type.text",
         ],
-        'str_id' => [
+        'audience_remote_id' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
                 "default_value" => null,
             ]
         ],
-        'permission_reminder' => [
+        'audience_permission_reminder' => [
             "type"   => "anomaly.field_type.textarea",
         ],
-        'email_type_option' => [
+        'audience_email_type_option' => [
             "type"   => "anomaly.field_type.boolean",
         ],
-        'contact_company_name' => [
+        'audience_contact_company_name' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'contact_address1' => [
+        'audience_contact_address1' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'contact_city' => [
+        'audience_contact_city' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'contact_state' => [
+        'audience_contact_state' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'contact_zip' => [
+        'audience_contact_zip' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'contact_country' => [
+        'audience_contact_country' => [
             "type"   => "anomaly.field_type.select",
             "config" => [
                 "options"       =>
@@ -95,16 +95,16 @@ class ThriveModuleMailchimpCreateAudiencesStream extends Migration
                 "mode"          => "dropdown",
             ]
         ],
-        'campaign_from_name' => [
+        'audience_campaign_from_name' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'campaign_from_email' => [
+        'audience_campaign_from_email' => [
             "type"   => "anomaly.field_type.email",
         ],
-        'campaign_subject' => [
+        'audience_campaign_subject' => [
             "type"   => "anomaly.field_type.text",
         ],
-        'campaign_language' => [
+        'audience_campaign_language' => [
             "type"   => "anomaly.field_type.select",
             "config" => [
                 "options"       =>
@@ -248,6 +248,8 @@ class ThriveModuleMailchimpCreateAudiencesStream extends Migration
                 "mode"          => "dropdown",
             ]
         ],
+
+        // @deprecated
         'thrive_sync_status' => [
             "type"   => "anomaly.field_type.text",
             "config"  =>[
@@ -262,82 +264,115 @@ class ThriveModuleMailchimpCreateAudiencesStream extends Migration
      * @var array
      */
     protected $assignments = [
-
-        "thrive_sync_status" => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "name" => [
+        "audience_name" => [
             'translatable'      => false,
             'unique'            => true,
             'required'          => true,
         ],
-        'str_id' => [
+        'audience_remote_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'permission_reminder' => [
+        'audience_permission_reminder' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'email_type_option' => [
+        'audience_email_type_option' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'contact_company_name' => [
+        'audience_contact_company_name' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'contact_address1' => [
+        'audience_contact_address1' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'contact_city' => [
+        'audience_contact_city' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'contact_state' => [
+        'audience_contact_state' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'contact_zip' => [
+        'audience_contact_zip' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'contact_country' => [
+        'audience_contact_country' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'campaign_from_name' => [
+        'audience_campaign_from_name' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'campaign_from_email' => [
+        'audience_campaign_from_email' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'campaign_subject' => [
+        'audience_campaign_subject' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'campaign_language' => [
+        'audience_campaign_language' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ]
+        ],
+
+
+        // @deprecated - Status Fields
+        "thrive_sync_status" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //   
+        "status_remote_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],                         
     ];
 
 }

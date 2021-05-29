@@ -95,7 +95,11 @@ class Sync extends Command implements ShouldQueue
             $option = "Default";
         }
 
-        $this->processTasks();
+        if($option =='clean')
+            $this->clean_lists();
+        else
+            $this->processTasks();
+            
 
         Log::info('The command was successful with the option of: '. $option);
 
@@ -133,6 +137,16 @@ class Sync extends Command implements ShouldQueue
             $this->info('Subscribers have been Synchronised.');
         }
 
+    }
+
+    private function clean_lists()
+    {
+        if(Audience::CleanVagrantLists($this->audienceRepository))
+        {
+            Log::info('Removed Unwanted Audiences.');
+
+            $this->info('Removed Unwanted Audiences.');
+        }
     }
 
 }

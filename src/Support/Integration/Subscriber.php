@@ -82,7 +82,7 @@ class Subscriber
 		{
 			foreach($repository->all() as $local)
 			{
-				$lists          = $mailchimp->getMembers( $local->str_id, 'total_items');
+				$lists          = $mailchimp->getMembers( $local->audience_remote_id, 'total_items');
 				$max_records    = ($lists->total_items) ?? 0;
 				$offset         = self::START_COUNT;
 				$count          = self::MAX_RECORDS;
@@ -92,7 +92,7 @@ class Subscriber
 
 				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
 				{
-					$lists = $mailchimp->getMembers( $local->str_id, $fields, $exfields, $count, $offset );
+					$lists = $mailchimp->getMembers( $local->audience_remote_id, $fields, $exfields, $count, $offset );
 
 					if(isset($lists->members))
 					{
@@ -102,7 +102,7 @@ class Subscriber
 							foreach($lists->members as $member)
 							{
 								// Do we have on in our table ?
-								if($subscriber = SubscriberModel::where('audience',$local->str_id)->where('email',$member->email_address)->first())
+								if($subscriber = SubscriberModel::where('subscriber_audience_id',$local->audience_remote_id)->where('subscriber_email',$member->email_address)->first())
 								{
 									self::UpdateLocalSubscriberFromRemote( $subscriber, $member, $local );
 								}
@@ -147,17 +147,17 @@ class Subscriber
 		{
 			// Check to ensure mailchimp still
 			// has this list.
-			if($mailchimp->hasList($entry->audience))
+			if($mailchimp->hasList($entry->subscriber_audience_id))
 			{
 				// update contact
-				$fname = ($entry->fname != "") ? $entry->fname : null ;
-				$lname = ($entry->lname != "") ? $entry->lname : null ;
+				$fname = ($entry->subscriber_fname != "") ? $entry->subscriber_fname : null ;
+				$lname = ($entry->subscriber_lname != "") ? $entry->subscriber_lname : null ;
 
-				//Log::info('Pushing Contact: '. $entry->fname);
+				//Log::info('Pushing Contact: '. $entry->subscriber_fname);
 				return $mailchimp->setListMemberWithMergeFields(
-														$entry->audience,
-														$entry->email,
-														$entry->subscribed,
+														$entry->subscriber_audience_id,
+														$entry->subscriber_email,
+														$entry->subscriber_subscribed,
 														$fname,
 														$lname);
 			}
@@ -185,13 +185,12 @@ class Subscriber
 			// dd($local);
 			foreach($local as $subscriber)
 			{
-				Log::debug('  » 00 Pushing User        : ' . $subscriber->email);
+				Log::debug('  » 00 Pushing User        : ' . $subscriber->subscriber_email);
 
 				self::PostSubscriberToMailchimp($subscriber);
 			}
 
 			return true;
-
 		}
 
 		return false;
@@ -214,17 +213,17 @@ class Subscriber
 		{
 			// Check to ensure mailchimp still
 			// has this list.
-			if($mailchimp->hasList($entry->audience))
+			if($mailchimp->hasList($entry->subscriber_audience_id))
 			{
 				// update contact
-				$fname = ($entry->fname != "") ? $entry->fname : null ;
-				$lname = ($entry->lname != "") ? $entry->lname : null ;
+				$fname = ($entry->subscriber_fname != "") ? $entry->subscriber_fname : null ;
+				$lname = ($entry->subscriber_lname != "") ? $entry->subscriber_lname : null ;
 
-				//Log::info('Pushing Contact: '. $entry->fname);
+				//Log::info('Pushing Contact: '. $entry->subscriber_fname);
 				return $mailchimp->setListMemberWithMergeFields(
-														$entry->audience,
-														$entry->email,
-														$entry->subscribed,
+														$entry->subscriber_audience_id,
+														$entry->subscriber_email,
+														$entry->subscriber_subscribed,
 														$fname,
 														$lname);
 			}
@@ -237,10 +236,10 @@ class Subscriber
 
 	/**
 	 * LocalhasSubscriber
-	 * 
+	 *
 	 * @comment		Need to asses if we really need this function
-	 * 				It seems this would be much better served 
-	 * 				on the Model! 
+	 * 				It seems this would be much better served
+	 * 				on the Model!
 	 *
 	 * @param  mixed $email
 	 * @param  mixed $audience_id
@@ -248,7 +247,7 @@ class Subscriber
 	 */
 	public static function LocalhasSubscriber($email,$audience_id)
 	{
-		if($subscriber = SubscriberModel::where('email',$email)->where('audience',$audience_id)->first())
+		if($subscriber = SubscriberModel::where('subscriber_email',$email)->where('subscriber_audience_id',$audience_id)->first())
 		{
 			return $subscriber;
 		}
@@ -294,9 +293,9 @@ class Subscriber
 	/**
 	 * PrepareContact
 	 *
-	 * @deprecated - 
+	 * @deprecated -
 	 * @see FormatContact.
-	 * 
+	 *
 	 * @param  mixed $email
 	 * @param  mixed $subscribe
 	 * @param  mixed $FNAME
@@ -334,13 +333,15 @@ class Subscriber
 		{
 			// create
 			$local = new SubscriberModel();
-			$local->email                   = $remote->email_address;
-			$local->thrive_contact_synced   = true;
-			$local->audience                = $list->str_id;
-			$local->subscribed              = ($remote->status == 'subscribed') ? true: false ;
-			$local->audience_name           = $list->name ;
-			$local->fname                   = $remote->merge_fields->FNAME ;
-			$local->lname                   = $remote->merge_fields->LNAME ;
+			$local->subscriber_email        	= $remote->email_address;
+			$local->subscriber_remote_id   		= $remote->id;
+			$local->thrive_contact_synced   	= true;
+			$local->subscriber_audience_id     	= $list->audience_remote_id;
+			$local->subscriber_subscribed       = ($remote->status == 'subscribed') ? true: false;
+			$local->subscriber_status       	= $remote->status;
+			$local->subscriber_audience_name 	= $list->audience_name;
+			$local->subscriber_fname            = $remote->merge_fields->FNAME;
+			$local->subscriber_lname            = $remote->merge_fields->LNAME;
 			$local->save();
 
 			return true;
@@ -353,6 +354,35 @@ class Subscriber
 		return false;
 	}
 
+
+	public static function CreateLocalSubscriber( $email_address, $list_id )
+	{
+		try
+		{
+			if(SubscriberModel::where('subscriber_audience_id',$list_id)->where('email',$email_address)->first())
+			{
+				Log::debug('Subscriber Already exist in Mailchimp');
+				return false;
+			}
+
+			// create
+			$local = new SubscriberModel();
+			$local->subscriber_email        = $email_address;
+			$local->thrive_contact_synced   = false;
+			$local->subscriber_status      	= 'subscribed';
+			$local->subscriber_audience_id  = $list_id;
+			$local->subscriber_subscribed   = true;
+			$local->save();
+
+			return $local;
+		}
+		catch(\Exceeption $e)
+		{
+			//can we delete what we created ?
+		}
+
+		return false;
+	}
 
 	/**
 	 * UpdateLocalSubscriberFromRemote
@@ -367,14 +397,18 @@ class Subscriber
 		try
 		{
 			// update
-			$subscriber->email                   = $remote->email_address;
-			$subscriber->thrive_contact_synced   = true;
-			$subscriber->audience                = $list->str_id;
-			$subscriber->subscribed              = ($remote->status == 'subscribed') ? true: false ;
-			$subscriber->audience_name           = $list->name ;
+			$subscriber->subscriber_email        	= $remote->email_address;
+			$subscriber->thrive_contact_synced   	= true;
+			$subscriber->subscriber_remote_id   	= $remote->id;
 
-			$subscriber->fname                   = $remote->merge_fields->FNAME ;
-			$subscriber->lname                   = $remote->merge_fields->LNAME ;
+			$subscriber->subscriber_audience_id     = $list->audience_remote_id;
+			$subscriber->subscriber_subscribed      = ($remote->status == 'subscribed') ? true: false ;
+			$subscriber->subscriber_status      	= $remote->status;
+			
+			$subscriber->subscriber_audience_name 	= $list->audience_name;
+
+			$subscriber->subscriber_fname           = $remote->merge_fields->FNAME;
+			$subscriber->subscriber_lname           = $remote->merge_fields->LNAME;
 			$subscriber->save();
 
 			return true;

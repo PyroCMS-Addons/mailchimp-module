@@ -72,7 +72,7 @@ class SubscriberFormHandler
         Log::debug('  » 00 Public Handle       : ');
         Log::debug('  » 00 Admin Mode          : Public'); //. $create_or_edit );
 
-        $email              = $request->input('email');
+        $email              = $request->input('subscriber_email');
         $strid              = $request->input('strid');
         $action             = $request->input('action');
         $action_bool        = ($action == 'subscribe') ? true : false ;
@@ -106,18 +106,18 @@ class SubscriberFormHandler
         if($subscriber = Subscriber::LocalhasSubscriber($email_adddress, $strid))
         {
             Log::debug('        » Has Local        : YES');
-            $subscriber->subscribed     = $subscribe;
-            $subscriber->audience       = $strid;
+            $subscriber->subscriber_subscribed  = $subscribe;
+            $subscriber->subscriber_audience_id    = $strid;
             $subscriber->save();
         }
         else
         {
             Log::debug('        » Has Local        : NO');
             $subscriber = new SubscriberModel();
-            $subscriber->email                   = $email_adddress;
-            $subscriber->subscribed              = $subscribe;
+            $subscriber->subscriber_email        = $email_adddress;
+            $subscriber->subscriber_subscribed   = $subscribe;
             $subscriber->thrive_contact_synced   = false; //we will sync later
-            $subscriber->audience                = $strid;
+            $subscriber->subscriber_audience_id     = $strid;
             $subscriber->save();
         }
 

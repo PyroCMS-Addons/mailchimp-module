@@ -23,7 +23,7 @@ class CampaignTableButtons extends TableBuilder
                     'data-message' => 'Are you sure ?'
                 ],
                 'enabled'    => function (EntryInterface $entry) {
-                    if ($entry->status == 'sent') {
+                    if ($entry->campaign_status == 'sent') {
                         return false;
                     }
                     return true;
@@ -33,7 +33,7 @@ class CampaignTableButtons extends TableBuilder
             [
                 'type'      => 'success',
                 'disabled'    => function (EntryInterface $entry) {
-                    if ($entry->status == 'sent') {
+                    if ($entry->campaign_status == 'sent') {
                         return true;
                     }
                     return false;
@@ -47,7 +47,7 @@ class CampaignTableButtons extends TableBuilder
                 'href'        => 'admin/mailchimp/campaigns/option/edit/{entry.id}',                
                 'type'       => 'default',
                 'enabled'    => function (EntryInterface $entry) {
-                    if ($entry->status == 'save') {
+                    if ($entry->campaign_status == 'save') {
                         return true;
                     }
                     return true;

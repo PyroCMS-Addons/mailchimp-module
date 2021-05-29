@@ -19,8 +19,8 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
      * @var array
      */
     protected $stream = [
-        'slug' => 'campaigns',
-        'title_column' => 'campaign_name',
+        'slug'          => 'campaigns',
+        'title_column'  => 'campaign_name',
         'translatable'  => false,
         'versionable'   => false,
         'trashable'     => true,
@@ -37,7 +37,7 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
         "campaign_name" => [
             "type"   => "anomaly.field_type.text",
         ],
-        'campaign_str_id' => [
+        'campaign_remote_id' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
                 "default_value" => null,
@@ -61,22 +61,12 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
                 "mode"          => "dropdown",
             ]
         ],     
-        'list_id' => [
+        'campaign_list_id' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
                 "default_value" => null,
             ]
         ],
-        'campaign_sync_status' => [
-            "type"   => "anomaly.field_type.text",
-            "config"  =>[
-                "default_value" => ""
-            ]
-        ],
-        'status' => [
-            "type"   => "anomaly.field_type.text",
-        ],        
-
         'campaign_subject_line' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
@@ -97,7 +87,18 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             "config" => [
                 "default_value" => null,
             ]
-        ],                     
+        ],      
+        'campaign_status' => [
+            "type"   => "anomaly.field_type.text",
+        ], 
+
+        // @deprecated status fields
+        'campaign_sync_status' => [
+            "type"   => "anomaly.field_type.text",
+            "config"  =>[
+                "default_value" => ""
+            ]
+        ],       
     ];
 
     /**
@@ -110,28 +111,18 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             'translatable'      => false,
             'unique'            => true,
             'required'          => true,
-        ],
-        'campaign_str_id' => [
+        ], 
+        'campaign_remote_id' => [
             'translatable'      => false,
             'unique'            => true,
             'required'          => true,
-        ],        
-        'list_id' => [
+        ],              
+        'campaign_list_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
         'campaign_type' => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => true,
-        ],
-        'status' => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],        
-        'campaign_sync_status' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
@@ -151,14 +142,54 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             'unique'            => false,
             'required'          => false,
         ],
-        // have considered this as unique
-        // but perhaps during alpha lets 
-        // leave this loosy.
         'campaign_template_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
+        'campaign_status' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+
+        // @depreated status fields
+        'campaign_sync_status' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => true,
+        ],
+
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //   
+        "status_remote_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],           
            
     ];
 

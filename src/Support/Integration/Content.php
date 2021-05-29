@@ -77,19 +77,19 @@ class Content
         if($mailchimp = Mailchimp::Connect())
         {
             // 1. Do we have it locally
-            if($content = ContentModel::where('content_campaign_id', $campaign->campaign_str_id)->first())
+            if($content = ContentModel::where('content_campaign_id', $campaign->campaign_remote_id)->first())
             {
                 return $content;
             }
             else
             {
                 // 2. ok, well if not then lets download the content
-                if($remote = $mailchimp->getCampaignContent( $campaign->campaign_str_id ))
+                if($remote = $mailchimp->getCampaignContent( $campaign->campaign_remote_id ))
                 {
                     // Now store the content
                     $local = new ContentModel;
                     $local->content_name            = 'Template for ' . $campaign->campaign_name;
-                    $local->content_campaign_id     = $campaign->campaign_str_id;
+                    $local->content_campaign_id     = $campaign->campaign_remote_id;
                     $local->content_plain_text      = (isset($remote->plain_text)) ? $remote->plain_text : '' ;
                     $local->content_html            = (isset($remote->html)) ? $remote->html : '' ; 
                     $local->content_archive_html    = (isset($remote->archive_html)) ? $remote->archive_html : '' ;

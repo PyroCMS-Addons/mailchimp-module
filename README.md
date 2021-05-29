@@ -21,11 +21,11 @@ PyroCMS Mailchimp Integration Module
 Please note, while this module is still in alpha, any code updates you receive, please uninstall and reinstall the module. There will be no upgrade path while under heavy development.
 
 
-#### About
+## About
 The Mailchimp Module integrates your Mailchimp Campaigns and allows you to Update campaign, send, and duplicate campaigns all within PyroCMS admin. It also has a Plugin so you can directly subscribe users and keep your subscribers in sync with Mailchimps Audience/List.
 
 
-# Quick Start
+## Quick Start
 1. You need to get your API key from Mailchimp, you can read about it here [https://mailchimp.com/help/about-api-keys/]
 2. You also need to get the Server Prefix which looks like this `us19`, when you log into Mailchimp it will be the first part of the domain.
 3. Update your ENV File with these details.
@@ -36,7 +36,7 @@ THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
 4. Follow the installatios steps
 5. Once installed, go to PyroCMS admin, and goto Mailchimp, under each section there will be a button to `Sync`
 
-## Installation
+### Installation
 
  1. Add to your addons directory as `/addons/default/thrive/mailchimp-module/*`
  2. Dump Autoloader `composer dump-autoload`
@@ -44,9 +44,9 @@ THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
  4. Once you have connected your API key, run this command: `php artisan mailchimp:sync`
 
 
-## Plugin Usage
+### Plugin
 
-The plugin is very powerful however for the minimalist usage, use the below
+Mailchimp comes with a `Plugin` that is very easy to use and integrate into your themes.
 
 ### Subscribe Form
 ```
@@ -81,12 +81,20 @@ Check back soon.
 
 
 
-# Task Scheduling
+## Commands & Task Scheduling
 
-`php artisan mailchimp:tidy`
+What                       | Command
+-------------------------- | -------------------------------
+Start the Task Scheduler   | `php artisan mailchimp:tidy`  
+Sync All Libraries (once)  | `php artisan mailchimp:sync`  
 
-Mailchimp Module uses Laravel + Pyro task scheduler to keep data in sync autoamtically.
+        
+## @todos
 
-To Start the Schedule, run the above command.
+What                      | Why                                                                                 
+-------------------------- | ---------------
+`Rename Stream Fields`    | For consistancy and ability to expand on module development in future  
+`Rename Stream Fields`    | For consistancy and ability to expand on module development in future  
+`Rename Stream Fields`    | For consistancy and ability to expand on module development in future  
 
-Future builds will allow you to set the frequence within the command and also via the settins.
+

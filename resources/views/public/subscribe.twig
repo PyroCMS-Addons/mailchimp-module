@@ -12,7 +12,8 @@
 
     {{ csrf_field()|raw }}
 
-    <input class="{{ options.input_class }}" type="email"  name="email"   placeholder="your@email.com" >
+    {# <input class="{{ options.input_class }}" type="email"               name="email"   placeholder="your@email.com" > #}
+    <input class="{{ options.input_class }}" type="subscriber_email"    name="email"   placeholder="your@email.com" >
 
     {% if options.use_fname  %}
         <input class="{{ options.input_class }}"  type="text" name="fname" value="" placeholder="Name">
@@ -20,9 +21,6 @@
 
     <input type="hidden" name="strid"  value="{{ options.list }}">
 
-    {% if options.tag != '' %}
-        <input type="hidden" name="mc_tags[]" value="{{ options.tag }}">
-    {% endif %}
     {% for tag in options.tags  %}
         <input type="hidden" name="mc_tags[]" value="{{ tag }}">
     {% endfor %}

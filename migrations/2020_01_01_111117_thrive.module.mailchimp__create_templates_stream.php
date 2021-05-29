@@ -134,5 +134,36 @@ class ThriveModuleMailchimpCreateTemplatesStream extends Migration
             'unique'            => false,
             'required'          => false,
         ],
+
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //   
+        "status_remote_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],           
     ];
 }

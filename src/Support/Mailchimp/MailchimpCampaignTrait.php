@@ -155,8 +155,8 @@ trait MailchimpCampaignTrait
         try 
         {    
             if($response = $this->mailchimp->campaigns->sendTestEmail($campaign_id, [
-                "test_emails" => $email_array,
-                "send_type" => "html",
+                "test_emails"   => $email_array,
+                "send_type"     => "html",
             ])) {
 
                 if($response == null)
@@ -209,12 +209,12 @@ trait MailchimpCampaignTrait
     /**
      * hasCampaign
      *
-     * @param  mixed $str_id
+     * @param  mixed $campaign_id
      * @return bool
      */
-    public function hasCampaign($str_id) : bool
+    public function hasCampaign($campaign_id) : bool
     {
-        if($campaign = $this->getCampaign($str_id))
+        if($campaign = $this->getCampaign($campaign_id))
         {
             return true;
         }

@@ -32,7 +32,7 @@ class CampaignRepository extends EntryRepository implements CampaignRepositoryIn
      */
     public function findByStrId($str_id)
     {
-        return $this->model->where('campaign_str_id', $str_id)->first();
+        return $this->model->where('campaign_remote_id', $str_id)->first();
     }
 
 

@@ -2,87 +2,15 @@
 
 return [
 
-    'email' => [
-        'name' => 'Email',
-        'instructions' => 'Email Address',
-    ],
-    'subscribed' => [
-        'name' => 'Subscribed',
-        'instructions' => 'Is User Subscribed',
-    ],    
     //
-    // Audience Fields
-    //
-    'name' => [
-        'name' => 'Name',
-        'instructions' => 'Give a Valid Audience Name',
-        'placeholder' => 'My Audience',
+    // @deprecated status fields
+    // 
+    'campaign_sync_status' => [
+        'name' => 'Sync Status',
+        'instructions' => '',
+        'placeholder' => '',
     ],
-    'str_id' => [
-        'name' => 'List-ID',
-        'instructions' => 'The ID of the Audience',
-        'placeholder' => 'You do not set this.',
-    ],    
-    'permission_reminder' => [
-        'name' => 'Permission Reminder',
-        'instructions' => 'The text reminder explaining to the user why they have been subscribed',
-        'placeholder' => 'You have been added to this list when you subscribed on our website.',
-    ],    
-    'email_type_option' => [
-        'name' => 'Email Type Option',
-        'instructions' => 'Enable this if you prefer different email types per users. We do not recomend this unless you are an advanced user.',
-    ],    
-    'contact_company_name' => [
-        'name' => 'Company Name',
-        'instructions' => 'Enter your company Name',
-        'placeholder' => 'Impressive Co.',
-    ],      
-    'contact_address1' => [
-        'name' => 'Company Address',
-        'instructions' => 'Enter your company Address',
-        'placeholder' => '123 Fake St',
-    ],      
-    'contact_city' => [
-        'name' => 'Company City',
-        'instructions' => 'Enter your company HQ City Location',
-        'placeholder' => 'Brisbane',
-    ],     
-    'contact_state' => [
-        'name' => 'Company State',
-        'instructions' => 'Enter your company HQ State Location',
-        'placeholder' => 'QLD',
-    ],   
-     
-    'contact_country' => [
-        'name' => 'Country',
-        'instructions' => 'Enter your company HQ Country Location',
-        'placeholder' => 'AU',
-    ],    
-    'contact_zip' => [
-        'name' => 'Company Zip',
-        'instructions' => 'Enter your company HQ ZIP Location',
-        'placeholder' => '4000',
-    ],        
-    'campaign_from_name' => [
-        'name' => 'Campaign From Name',
-        'instructions' => 'Who is this Sent From (name)',
-        'placeholder' => 'Jo Jackson',
-    ],           
-    'campaign_from_email' => [
-        'name' => 'Campaign From Email',
-        'instructions' => 'Who is this Sent From (email)',
-        'placeholder' => 'JoJackson@email.com',
-    ],            
-    'campaign_subject' => [
-        'name' => 'Campaign Subject',
-        'instructions' => 'Set a Subject for the campaign',
-        'placeholder' => 'The Best Campaign ever',
-    ],        
-    'campaign_language' => [
-        'name' => 'Campaign language',
-        'instructions' => 'Set a Language',
-        'placeholder' => 'EN_US',
-    ],  
+
     'thrive_sync_status' => [
         'name' => 'Sync Status',
         'instructions' => '',
@@ -90,18 +18,172 @@ return [
     ],
 
 
+
+
+    //
+    // Status Fields
+    // 
+    "status_remote_timestamp" => [
+        'name'          => 'Remote Timestamp',
+        'instructions'  => '',
+    ],  
+    "status_local_timestamp" => [
+        'name'          => 'Local Timestamp',
+        'instructions'  => '',
+    ],   
+    "status_sync" => [
+        'name'          => 'Sync Status',
+        'instructions'  => '',
+    ],    
+    "status_created_locally" => [
+        'name'          => 'Created Locally',
+        'instructions'  => '',
+    ],    
+    "status_created_source" => [
+        'name'          => 'Created Source',
+        'instructions'  => '',
+    ],   
+    
+    
+    //
+    // Subscriber Fields
+    //
+    'subscriber_email' => [
+        'name' => 'Email',
+        'instructions' => 'Email Address',
+    ],
+    'subscriber_remote_id' => [
+        'name'             => 'Subscriber Hash',
+        'instructions'     => '',
+    ],
+    'subscriber_audience_id' => [
+        'name'              => 'Audience ID',
+        'instructions'      => '',
+        'placeholder'       => '',
+    ],
+    'subscriber_audience_name' => [
+        'name'              => 'Audience',
+        'instructions'      => '',
+        'placeholder'       => '',
+    ],
+    'subscriber_subscribed' => [
+        'name'              => 'Subscribed',
+        'instructions'      => 'Is User Subscribed',
+    ],   
+    'subscriber_status' => [
+        'name'              => 'Status',
+        'instructions'      => 'Membership Status',
+    ],      
+    'subscriber_fname'      => [
+        'name'              => 'First Name',
+        'instructions'      => '',
+        'placeholder'       => '',
+    ],
+    'subscriber_lname' => [
+        'name'              => 'Last Name',
+        'instructions'      => '',
+        'placeholder'       => '',
+    ],
+
+
+    //
+    // Audience Fields
+    //
+    'audience_name' => [
+        'name' => 'Name',
+        'instructions' => 'Give a Valid Audience Name',
+        'placeholder' => 'My Audience',
+    ],
+    'audience_remote_id' => [
+        'name' => 'List-ID',
+        'instructions' => 'ID of the Audience',
+        'placeholder' => '',
+    ],  
+    'audience_permission_reminder' => [
+        'name' => 'Permission Reminder',
+        'instructions' => 'The text reminder explaining to the user why they have been subscribed',
+        'placeholder' => 'You have been added to this list when you subscribed on our website.',
+    ],    
+    'audience_email_type_option' => [
+        'name' => 'Email Type Option',
+        'instructions' => 'Enable this if you prefer different email types per users. We do not recomend this unless you are an advanced user.',
+    ],    
+    'audience_contact_company_name' => [
+        'name' => 'Company Name',
+        'instructions' => 'Enter your company Name',
+        'placeholder' => 'Impressive Co.',
+    ],      
+    'audience_contact_address1' => [
+        'name' => 'Company Address',
+        'instructions' => 'Enter your company Address',
+        'placeholder' => '123 Fake St',
+    ],      
+    'audience_contact_city' => [
+        'name' => 'Company City',
+        'instructions' => 'Enter your company HQ City Location',
+        'placeholder' => 'Brisbane',
+    ],     
+    'audience_contact_state' => [
+        'name' => 'Company State',
+        'instructions' => 'Enter your company HQ State Location',
+        'placeholder' => 'QLD',
+    ],
+    'audience_contact_country' => [
+        'name' => 'Country',
+        'instructions' => 'Enter your company HQ Country Location',
+        'placeholder' => 'AU',
+    ],    
+    'audience_contact_zip' => [
+        'name' => 'Company Zip',
+        'instructions' => 'Enter your company HQ ZIP Location',
+        'placeholder' => '4000',
+    ],   
+    'audience_campaign_from_name' => [
+        'name' => 'Campaign From Name',
+        'instructions' => 'Who is this Sent From (name)',
+        'placeholder' => 'Jo Jackson',
+    ],    
+    'audience_campaign_from_email' => [
+        'name' => 'Campaign From Email',
+        'instructions' => 'Who is this Sent From (email)',
+        'placeholder' => 'JoJackson@email.com',
+    ],            
+    'audience_campaign_subject' => [
+        'name' => 'Campaign Subject',
+        'instructions' => 'Set a Subject for the campaign',
+        'placeholder' => 'The Best Campaign ever',
+    ],        
+    'audience_campaign_language' => [
+        'name' => 'Campaign language',
+        'instructions' => 'Set a Language',
+        'placeholder' => 'EN_US',
+    ],  
+
+
+    //
     // Campaigns
+    //
+    'campaign_from_name' => [
+        'name' => 'Campaign From Name',
+        'instructions' => 'Who is this Sent From (name)',
+        'placeholder' => 'Jo Jackson',
+    ], 
+    'campaign_subject' => [
+        'name' => 'Campaign Subject',
+        'instructions' => 'Set a Subject for the campaign',
+        'placeholder' => 'The Best Campaign ever',
+    ],       
     'campaign_name' => [
         'name' => 'Name/Title',
         'instructions' => '',
         'placeholder' => '',
     ],
-    'campaign_str_id' => [
+    'campaign_remote_id' => [
         'name' => 'Remote ID',
         'instructions' => '',
         'placeholder' => '',
     ],
-    'list_id' => [
+    'campaign_list_id' => [
         'name' => 'List ID',
         'instructions' => '',
         'placeholder' => '',
@@ -111,54 +193,27 @@ return [
         'instructions' => '',
         'placeholder' => '',
     ],
-    'status' => [
-        'name' => 'Status',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
-    'campaign_sync_status' => [
-        'name' => 'Sync Status',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
-
-    
-    'fname' => [
-        'name' => 'First Name',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
-    'lname' => [
-        'name' => 'Last Name',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
-
-    'audience' => [
-        'name' => 'Audience ID',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
-    'audience_name' => [
-        'name' => 'Audience Name',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
     'campaign_reply_to' => [
         'name' => 'Reply to (Email)',
         'instructions' => '',
         'placeholder' => '',
     ],
     'campaign_subject_line' => [
-        'name' => 'Subject',
-        'instructions' => '',
-        'placeholder' => '',
+        'name'          => 'Subject',
+        'instructions'  => '',
+        'placeholder'   => '',
+    ],
+    'campaign_status' => [
+        'name'          => 'Status',
+        'instructions'  => '',
+        'placeholder'   => '',
     ],
 
 
 
-
-
+    //
+    // Automations
+    //
     'automation_title' => [
         'name' => 'Title',
         'instructions' => '',

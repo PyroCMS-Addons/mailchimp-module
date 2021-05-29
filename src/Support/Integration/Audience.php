@@ -43,7 +43,7 @@ class Audience
         if($mailchimp = Mailchimp::Connect())
         {
             // is there a remote list
-            if($remote = $mailchimp->getList($entry->str_id))
+            if($remote = $mailchimp->getList($entry->audience_remote_id))
             {
                 if(self::updateLocalFromRemote($entry, $remote))
                 {
@@ -80,14 +80,14 @@ class Audience
             foreach($all_remote_lists as $remote)
             {
                 // check if we have a local copy
-                if($local_list = $repository->findBy('str_id',$remote->id))
+                if($local_list = $repository->findBy('audience_remote_id',$remote->id))
                 {
                     self::Sync($local_list);
                 }
                 else
                 {
                     // check if we have a deleted copy loally
-                    if($repository->allWithTrashed()->findBy('str_id',$remote->id))
+                    if($repository->allWithTrashed()->findBy('audience_remote_id',$remote->id))
                     {
                         // skip as we have a clash and deleted locally
                         // we can check to see if its deleted remotely
@@ -103,9 +103,7 @@ class Audience
                             $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
                         }
                     }
-
                 }
-
             }
 
             // Now Check for vagrant lists
@@ -117,7 +115,6 @@ class Audience
         }
 
         return false;
-
     }
     
     
@@ -134,15 +131,15 @@ class Audience
         {
             if($list_values = self::PrepareList($entry))
             {
-                if($mailchimp->hasList($entry->str_id))
+                if($mailchimp->hasList($entry->audience_remote_id))
                 {
-                    return $mailchimp->updateList($entry->str_id, $list_values);
+                    return $mailchimp->updateList($entry->audience_remote_id, $list_values);
                 }
                 else
                 {
                     if($remote_list = $mailchimp->createList($list_values))
                     {
-                        $entry->update(['str_id' => $remote_list->id]);
+                        $entry->update(['audience_remote_id' => $remote_list->id]);
                         return true;
                     }
                     else
@@ -186,7 +183,7 @@ class Audience
 
                 foreach($all_remote_lists as $remote_list)
                 {
-                    if( $local_list->str_id == $remote_list->id )
+                    if( $local_list->audience_remote_id == $remote_list->id )
                     {
                         $found = true;
                     }
@@ -226,24 +223,24 @@ class Audience
         {
             $list_values =
             [
-                "name"                  => $entry->name,
-                "permission_reminder"   => $entry->permission_reminder,
-                "email_type_option"     => $entry->email_type_option,
+                "name"                  => $entry->audience_name,
+                "permission_reminder"   => $entry->audience_permission_reminder,
+                "email_type_option"     => $entry->audience_email_type_option,
                 "contact"           =>
                 [
-                    "company"           => $entry->contact_company_name,
-                    "address1"          => $entry->contact_address1,
-                    "city"              => $entry->contact_city,
-                    "state"             => $entry->contact_state,
-                    "zip"               => $entry->contact_zip,
-                    "country"           => $entry->contact_country,
+                    "company"           => $entry->audience_contact_company_name,
+                    "address1"          => $entry->audience_contact_address1,
+                    "city"              => $entry->audience_contact_city,
+                    "state"             => $entry->audience_contact_state,
+                    "zip"               => $entry->audience_contact_zip,
+                    "country"           => $entry->audience_contact_country,
                 ],
                 "campaign_defaults" =>
                 [
-                    "from_name"         => $entry->campaign_from_name,
-                    "from_email"        => $entry->campaign_from_email,
-                    "subject"           => $entry->campaign_subject,
-                    "language"          => $entry->campaign_language,
+                    "from_name"         => $entry->audience_campaign_from_name,
+                    "from_email"        => $entry->audience_campaign_from_email,
+                    "subject"           => $entry->audience_campaign_subject,
+                    "language"          => $entry->audience_campaign_language,
                 ]
             ];
         }
@@ -274,20 +271,20 @@ class Audience
     {
         try
         {
-            $local->name                     = $remote->name;
-            $local->str_id                   = $remote->id;
-            $local->permission_reminder      = $remote->permission_reminder;
-            $local->email_type_option        = $remote->email_type_option;
-            $local->contact_company_name     = $remote->contact->company;
-            $local->contact_address1         = $remote->contact->address1;
-            $local->contact_state            = $remote->contact->state;
-            $local->contact_zip              = $remote->contact->zip;
-            $local->contact_country          = $remote->contact->country;
-            $local->contact_city             = $remote->contact->city;
-            $local->campaign_from_name       = $remote->campaign_defaults->from_name;
-            $local->campaign_from_email      = $remote->campaign_defaults->from_email;
-            $local->campaign_subject         = $remote->campaign_defaults->subject;
-            $local->campaign_language        = $remote->campaign_defaults->language;
+            $local->audience_name                   = $remote->name;
+            $local->audience_remote_id              = $remote->id;
+            $local->audience_permission_reminder    = $remote->permission_reminder;
+            $local->audience_email_type_option      = $remote->email_type_option;
+            $local->audience_contact_company_name   = $remote->contact->company;
+            $local->audience_contact_address1       = $remote->contact->address1;
+            $local->audience_contact_state          = $remote->contact->state;
+            $local->audience_contact_zip            = $remote->contact->zip;
+            $local->audience_contact_country        = $remote->contact->country;
+            $local->audience_contact_city           = $remote->contact->city;
+            $local->audience_campaign_from_name     = $remote->campaign_defaults->from_name;
+            $local->audience_campaign_from_email    = $remote->campaign_defaults->from_email;
+            $local->audience_campaign_subject       = $remote->campaign_defaults->subject;
+            $local->audience_campaign_language      = $remote->campaign_defaults->language;
             $local->save();
 
             return $local;
@@ -313,20 +310,20 @@ class Audience
         {
             $local = new AudienceModel();
 
-            $local->name                     = $remote->name;
-            $local->str_id                   = $remote->id;
-            $local->permission_reminder      = $remote->permission_reminder;
-            $local->email_type_option        = $remote->email_type_option;
-            $local->contact_company_name     = $remote->contact->company;
-            $local->contact_address1         = $remote->contact->address1;
-            $local->contact_state            = $remote->contact->state;
-            $local->contact_zip              = $remote->contact->zip;
-            $local->contact_country          = $remote->contact->country;
-            $local->contact_city             = $remote->contact->city;
-            $local->campaign_from_name       = $remote->campaign_defaults->from_name;
-            $local->campaign_from_email      = $remote->campaign_defaults->from_email;
-            $local->campaign_subject         = $remote->campaign_defaults->subject;
-            $local->campaign_language        = $remote->campaign_defaults->language;
+            $local->audience_name                   = $remote->name;
+            $local->audience_remote_id              = $remote->id;
+            $local->audience_permission_reminder    = $remote->permission_reminder;
+            $local->audience_email_type_option      = $remote->email_type_option;
+            $local->audience_contact_company_name   = $remote->contact->company;
+            $local->audience_contact_address1       = $remote->contact->address1;
+            $local->audience_contact_state          = $remote->contact->state;
+            $local->audience_contact_zip            = $remote->contact->zip;
+            $local->audience_contact_country        = $remote->contact->country;
+            $local->audience_contact_city           = $remote->contact->city;
+            $local->audience_campaign_from_name     = $remote->campaign_defaults->from_name;
+            $local->audience_campaign_from_email    = $remote->campaign_defaults->from_email;
+            $local->audience_campaign_subject       = $remote->campaign_defaults->subject;
+            $local->audience_campaign_language      = $remote->campaign_defaults->language;
 
             $local->save();
 
@@ -345,12 +342,12 @@ class Audience
      * LocalHasAudience
      * 
      * 
-     * @param  mixed $str_id
+     * @param  mixed $audience_remote_id
      * @return void
      */
-    public static function LocalHasAudience($str_id)
+    public static function LocalHasAudience($audience_id)
     {
-        if($a = AudienceModel::where('str_id',$str_id)->first())
+        if($a = AudienceModel::where('audience_remote_id',$audience_id)->first())
         {
             return true;
         }

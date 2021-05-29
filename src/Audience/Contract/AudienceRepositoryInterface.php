@@ -10,5 +10,5 @@ interface AudienceRepositoryInterface extends EntryRepositoryInterface
      * @param $slug
      * @return null|FormInterface
      */
-    public function findByStrId($str_id);
+    public function findByAudienceId($audience_id);
 }

@@ -39,13 +39,13 @@ class CampaignTableColumns
                         return "<span class='small text-success'>".ucfirst($entry->campaign_type)."</span>";
                     },
                 ],                                  
-                'entry.status'    => [
+                'entry.campaign_status'    => [
                     'wrapper' => function (CampaignInterface $entry) {
 
                         $status_color = 'info';
                         $status_text  = 'Active';
                 
-                        switch($entry->status)
+                        switch($entry->campaign_status)
                         {
                             case 'sent':
                                 $status_color = 'danger';
@@ -57,7 +57,7 @@ class CampaignTableColumns
                                 break; 
                             default:                               
                                 $status_color = 'success';
-                                $status_text  = 'Active (Draft)' . $entry->status;
+                                $status_text  = 'Active (Draft)' . $entry->campaign_status;
                         }
 
                         return "<span class='tag tag-{$status_color}'>{$status_text}</span>";

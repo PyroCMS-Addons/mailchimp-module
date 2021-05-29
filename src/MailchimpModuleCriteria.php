@@ -15,12 +15,20 @@ class MailchimpModuleCriteria extends PluginCriteria
         $this->options['form_name']         = 'mailchimp'; 
         $this->options['form_name']         = 'mailchimp'; 
         $this->options['button_text']       = 'Submit'; 
-        $this->options['use_fname']         = false; 
         $this->options['input_class']       = 'form-control'; 
-        $this->options['view']             = 'thrive.module.mailchimp::public.subscribe'; 
-        
-        // perhaps show a way to add additional fields
-        // $this->options['fname']             = '';
+        $this->options['view']              = 'thrive.module.mailchimp::public.subscribe'; 
+
+        //
+        // Experimental, not nessiserially 
+        // considered for V1.
+        $this->options['use_fname']         = false; 
+        $this->options['tag_year']          = false;  // adds the current year to input tags
+        $this->options['tag_month']         = false;  // adds the current month to input tags
+
+
+        //Array of addtional merge fields
+        // If available, they will be posted
+        $this->options['merge_fields']       = ['FNAME','LNAME','DOB'];
 
         return $this;
     }

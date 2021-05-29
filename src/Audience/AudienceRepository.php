@@ -26,17 +26,16 @@ class AudienceRepository extends EntryRepository implements AudienceRepositoryIn
         $this->model = $model;
     }
 
-
-     /**
-     * Find a form by it's slug.
+    
+    /**
+     * findByAudienceId
      *
-     * @param $slug
-     * @return null|FormInterface
+     * @param  mixed $audience_id
+     * @return void
      */
-    public function findByStrId($str_id)
+    public function findByAudienceId($audience_id)
     {
-        return $this->model->where('str_id', $str_id)->first();
+        return $this->model->where('audience_remote_id', $audience_id)->first();
     }
-
 
 }

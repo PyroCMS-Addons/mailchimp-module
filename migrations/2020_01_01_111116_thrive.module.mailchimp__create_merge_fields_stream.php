@@ -48,16 +48,48 @@ class ThriveModuleMailchimpCreateMergeFieldsStream extends Migration
      * @var array
      */
     protected $assignments = [
-        "content_name" => [
+        "merge_field_name" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'content_plain_text' => [
+        'merge_field_list_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
+
+
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //   
+        "status_remote_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],           
     ];
 
 }

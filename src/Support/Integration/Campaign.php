@@ -79,15 +79,15 @@ class Campaign
     
                 foreach($campaigns as $campaign)
                 {
-                    if($local = $repository->findBy('campaign_str_id', $campaign->id))
+                    if($local = $repository->findBy('campaign_remote_id', $campaign->id))
                     {
                         // Update Local
                         $local->campaign_name        = $campaign->settings->title;
                         $local->campaign_type        = $campaign->type;
-                        $local->list_id              =  $campaign->recipients->list_id;  
+                        $local->campaign_list_id     = $campaign->recipients->list_id;  
                         $local->campaign_sync_status = 'Synchronised';
-                        $local->status               = $campaign->status;
-                        $local->campaign_str_id      = $campaign->id;
+                        $local->campaign_status      = $campaign->status;
+                        $local->campaign_remote_id   = $campaign->id;
                         $local->save();
     
                     }
@@ -104,10 +104,10 @@ class Campaign
                             $item = new CampaignModel();
                             $item->campaign_name        = $campaign->settings->title;
                             $item->campaign_type        = $campaign->type;
-                            $item->list_id              = $campaign->recipients->list_id;  
+                            $item->campaign_list_id     = $campaign->recipients->list_id;  
                             $item->campaign_sync_status = 'Synched';
-                            $item->status               = $campaign->status;
-                            $item->campaign_str_id      = $campaign->id;
+                            $item->campaign_status      = $campaign->status;
+                            $item->campaign_remote_id   = $campaign->id;
                             $item->save();
                             // $item->update(['thrive_sync_status' => 'Just Created']);
                         }                
@@ -210,7 +210,7 @@ class Campaign
             }
 
             return $mailchimp->updateCampaign(
-                                $entry->campaign_str_id,
+                                $entry->campaign_remote_id,
                                 $settings);
         }
 
@@ -230,16 +230,16 @@ class Campaign
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            if($remote_campaign = $mailchimp->copyCampaign($entry->campaign_str_id))
+            if($remote_campaign = $mailchimp->copyCampaign($entry->campaign_remote_id))
             {
                 // create local
                 $newcampaign = new CampaignModel;
                 $newcampaign->campaign_name             = $remote_campaign->settings->title;
                 $newcampaign->campaign_type             = $remote_campaign->type;
-                $newcampaign->list_id                   = $remote_campaign->recipients->list_id;
+                $newcampaign->campaign_list_id          = $remote_campaign->recipients->list_id;
                 $newcampaign->campaign_sync_status      = 'Synchronized';
-                $newcampaign->status                    = $remote_campaign->status;
-                $newcampaign->campaign_str_id           = $remote_campaign->id;
+                $newcampaign->campaign_status           = $remote_campaign->status;
+                $newcampaign->campaign_remote_id        = $remote_campaign->id;
                 $newcampaign->campaign_subject_line     = $remote_campaign->settings->subject_line;
                 $newcampaign->campaign_from_name        = $remote_campaign->settings->from_name;
                 $newcampaign->campaign_reply_to         = $remote_campaign->settings->reply_to;
@@ -262,7 +262,7 @@ class Campaign
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            return $mailchimp->sendCampaign($entry->campaign_str_id);
+            return $mailchimp->sendCampaign($entry->campaign_remote_id);
         }
 
         return false;
@@ -281,13 +281,11 @@ class Campaign
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            return $mailchimp->sendTestCampaign($entry->campaign_str_id, $email_array);
+            return $mailchimp->sendTestCampaign($entry->campaign_remote_id, $email_array);
         }
 
         return false;
     }
-    
-
 
     
     /**

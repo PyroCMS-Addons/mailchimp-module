@@ -13,7 +13,7 @@ class CampaignModel extends MailchimpCampaignsEntryModel implements CampaignInte
      */
     public function getStrId()
     {
-        return $this->campaign_str_id;
+        return $this->campaign_remote_id;
     }
     
     /**
@@ -23,7 +23,7 @@ class CampaignModel extends MailchimpCampaignsEntryModel implements CampaignInte
      */
     public function canEdit()
     {
-        if($this->status == 'sent')
+        if($this->campaign_status == 'sent')
         {
             return false;
         }

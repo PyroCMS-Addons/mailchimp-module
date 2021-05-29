@@ -17,7 +17,7 @@ class AudienceFormBuilder extends FormBuilder
      */
     protected $fields = [
         '*',
-        'str_id' => [
+        'audience_remote_id' => [
             'disabled' => 'edit',
         ],
     ];
@@ -73,35 +73,35 @@ class AudienceFormBuilder extends FormBuilder
                 'general' => [
                     'title'  => 'Audience',
                     'fields' => [
-                        'name',
-                        'str_id',
+                        'audience_name',
+                        'audience_remote_id',
                     ],
                 ],   
                 'tab2' => [
                     'title'  => 'Fields',
                     'fields' => [
-                        'permission_reminder',
-                        'email_type_option',
+                        'audience_permission_reminder',
+                        'audience_email_type_option',
                     ],
                 ],  
                 'tab3' => [
                     'title'  => 'Contact',
                     'fields' => [
-                        'contact_company_name',
-                        'contact_address1',
-                        'contact_city',
-                        'contact_state',
-                        'contact_zip',
-                        'contact_country'
+                        'audience_contact_company_name',
+                        'audience_contact_address1',
+                        'audience_contact_city',
+                        'audience_contact_state',
+                        'audience_contact_zip',
+                        'audience_contact_country'
                     ],
                 ],  
                 'tab4' => [
                     'title'  => 'Campaign',
                     'fields' => [
-                        'campaign_from_name',
-                        'campaign_from_email',
-                        'campaign_subject',
-                        'campaign_language',
+                        'audience_campaign_from_name',
+                        'audience_campaign_from_email',
+                        'audience_campaign_subject',
+                        'audience_campaign_language',
                     ],
                 ],                                                                
             ],
@@ -135,10 +135,10 @@ class AudienceFormBuilder extends FormBuilder
 
         $entry = $this->getFormEntry();
 
-        $new_name                   = $this->getRequestValue('name');
-        $new_str_id                 = $this->getRequestValue('str_id');
+        $audience_name                  = $this->getRequestValue('name');
+        $audience_list                  = $this->getRequestValue('audience_remote_id');
 
-        $this->can_post_to_mailchimp = true;
+        $this->can_post_to_mailchimp    = true;
 
     }
     

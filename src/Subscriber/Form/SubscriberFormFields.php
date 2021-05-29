@@ -16,7 +16,7 @@ class SubscriberFormFields
         // viewing & subscribing..
         $fields =
         [
-            'email',
+            'subscriber_email',
         ];
 
         $stream = $builder->getForm();
@@ -29,16 +29,16 @@ class SubscriberFormFields
             $fields =
             [
                 '*',
-                'subscribed',
-                'fname',
-                'lname',
-                'audience' => [
+                'subscriber_subscribed',
+                'subscriber_fname',
+                'subscriber_lname',
+                'subscriber_audience_id' => [
                     'disabled' => 'edit',
                 ],
-                'audience_name' => [
+                'subscriber_audience_name' => [
                     'disabled' => 'edit',
                 ],
-                'email' => [
+                'subscriber_email' => [
                     'disabled' => 'edit',
                 ],
             ];
@@ -53,11 +53,11 @@ class SubscriberFormFields
             // for admin viewing.
             $fields =
             [
-                'email',
-                'audience',
-                'subscribed',
-                'fname',
-                'lname',
+                'subscriber_email',
+                'subscriber_audience_id',
+                'subscriber_subscribed',
+                'subscriber_fname',
+                'subscriber_lname',
             ];
         }
 

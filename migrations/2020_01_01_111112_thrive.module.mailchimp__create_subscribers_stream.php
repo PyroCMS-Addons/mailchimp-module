@@ -20,7 +20,7 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      */
     protected $stream = [
         'slug' => 'subscribers',
-        'title_column' => 'email',
+        'title_column' => 'subscriber_email',
         'translatable'  => false,
         'versionable'   => false,
         'trashable'     => true,
@@ -34,12 +34,16 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      * @var array
      */
     protected $fields = [
-        "thrive_contact_synced" => "anomaly.field_type.text",   
-        "audience"              => "anomaly.field_type.text", 
-        "audience_name"         => "anomaly.field_type.text", 
-        "fname"                 => "anomaly.field_type.text", 
-        "lname"                 => "anomaly.field_type.text", 
-        "subscribed"            => [
+        'subscriber_email'              => [
+            "type"   => "anomaly.field_type.email",
+            "config" => [
+                "default_value" => null,
+            ]
+        ],
+        "subscriber_remote_id"          => "anomaly.field_type.text", 
+        "subscriber_audience_id"        => "anomaly.field_type.text", 
+        "subscriber_audience_name"      => "anomaly.field_type.text", 
+        "subscriber_subscribed"         => [
             "type"   => "anomaly.field_type.boolean",
             "config" => [
                 "default_value" => false,
@@ -50,13 +54,14 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
                 "mode"          => "switch",
                 "label"         => null,
             ]
-        ],       
-        'email'                 => [
-            "type"   => "anomaly.field_type.email",
-            "config" => [
-                "default_value" => null,
-            ]
-        ],
+        ], 
+        "subscriber_status"             => "anomaly.field_type.text", 
+        "subscriber_fname"              => "anomaly.field_type.text", 
+        "subscriber_lname"              => "anomaly.field_type.text", 
+ 
+        // @deprecated field
+        "thrive_contact_synced"         => "anomaly.field_type.text",   
+
     ];
 
     /**
@@ -65,41 +70,89 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      * @var array
      */
     protected $assignments = [
-        "thrive_contact_synced" => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],        
-        'subscribed' => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        'email' => [
+      
+        'subscriber_email' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
-        ],        
-        'audience' => [
+        ],    
+        'subscriber_remote_id' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],             
+        'subscriber_audience_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],         
-        'audience_name' => [
+        'subscriber_audience_name' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],   
-        'fname' => [
+        'subscriber_subscribed' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ], 
+        'subscriber_fname' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'lname' => [
+        'subscriber_lname' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],                                       
+        ],   
+        'subscriber_status' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+
+        
+        //
+        // Old Sync Status Field
+        // @deprecated
+        //
+        "thrive_contact_synced" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //
+        "status_remote_timestamp"   => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp"    => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync"               => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally"    => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source"     => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],          
     ];
 
 }

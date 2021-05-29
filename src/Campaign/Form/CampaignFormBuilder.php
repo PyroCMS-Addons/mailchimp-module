@@ -15,7 +15,7 @@ class CampaignFormBuilder extends FormBuilder
      */
     protected $fields = [
         '*',
-        'campaign_str_id' => [
+        'campaign_remote_id' => [
             'disabled' => 'edit',
         ],
         'campaign_sync_status' => [
@@ -24,7 +24,7 @@ class CampaignFormBuilder extends FormBuilder
         'campaign_type' => [
             'disabled' => 'edit',
         ],
-        'list_id' => [
+        'campaign_list_id' => [
             'disabled' => 'edit',
         ],    
     ];
@@ -98,11 +98,11 @@ class CampaignFormBuilder extends FormBuilder
                 'locked_fields' => [
                     'title'  => 'Locked Details',                  
                     'fields' => [
-                        'campaign_str_id',
+                        'campaign_remote_id',
                         'campaign_sync_status',
                         'thrive_sync_status',
                         'campaign_type',
-                        'list_id',
+                        'campaign_list_id',
                     ],
                 ],                 
                 'viewtab' => [
@@ -111,7 +111,7 @@ class CampaignFormBuilder extends FormBuilder
                         'module::admin/tabs/campaign-actions',
                     ],
                     'fields' => [
-                        'list_id',
+                        'campaign_list_id',
                     ],                    
                 ],                                                                               
             ],
@@ -161,7 +161,7 @@ class CampaignFormBuilder extends FormBuilder
 
         Log::debug('--- [ Begin ] ---  CampaignFormBuilder::onSaved ');
 
-        Log::debug('  » 00 Pushing Campaign    : ' . $entry->campaign_name . ' || '. $entry->campaign_str_id );
+        Log::debug('  » 00 Pushing Campaign    : ' . $entry->campaign_name . ' || '. $entry->campaign_remote_id );
 
 
         if($this->can_post_to_mailchimp)

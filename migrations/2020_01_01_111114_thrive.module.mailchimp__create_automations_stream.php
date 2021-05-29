@@ -69,51 +69,84 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
      * @var array
      */
     protected $assignments = [
-        "automation_title" => [
+        "automation_title"          => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'automation_workflow_id' => [
+        'automation_workflow_id'    => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],        
-        'automation_status' => [
+        'automation_start_time'     => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_start_time' => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        'automation_create_time' => [
+        'automation_create_time'    => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],        
-        'automation_emails_sent' => [
+        'automation_emails_sent'    => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_list_id' => [
+        'automation_list_id'        => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_from_name' => [
+        'automation_from_name'      => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_reply_to' => [
+        'automation_reply_to'       => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
+        'automation_status'         => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+
+
+
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //  
+        "status_remote_timestamp"   => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp"    => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync"               => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally"    => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source"     => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],         
             
     ];
 

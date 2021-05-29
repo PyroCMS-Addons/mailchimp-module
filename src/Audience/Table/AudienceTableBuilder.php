@@ -29,15 +29,15 @@ class AudienceTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $columns = [
-        // 'name',
-        'name' => [
-            'wrapper' => '<a href="{{ url("admin/mailchimp/audiences/edit/{entry.id}") }}"
-                            data-toggle="modal"
-                            data-target="#modal">{entry.name}</a>',
-        ],
+        // 'audience_name' => [
+        //     'wrapper' => '<a href="{{ url("admin/mailchimp/audiences/edit/{entry.id}") }}"
+        //                     data-toggle="modal"
+        //                     data-target="#modal">{entry.audience_name}</a>',
+        // ],
+        'audience_name',      
         'thrive_sync_status',
-        'str_id' => [
-            'wrapper' => '<span class="tag tag-default">{entry.str_id}</span>',
+        'audience_remote_id' => [
+            'wrapper' => '<span class="tag tag-default">{entry.audience_remote_id}</span>',
         ]
     ];
 

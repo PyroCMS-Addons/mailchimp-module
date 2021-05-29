@@ -29,7 +29,7 @@ class ContentController extends AdminController
     {
         $campaign = CampaignModel::find($id);
 
-        $html = Content::Get($campaign->campaign_str_id);
+        $html = Content::Get($campaign->campaign_remote_id);
 
         return view('thrive.module.mailchimp::admin.content.view')->withContent($html->html);
     }

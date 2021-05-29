@@ -38,22 +38,22 @@ class SubscriberFormSections
                         'general' => [
                             'title'  => 'thrive.module.mailchimp::tabs.subscriber_status',
                             'fields' => [
-                                'email',
-                                'subscribed',
+                                'subscriber_email',
+                                'subscriber_subscribed',
                             ],
                         ],
                         'name' => [
                             'title'  => 'thrive.module.mailchimp::tabs.subscriber_name',
                             'fields' => [
-                                'fname',
-                                'lname',
+                                'subscriber_fname',
+                                'subscriber_lname',
                             ],
                         ],
                         'options' => [
-                            'title'  => 'thrive.module.mailchimp::tabs.subscriber_audience',
+                            'title'  => 'thrive.module.mailchimp::tabs.subscriber_audience_id',
                             'fields' => [
-                                'audience',
-                                'audience_name',
+                                'subscriber_audience_id',
+                                'subscriber_audience_name',
                             ],
                         ],
                     ],

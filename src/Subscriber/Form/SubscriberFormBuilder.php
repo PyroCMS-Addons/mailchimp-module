@@ -36,7 +36,8 @@ class SubscriberFormBuilder extends FormBuilder
      * @var array|string
      */
     protected $skips = [
-        'thrive_contact_synced'
+        'thrive_contact_synced',
+        'subscriber_status',
     ];
 
     /**
@@ -118,7 +119,7 @@ class SubscriberFormBuilder extends FormBuilder
 
         Log::debug('--- [ Begin ] ---  SubscriberFormBuilder::onSaved ');
 
-        Log::debug('  » 00 Pushing User        : ' . $entry->email);
+        Log::debug('  » 00 Pushing User        : ' . $entry->subscriber_email);
 
 
         if($this->can_post_to_mailchimp)

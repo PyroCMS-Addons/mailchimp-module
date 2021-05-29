@@ -92,7 +92,7 @@ class AutomationFormBuilder extends FormBuilder
                 'details' => [
                     'title'  => 'From',
                     'fields' => [
-                        'campaign_from_name',
+                        'audience_campaign_from_name',
                     ],
                 ],
                 'locked_fields' => [

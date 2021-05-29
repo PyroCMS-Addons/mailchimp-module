@@ -313,7 +313,7 @@ trait MailchimpContactsTrait
      * @param  mixed $email
      * @return void
      */
-    public function getEmailHash($email)
+    public function getEmailHash(string $email)
     {
         return md5(strtolower($email));
     }

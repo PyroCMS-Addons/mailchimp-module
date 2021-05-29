@@ -34,16 +34,16 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
      * @var array
      */
     protected $fields = [
-        "content_name" => [
+        "content_name"          => [
             "type"   => "anomaly.field_type.text",
         ], 
-        "content_campaign_id" => [ 
+        "content_campaign_id"   => [ 
             "type"   => "anomaly.field_type.text",
         ],            
-        'content_plain_text' => [
+        'content_plain_text'    => [
             "type"   => "anomaly.field_type.textarea",
         ],    
-        'content_html' => [
+        'content_html'          => [
             "type"   => "anomaly.field_type.editor",
             "config" => [
                 "default_value" => null,
@@ -52,7 +52,7 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
                 "word_wrap"     => null,
             ]            
         ],         
-        'content_archive_html' => [
+        'content_archive_html'  => [
             "type"   => "anomaly.field_type.editor",
             "config" => [
                 "default_value" => null,
@@ -61,7 +61,7 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
                 "word_wrap"     => null,
             ]                        
         ],  
-        'content_fields' => [
+        'content_fields'        => [
             "type"   => "anomaly.field_type.text",                      
         ],          
                        
@@ -103,7 +103,39 @@ class ThriveModuleMailchimpCreateContentStream extends Migration
             'unique'            => false,
             'required'          => false,
         ],
-            
+
+        
+        
+        //
+        // New Common Status Fields
+        // These will replace old status
+        // fields.
+        //   
+        "status_remote_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
+        "status_local_timestamp" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],   
+        "status_sync" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_locally" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],    
+        "status_created_source" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],  
     ];
 
 }
