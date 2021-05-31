@@ -41,6 +41,16 @@ class SubscriberFormFields
                 'subscriber_email' => [
                     'disabled' => 'edit',
                 ],
+                'status_remote_timestamp' => [
+                    'disabled' => 'edit',
+                ],
+                'local_timestamp_sync' => [
+                    'disabled' => 'edit',
+                ],
+                'local_timestamp_save' => [
+                    'disabled' => 'edit',
+                ],                
+
             ];
         }
 

@@ -20,10 +20,9 @@ PyroCMS Mailchimp Integration Module
 #### Important Message
 ```
 Please note, while this module is still in alpha, any code updates you receive, 
-please uninstall and reinstall the module. There will be no upgrade path 
-while under heavy development. Many of the fields may undergo name 
-changes and I may not be including an upgrade path 
-until I am in Beta.
+please reinstall the module. There will be no upgrade path while under 
+heavy development. Many of the fields may undergo name changes and 
+I may not be including an upgrade path until I am in Beta.
 ```
 
 ## About

@@ -35,7 +35,7 @@ class AudienceFormBuilder extends FormBuilder
      * @var array|string
      */
     protected $skips = [
-        'thrive_sync_status'
+        // 'somefield'
     ];
 
     /**
@@ -157,13 +157,10 @@ class AudienceFormBuilder extends FormBuilder
             if(Audience::Post($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
-                $entry->update(['thrive_sync_status' => 'Updated']);
             }
             else 
             {
                 $messages->error('Failed to POST to Mailchimp');
-                $entry->update(['thrive_sync_status' => 'Post Failed']);
-
             }
         }
         //$this->setFormResponse(redirect('admin/mailchimp/audiences'));

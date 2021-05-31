@@ -25,16 +25,81 @@ use MailchimpMarketing\ApiException;
  * @version    	Release: 1.0.0
  * @link       	https://github.com/PyroCMS-Addons/mailchimp-module
  * @since      	Class available since Release 1.0.0
- * 
+ *
  */
 trait MailchimpAudiencesTrait
 {
 
     /**
+     * createList
+     *
+     * Create a new list in your Mailchimp account.
+     *
+     * @param  string           $list_id
+     * @return boolean
+     *
+     * PrepareList(..) can prepare the correct values for $list_values.
+     * @see Thrive\MailchimpModule\Support\Integartion\Audience::PrepareList(AudienceInterface $entry)
+     *
+     * @see https://mailchimp.com/developer/marketing/api/lists/delete-list/
+     *
+     */
+    public function createList($list_values = [])
+    {
+        $response = null;
+        $status = true;
+
+        try
+        {
+            $response = $this->mailchimp->lists->createList($list_values);
+        }
+        catch (ApiException $ex)
+        {
+            $status = false;
+
+            Log::error('MailchimpMarketing\ApiException ex, see below export of response.');
+            Log::error(print_r($ex,true));
+        }
+        catch(RequestException $gex)
+        {
+            $status = false;
+
+            if ($gex->hasResponse())
+            {
+                $response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+            }
+            else
+            {
+                Log::error('Error Creating Audience, possible restriction applied.');
+            }
+
+        }
+        catch(\Exception $e)
+        {
+            $status = false;
+
+            $json = $e->getResponse()->getBody()->getContents();
+            Log::error('Create Audience Error : '.print_r($json,true));
+        }
+        finally
+        {
+            if($status)
+                return $response;
+        }
+
+        return false;
+    }
+
+    /**
      * updateList
      *
      * Update the settings for a specific list.
-     * 
+     *
      *
      * @param  string           $list_id
      * @param  array            $list_values
@@ -94,14 +159,14 @@ trait MailchimpAudiencesTrait
                 return true;
             }
         }
-        catch (ApiException $ex) 
+        catch (ApiException $ex)
         {
             Log::error('MailchimpMarketing\ApiException ex, see below export of response.');
             Log::error(print_r($ex,true));
-        }      
-        catch(RequestException $gex) 
+        }
+        catch(RequestException $gex)
         {
-            if ($gex->hasResponse()) 
+            if ($gex->hasResponse())
             {
                 $response = $gex->getResponse();
                 $json = $gex->getResponse()->getBody()->getContents();
@@ -115,7 +180,7 @@ trait MailchimpAudiencesTrait
                 Log::error('Error Deleting Audience,  possible restriction applied.');
             }
 
-        } 
+        }
         catch(\Exception $e)
         {
             $json = $e->getResponse()->getBody()->getContents();
@@ -125,42 +190,6 @@ trait MailchimpAudiencesTrait
         return false;
     }
 
-
-    /**
-     * createList
-     *
-     * Create a new list in your Mailchimp account.
-     *
-     * @param  string           $list_id
-     * @return boolean
-     *
-     * PrepareList(..) can prepare the correct values for $list_values.
-     * @see Thrive\MailchimpModule\Support\Integartion\Audience::PrepareList(AudienceInterface $entry)
-     *
-     * @see https://mailchimp.com/developer/marketing/api/lists/delete-list/
-     *
-     */
-    public function createList($list_values = [])
-    {
-        $response = null;
-        $status = true;
-
-        try
-        {
-            $response = $this->mailchimp->lists->createList($list_values);
-        }
-        catch (\Exception $e)
-        {
-            $status = false;
-        }
-        finally
-        {
-            if($status)
-                return $response;
-        }
-
-        return false;
-    }
 
     /**
      * hasList

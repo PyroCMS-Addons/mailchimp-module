@@ -98,28 +98,21 @@ class SubscriberFormHandler
      * @param $email_adddress   - @required     - Email address of user
      * @param $subscribe        - @required     - Should we subscribe or unsubscribe
      */
-    private function addUpdateLocalValue( $strid, $email_adddress, $subscribe, $tags = null)
+    private function addUpdateLocalValue( $strid, $email_address, $subscribe, $tags = null)
     {
 
         Log::debug('  » 02 Local Entry         : BEGIN ');
 
-        if($subscriber = Subscriber::LocalhasSubscriber($email_adddress, $strid))
+        $action = 'Local not found, will CREATE';
+
+        if($subscriber = Subscriber::LocalHasSubscriber($email_address, $strid))
         {
-            Log::debug('        » Has Local        : YES');
-            $subscriber->subscriber_subscribed  = $subscribe;
-            $subscriber->subscriber_audience_id    = $strid;
-            $subscriber->save();
+            $action = 'Has Local, so will UPDATE';
         }
-        else
-        {
-            Log::debug('        » Has Local        : NO');
-            $subscriber = new SubscriberModel();
-            $subscriber->subscriber_email        = $email_adddress;
-            $subscriber->subscriber_subscribed   = $subscribe;
-            $subscriber->thrive_contact_synced   = false; //we will sync later
-            $subscriber->subscriber_audience_id     = $strid;
-            $subscriber->save();
-        }
+
+        Log::debug('        » Executing Action : ' . $action);
+
+        Subscriber::CreateOrUpdateLocalSubscriber( $email_address, $strid, $subscribe );
 
         return true;
 
@@ -177,7 +170,7 @@ class SubscriberFormHandler
         }
     }
 
-    
+
     /**
      * testUserInput
      *

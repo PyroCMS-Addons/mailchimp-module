@@ -47,7 +47,7 @@ class Audience
             {
                 if(self::updateLocalFromRemote($entry, $remote))
                 {
-                    $entry->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
+
                 }
             }
             else
@@ -101,7 +101,7 @@ class Audience
                         // one to keep it in sync.
                         if($item = self::CreateLocalFromRemote($remote))
                         {
-                            $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
+
                         }
                     }
                 }
@@ -134,10 +134,12 @@ class Audience
             {
                 if($mailchimp->hasList($entry->audience_remote_id))
                 {
+                    // Has a list, so update remote
                     return $mailchimp->updateList($entry->audience_remote_id, $list_values);
                 }
                 else
                 {
+                    // has no list, so create remote
                     if($remote_list = $mailchimp->createList($list_values))
                     {
                         $entry->update(['audience_remote_id' => $remote_list->id]);
@@ -145,6 +147,7 @@ class Audience
                     }
                     else
                     {
+                        //error creating remote, check logs
                         //set local entry status to requires sync_create
                     }
                 }
@@ -177,10 +180,21 @@ class Audience
     {
         if($mailchimp = Mailchimp::Connect())
         {
-            if($mailchimp->deleteList($audience->audience_remote_id))
+            if($remote = $mailchimp->hasList($audience->audience_remote_id))
             {
-                // Delete Local Audience
-                $audience->forceDelete();
+                if($mailchimp->deleteList($audience->audience_remote_id))
+                {
+                    // Delete Local Audience
+                    $audience->forceDelete();
+                    return true;
+                }
+            }
+            else
+            {
+                // since no remote, lets delete locally
+                // However best to soft delete.
+                $audience->delete();
+                Log::debug('No Remote Audience Found, Deleting Local Copy of Audience.');
                 return true;
             }
         }

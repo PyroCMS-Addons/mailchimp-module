@@ -11,13 +11,6 @@ return [
         'placeholder' => '',
     ],
 
-    'thrive_sync_status' => [
-        'name' => 'Sync Status',
-        'instructions' => '',
-        'placeholder' => '',
-    ],
-
-
 
 
     //
@@ -26,11 +19,16 @@ return [
     "status_remote_timestamp" => [
         'name'          => 'Remote Timestamp',
         'instructions'  => '',
-    ],  
-    "status_local_timestamp" => [
-        'name'          => 'Local Timestamp',
-        'instructions'  => '',
     ],   
+    "local_timestamp_sync" => [
+        'name'          => 'Last Sync Time',
+        'instructions'  => '[Last Sync Time] must be in Sync with [Last Save Time]. If not, the Sync action will perform nessessary action',
+    ],   
+    "local_timestamp_save" => [
+        'name'          => 'Last Save Time',
+        'instructions'  => '[Last Sync Time] must be in Sync with [Last Save Time]. If not, the Sync action will perform nessessary action',
+    ],   
+
     "status_sync" => [
         'name'          => 'Sync Status',
         'instructions'  => '',

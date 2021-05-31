@@ -56,6 +56,14 @@ class SubscriberFormSections
                                 'subscriber_audience_name',
                             ],
                         ],
+                        'timestamps' => [
+                            'title'  => 'thrive.module.mailchimp::tabs.timestamps',
+                            'fields' => [
+                                'status_remote_timestamp',
+                                'local_timestamp_sync', 
+                                'local_timestamp_save', 
+                            ],
+                        ],                        
                     ],
                 ],
             ];

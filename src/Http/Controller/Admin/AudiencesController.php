@@ -108,7 +108,7 @@ class AudiencesController extends AdminController
             if(Audience::Delete($audience))
             {
                 // Now delete all subscribers
-                if($subscribers->deleteByAudienceId($audience->audience_remote_id))
+                if($subscribers->deleteByAudienceId( (string)$audience->audience_remote_id))
                 {
                     // set messages
                 }

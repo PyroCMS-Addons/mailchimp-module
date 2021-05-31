@@ -13,6 +13,15 @@ use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
+/*
+ * @todo
+ * The Subscriber Integration Class needs more work to get Closer to SOLID principles.
+ * Timestamps for the entire system need updating but in particular for the
+ * Subscriber class.
+ * 
+ */
+
+
 /**
  * Subscriber
  *
@@ -80,19 +89,19 @@ class Subscriber
 		// Connect to Mailchimp
 		if($mailchimp = Mailchimp::Connect())
 		{
-			foreach($repository->all() as $local)
+			foreach($repository->all() as $local_audience)
 			{
-				$lists          = $mailchimp->getMembers( $local->audience_remote_id, 'total_items');
+				$lists          = $mailchimp->getMembers( $local_audience->audience_remote_id, 'total_items');
 				$max_records    = ($lists->total_items) ?? 0;
 				$offset         = self::START_COUNT;
 				$count          = self::MAX_RECORDS;
 				$fields         = null;
-				$fields         = 'members.id,members.email_address,members.status,members.merge_fields';
+				$fields         = 'members.id,members.email_address,members.status,members.merge_fields,members.last_changed';			
 				$exfields       = null; //'members.email_address,members.vip,full_name,total_items';
 
 				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
 				{
-					$lists = $mailchimp->getMembers( $local->audience_remote_id, $fields, $exfields, $count, $offset );
+					$lists = $mailchimp->getMembers( $local_audience->audience_remote_id, $fields, $exfields, $count, $offset );
 
 					if(isset($lists->members))
 					{
@@ -102,14 +111,26 @@ class Subscriber
 							foreach($lists->members as $member)
 							{
 								// Do we have on in our table ?
-								if($subscriber = SubscriberModel::where('subscriber_audience_id',$local->audience_remote_id)->where('subscriber_email',$member->email_address)->first())
+								if($subscriber = SubscriberModel::where('subscriber_audience_id',$local_audience->audience_remote_id)->where('subscriber_email',$member->email_address)->first())
 								{
-									self::UpdateLocalSubscriberFromRemote( $subscriber, $member, $local );
+									if(self::AreSyncChangesRequired($subscriber,$member))
+									{
+										// update
+										if($local_subscriber = self::UpdateLocalSubscriberFromRemote($subscriber, $member, $local_audience))
+										{
+											self::SyncTimestampsAsCurrent($local_subscriber);
+										}
+									}
+
 								}
 								else
 								{
 									// create
-									self::CreateLocalSubscriberFromRemote( $member, $local );
+									if($local_subscriber = self::CreateLocalSubscriberFromRemote( $member, $local_audience))
+									{
+										self::SyncTimestampsAsCurrent($local_subscriber);
+									}
+
 								}
 							}
 						}
@@ -140,30 +161,36 @@ class Subscriber
 	 * @param  mixed $entry
 	 * @return void
 	 */
-	public static function Post(SubscriberInterface $entry)
+	public static function Post(SubscriberInterface $subscriber)
 	{
 		// Connect to Mailchimp
 		if($mailchimp = Mailchimp::Connect())
 		{
 			// Check to ensure mailchimp still
 			// has this list.
-			if($mailchimp->hasList($entry->subscriber_audience_id))
+			if($mailchimp->hasList($subscriber->subscriber_audience_id))
 			{
 				// update contact
-				$fname = ($entry->subscriber_fname != "") ? $entry->subscriber_fname : null ;
-				$lname = ($entry->subscriber_lname != "") ? $entry->subscriber_lname : null ;
+				$fname = ($subscriber->subscriber_fname != "") ? $subscriber->subscriber_fname : null ;
+				$lname = ($subscriber->subscriber_lname != "") ? $subscriber->subscriber_lname : null ;
 
-				//Log::info('Pushing Contact: '. $entry->subscriber_fname);
-				return $mailchimp->setListMemberWithMergeFields(
-														$entry->subscriber_audience_id,
-														$entry->subscriber_email,
-														$entry->subscriber_subscribed,
+				// we may haveready updated the sync ts,
+				// however on a succesful Post() we need to update again
+				// to maintain the sync.
+				if($mailchimp->setListMemberWithMergeFields(
+														$subscriber->subscriber_audience_id,
+														$subscriber->subscriber_email,
+														$subscriber->subscriber_subscribed,
 														$fname,
-														$lname);
+														$lname)) 
+				{
+					// ok, now keep timestamps in sync
+					return self::SyncTimestampsAsCurrent($subscriber);
+				}
 			}
 			else
 			{
-				Log::debug('  » List does not exist on remote. List/Audience Id [ ' . $entry->subscriber_audience_id . ' ]' );
+				Log::debug('  » List does not exist on remote. List/Audience Id [ ' . $subscriber->subscriber_audience_id . ' ]' );
 			}
 		}
 
@@ -202,7 +229,7 @@ class Subscriber
 
 
 	/**
-	 * LocalhasSubscriber
+	 * LocalHasSubscriber
 	 *
 	 * @comment		Need to asses if we really need this function
 	 * 				It seems this would be much better served
@@ -212,7 +239,7 @@ class Subscriber
 	 * @param  mixed $audience_id
 	 * @return void
 	 */
-	public static function LocalhasSubscriber($email,$audience_id)
+	public static function LocalHasSubscriber($email,$audience_id)
 	{
 		if($subscriber = SubscriberModel::where('subscriber_email',$email)->where('subscriber_audience_id',$audience_id)->first())
 		{
@@ -286,43 +313,16 @@ class Subscriber
 
 		return $contact;
 	}
-
+	
+		
 	/**
-	 * CreateLocalSubscriberFromRemote
+	 * CreateOrUpdateLocalSubscriber
 	 *
-	 * @param  mixed $remote
-	 * @param  mixed $list
+	 * @param  mixed $email_address
+	 * @param  mixed $list_id
+	 * @param  mixed $status
 	 * @return void
 	 */
-	public static function CreateLocalSubscriberFromRemote( $remote, AudienceInterface $list )
-	{
-		try
-		{
-			// create
-			$local = new SubscriberModel();
-			$local->subscriber_email        	= $remote->email_address;
-			$local->subscriber_remote_id   		= $remote->id;
-			$local->thrive_contact_synced   	= true;
-			$local->subscriber_audience_id     	= $list->audience_remote_id;
-			$local->subscriber_subscribed       = ($remote->status == 'subscribed') ? true: false;
-			$local->subscriber_status       	= $remote->status;
-			$local->subscriber_audience_name 	= $list->audience_name;
-			$local->subscriber_fname            = $remote->merge_fields->FNAME;
-			$local->subscriber_lname            = $remote->merge_fields->LNAME;
-			$local->save();
-
-			return true;
-		}
-		catch(\Exceeption $e)
-		{
-			//can we delete what we created ?
-		}
-
-		return false;
-	}
-
-	
-	
 	public static function CreateOrUpdateLocalSubscriber( $email_address, $list_id, $status = 'subscribed' )
 	{
 		try
@@ -331,7 +331,7 @@ class Subscriber
 
 			if($subscriber = SubscriberModel::where('subscriber_audience_id',$list_id)->where('subscriber_email',$email_address)->first())
 			{
-			
+				// Do not alter or create remote TS
 			}
 			else
 			{
@@ -343,7 +343,6 @@ class Subscriber
 			$subscriber->subscriber_audience_id  	= $list_id;
 			$subscriber->subscriber_status       	= $status; 
 			$subscriber->subscriber_subscribed   	= ($status == 'subscribed') ? true: false ;;
-			$subscriber->thrive_contact_synced   	= false;
 			$subscriber->save();
 
 			return $subscriber;
@@ -377,11 +376,11 @@ class Subscriber
 
 			// create
 			$local = new SubscriberModel();
-			$local->subscriber_email        = $email_address;
-			$local->thrive_contact_synced   = false;
-			$local->subscriber_status      	= 'subscribed';
-			$local->subscriber_audience_id  = $list_id;
-			$local->subscriber_subscribed   = true;
+			$local->subscriber_email        	= $email_address;
+			$local->subscriber_status      		= 'subscribed';
+			$local->subscriber_audience_id  	= $list_id;
+			$local->subscriber_subscribed   	= true;
+
 			$local->save();
 
 			return $local;
@@ -393,6 +392,99 @@ class Subscriber
 
 		return false;
 	}
+
+
+
+	/**
+	 * CreateLocalSubscriberFromRemote
+	 *
+	 * @param  mixed $remote
+	 * @param  mixed $list
+	 * @return void
+	 */
+	public static function CreateLocalSubscriberFromRemote( $remote, AudienceInterface $list )
+	{
+		try
+		{
+			// create
+			$subscriber = new SubscriberModel();
+			$subscriber->subscriber_email        		= $remote->email_address;
+			$subscriber->subscriber_remote_id   		= $remote->id;
+			$subscriber->subscriber_audience_id     	= $list->audience_remote_id;
+			$subscriber->subscriber_subscribed       	= ($remote->status == 'subscribed') ? true: false;
+			$subscriber->subscriber_status       		= $remote->status;
+			$subscriber->subscriber_audience_name 		= $list->audience_name;
+			$subscriber->subscriber_fname            	= $remote->merge_fields->FNAME;
+			$subscriber->subscriber_lname            	= $remote->merge_fields->LNAME;
+			
+			// Timestamps for keeping in Sync
+			$subscriber->status_remote_timestamp 	= $remote->last_changed;
+				
+			$subscriber->save();
+
+			return $subscriber;
+
+		}
+		catch(\Exceeption $e)
+		{
+			//can we delete what we created ?
+		}
+
+		return false;
+	}
+
+		
+	/**
+	 * AreSyncChangesRequired
+	 * 
+	 * We dont check each field, we check the following;
+	 * 		1. Check remote TS for changes
+	 * 		2. Check local-TS-Save compared to local-TS-Sync
+	 *
+	 * @param  mixed $subscriber
+	 * @param  mixed $remote
+	 * @return void
+	 */
+	public static function AreSyncChangesRequired(SubscriberInterface $subscriber, $remote) : bool
+	{
+		// until bugs fixed this will always return true;
+		return true;
+
+		// Log::debug('Date1: ' . $subscriber->status_remote_timestamp);
+		// Log::debug('Date2: ' . $subscriber->local_timestamp_sync);
+		// Log::debug('Date3: ' . $subscriber->local_timestamp_save);
+		// Log::debug('Date3: ' . $remote->last_changed);
+
+
+		try
+		{
+			// Is Local TS less than the remote, then Sync
+			if($subscriber->status_remote_timestamp != "")
+			{
+				if( date('c', $subscriber->status_remote_timestamp) < date('c', $remote->last_changed ) )
+				{
+					return true;
+				}
+			}
+
+			if( ($subscriber->local_timestamp_sync != "") && ($subscriber->local_timestamp_save != ""))
+			{
+				if(date('c', $subscriber->local_timestamp_sync) < date('c', $subscriber->local_timestamp_save))
+				{
+					return true;
+				}
+			}
+
+		}
+		catch(\Exceeption $e)
+		{
+
+		}
+
+		return false;
+	}
+
+
 
 	/**
 	 * UpdateLocalSubscriberFromRemote
@@ -408,7 +500,6 @@ class Subscriber
 		{
 			// update
 			$subscriber->subscriber_email        	= $remote->email_address;
-			$subscriber->thrive_contact_synced   	= true;
 			$subscriber->subscriber_remote_id   	= $remote->id;
 
 			$subscriber->subscriber_audience_id     = $list->audience_remote_id;
@@ -419,9 +510,13 @@ class Subscriber
 
 			$subscriber->subscriber_fname           = $remote->merge_fields->FNAME;
 			$subscriber->subscriber_lname           = $remote->merge_fields->LNAME;
+
+			// Timestamps for keeping in Sync
+			$subscriber->status_remote_timestamp 	= $remote->last_changed;
+
 			$subscriber->save();
 
-			return true;
+			return $subscriber;
 		}
 		catch(\Exceeption $e)
 		{
@@ -430,4 +525,59 @@ class Subscriber
 
 		return false;
 	}
+
+	
+	/**
+	 * SyncTimestampsAsCurrent
+	 * 
+	 * This will set both sync timestamps to current
+	 *
+	 * @param  mixed $subscriber
+	 * @param  mixed $remote
+	 * @return void
+	 */
+	public static function SyncTimestampsAsCurrent(SubscriberInterface $subscriber)
+	{
+		$ts = date("c");
+		Log::debug('SET TS: SyncTimestampsAsCurrent : ' . $ts);
+
+		// Timestamps for keeping in Sync
+		$subscriber->local_timestamp_sync 	= $ts;
+		$subscriber->local_timestamp_save   = $ts;
+
+		$subscriber->save();
+
+		return true;
+	}
+
+		
+	/**
+	 * SetCurrentSaveTimestamp
+	 * This will only update the local save timestamp
+	 *
+	 * @param  mixed $subscriber
+	 * @return void
+	 */
+	public static function SetCurrentSaveTimestamp(SubscriberInterface $subscriber)
+	{
+		$ts = date("c");
+		Log::debug('SET TS: SetCurrentSaveTimestamp : ' . $ts);
+		// Timestamps for keeping in Sync
+		$subscriber->local_timestamp_save 	= $ts; // (now) ISO 8601 date (added in PHP 5)
+
+		// 'local_timestamp_sync' 
+		// 'local_timestamp_save' 
+		$subscriber->save();
+	}	
+
+
+	/**
+	 * @todo - Not required
+	 */
+	public static function GetCurrentSaveTimestamp()
+	{
+		// Timestamps for keeping in Sync
+		return date("c"); 
+		// (now) ISO 8601 date (added in PHP 5)
+	}	
 }

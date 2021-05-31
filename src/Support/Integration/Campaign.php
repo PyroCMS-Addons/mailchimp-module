@@ -68,6 +68,8 @@ class Campaign
      */
     public static function SyncAll(CampaignRepository $repository )
     {
+        // Log::error('Start SyncAll from Campaigns');
+
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
@@ -75,20 +77,26 @@ class Campaign
 
             if(isset(($campaigns->campaigns)))
             {
+                // Log::error('Found Some campaigns');
+
                 $campaigns = $campaigns->campaigns;
     
                 foreach($campaigns as $campaign)
                 {
                     if($local = $repository->findBy('campaign_remote_id', $campaign->id))
                     {
+                        // Log::error('Found Local Campaign - Lets Update');
+
                         // Update Local
                         self::UpdateLocalCampaignFromRemote($local, $campaign);    
                     }
                     else
                     {
+                        // Log::error('Did not Find Local Campaign - Lets Create');
+
                         // Not found
                         //check if exist if deleted
-                        if($repository->allWithTrashed()->findBy('str_id',$campaign->id))
+                        if($repository->allWithTrashed()->findBy('campaign_remote_id',$campaign->id))
                         {
                             $messages->error('You may have some Camapigns not included as we found similar Ids in the trashed area..');
                         }
@@ -258,6 +266,7 @@ class Campaign
 
     public static function CreateLocalCampaignFromRemote($remote)
     {
+        //Log::debug( print_r($remote,true) );
         try 
         {
             $item = new CampaignModel();
@@ -266,21 +275,20 @@ class Campaign
             $item->campaign_list_id         = $remote->recipients->list_id;  
             $item->campaign_status          = $remote->status;
             $item->campaign_remote_id       = $remote->id;
-            $item->campaign_subject_line    = $remote_campaign->settings->subject_line;
-            $item->campaign_from_name       = $remote_campaign->settings->from_name;
-            $item->campaign_reply_to        = $remote_campaign->settings->reply_to;        
+            $item->campaign_subject_line    = $remote->settings->subject_line;
+            $item->campaign_from_name       = $remote->settings->from_name;
+            $item->campaign_reply_to        = $remote->settings->reply_to;        
 
             // @deprecated ststus field
             $item->campaign_sync_status = 'Synchronized';
 
             $item->save();
-            // $item->update(['thrive_sync_status' => 'Just Created']);
 
-            return true;
+            return $item;
         }
         catch(\Exception $e)
         {
-
+            Log::error($e->getMessage());
         }
 
         return false;

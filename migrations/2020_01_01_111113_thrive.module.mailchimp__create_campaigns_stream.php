@@ -42,7 +42,7 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             "config" => [
                 "default_value" => null,
             ]
-        ],        
+        ],
         'campaign_type' => [
             "type"   => "anomaly.field_type.select",
             "config" => [
@@ -60,7 +60,7 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
                 "handler"       => "options",
                 "mode"          => "dropdown",
             ]
-        ],     
+        ],
         'campaign_list_id' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
@@ -72,25 +72,25 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             "config" => [
                 "default_value" => null,
             ]
-        ],   
+        ],
         'campaign_from_name' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
                 "default_value" => null,
             ]
-        ],    
+        ],
         'campaign_reply_to' => [
             "type"   => "anomaly.field_type.email",
-        ],    
+        ],
         'campaign_template_id' => [
             "type"   => "anomaly.field_type.text",
             "config" => [
                 "default_value" => null,
             ]
-        ],      
+        ],
         'campaign_status' => [
             "type"   => "anomaly.field_type.text",
-        ], 
+        ],
 
         // @deprecated status fields
         'campaign_sync_status' => [
@@ -98,7 +98,7 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             "config"  =>[
                 "default_value" => ""
             ]
-        ],       
+        ],
     ];
 
     /**
@@ -111,12 +111,12 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             'translatable'      => false,
             'unique'            => true,
             'required'          => true,
-        ], 
+        ],
         'campaign_remote_id' => [
             'translatable'      => false,
             'unique'            => true,
             'required'          => true,
-        ],              
+        ],
         'campaign_list_id' => [
             'translatable'      => false,
             'unique'            => false,
@@ -151,7 +151,7 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
+        ],
 
         // @depreated status fields
         'campaign_sync_status' => [
@@ -164,33 +164,37 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
         // New Common Status Fields
         // These will replace old status
         // fields.
-        //   
+        //
         "status_remote_timestamp" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],  
-        "status_local_timestamp" => [
+        ],
+        "local_timestamp_sync" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
+        ],
+        "local_timestamp_save" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
         "status_sync" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],    
+        ],
         "status_created_locally" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],    
+        ],
         "status_created_source" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],           
-           
-    ];
+        ],
 
+    ];
 }

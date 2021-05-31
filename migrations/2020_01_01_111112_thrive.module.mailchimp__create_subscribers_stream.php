@@ -40,9 +40,9 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
                 "default_value" => null,
             ]
         ],
-        "subscriber_remote_id"          => "anomaly.field_type.text", 
-        "subscriber_audience_id"        => "anomaly.field_type.text", 
-        "subscriber_audience_name"      => "anomaly.field_type.text", 
+        "subscriber_remote_id"          => "anomaly.field_type.text",
+        "subscriber_audience_id"        => "anomaly.field_type.text",
+        "subscriber_audience_name"      => "anomaly.field_type.text",
         "subscriber_subscribed"         => [
             "type"   => "anomaly.field_type.boolean",
             "config" => [
@@ -54,13 +54,10 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
                 "mode"          => "switch",
                 "label"         => null,
             ]
-        ], 
-        "subscriber_status"             => "anomaly.field_type.text", 
-        "subscriber_fname"              => "anomaly.field_type.text", 
-        "subscriber_lname"              => "anomaly.field_type.text", 
- 
-        // @deprecated field
-        "thrive_contact_synced"         => "anomaly.field_type.text",   
+        ],
+        "subscriber_status"             => "anomaly.field_type.text",
+        "subscriber_fname"              => "anomaly.field_type.text",
+        "subscriber_lname"              => "anomaly.field_type.text",
 
     ];
 
@@ -70,32 +67,32 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      * @var array
      */
     protected $assignments = [
-      
+
         'subscriber_email' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
-        ],    
+        ],
         'subscriber_remote_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],             
+        ],
         'subscriber_audience_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
-        ],         
+        ],
         'subscriber_audience_name' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
+        ],
         'subscriber_subscribed' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ], 
+        ],
         'subscriber_fname' => [
             'translatable'      => false,
             'unique'            => false,
@@ -105,23 +102,12 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
+        ],
         'subscriber_status' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
-
-        
-        //
-        // Old Sync Status Field
-        // @deprecated
-        //
-        "thrive_contact_synced" => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],  
+        ],
 
         //
         // New Common Status Fields
@@ -132,27 +118,32 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],  
-        "status_local_timestamp"    => [
+        ],
+        "local_timestamp_sync" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
+        ],
+        "local_timestamp_save" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
         "status_sync"               => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],    
+        ],
         "status_created_locally"    => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],    
+        ],
         "status_created_source"     => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],          
+        ],
     ];
 
 }

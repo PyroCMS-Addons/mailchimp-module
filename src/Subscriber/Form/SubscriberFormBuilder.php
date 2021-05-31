@@ -36,7 +36,6 @@ class SubscriberFormBuilder extends FormBuilder
      * @var array|string
      */
     protected $skips = [
-        'thrive_contact_synced',
         'subscriber_status',
         'subscriber_remote_id',
     ];
@@ -116,24 +115,31 @@ class SubscriberFormBuilder extends FormBuilder
      */
     public function onSaved(MessageBag $messages)
     {
-        $entry = $this->getFormEntry();
+        $subscriber = $this->getFormEntry();
 
         Log::debug('--- [ Begin ] ---  SubscriberFormBuilder::onSaved ');
 
-        Log::debug('  » 00 Pushing User        : ' . $entry->subscriber_email);
+        Log::debug('  » 00 Pushing User        : ' . $subscriber->subscriber_email);
+
+
+        $ts = date("c");
+		Log::debug('SET TS: onSaved : ' . $ts);
+
+        // Update Local Timestamp
+        $subscriber->local_timestamp_save    	= $ts; // (now) ISO 8601 date (added in PHP 5)
+        $subscriber->save();
+
 
 
         if($this->can_post_to_mailchimp)
         {
-            if($item = Subscriber::Post($entry))
+            if($item = Subscriber::Post($subscriber))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
-                $entry->update(['thrive_contact_synced' => 'thrive.module.mailchimp::common.sync_success']);
             }
             else
             {
                 $messages->error('Failed to POST to Mailchimp');
-                $entry->update(['thrive_contact_synced' => 'thrive.module.mailchimp::common.sync_failed']);
             }
         }
 

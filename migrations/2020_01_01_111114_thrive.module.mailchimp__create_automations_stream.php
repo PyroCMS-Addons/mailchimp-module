@@ -39,28 +39,28 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
         ],
         'automation_workflow_id' => [
             "type"   => "anomaly.field_type.text",
-        ],    
+        ],
         'automation_status' => [
             "type"   => "anomaly.field_type.text",
-        ],         
+        ],
         'automation_start_time' => [
             "type"   => "anomaly.field_type.text",
-        ],       
+        ],
         'automation_create_time' => [
             "type"   => "anomaly.field_type.text",
-        ],    
+        ],
         'automation_emails_sent' => [
             "type"   => "anomaly.field_type.text",
-        ],     
+        ],
         'automation_list_id' => [
             "type"   => "anomaly.field_type.text",
         ],
         'automation_from_name' => [
             "type"   => "anomaly.field_type.text",
-        ],    
+        ],
         'automation_reply_to' => [
             "type"   => "anomaly.field_type.email",
-        ],                        
+        ],
     ];
 
     /**
@@ -78,7 +78,7 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
-        ],        
+        ],
         'automation_start_time'     => [
             'translatable'      => false,
             'unique'            => false,
@@ -88,7 +88,7 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],        
+        ],
         'automation_emails_sent'    => [
             'translatable'      => false,
             'unique'            => false,
@@ -121,33 +121,37 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
         // New Common Status Fields
         // These will replace old status
         // fields.
-        //  
+        //
         "status_remote_timestamp"   => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],  
-        "status_local_timestamp"    => [
+        ],
+        "local_timestamp_sync" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],   
+        ],
+        "local_timestamp_save" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
         "status_sync"               => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],    
+        ],
         "status_created_locally"    => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],    
+        ],
         "status_created_source"     => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
-        ],         
-            
-    ];
+        ],
 
+    ];
 }

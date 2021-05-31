@@ -11,6 +11,6 @@ class SubscriberObserver extends EntryObserver
     {
         // Log::info('Updating from Observer');
 
-        // $subscriber->status_local_timestamp = '';
+        // $subscriber->local_timestamp_save = '';
     }
 }

@@ -100,7 +100,6 @@ class AutomationFormBuilder extends FormBuilder
                     'fields' => [
                         'campaign_str_id',
                         'campaign_sync_status',
-                        'thrive_sync_status',
                         'campaign_type',
                         'list_id',
                     ],
@@ -146,7 +145,6 @@ class AutomationFormBuilder extends FormBuilder
     {
         Log::debug('--- [ Begin ] ---  AutomationFormBuilder::onSaving ');
 
-        // $new_name    = $this->getRequestValue('thrive_sync_status');
 
         $this->can_post_to_mailchimp = true;
 

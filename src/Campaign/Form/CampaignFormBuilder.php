@@ -100,7 +100,6 @@ class CampaignFormBuilder extends FormBuilder
                     'fields' => [
                         'campaign_remote_id',
                         'campaign_sync_status',
-                        'thrive_sync_status',
                         'campaign_type',
                         'campaign_list_id',
                     ],

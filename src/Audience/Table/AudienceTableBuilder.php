@@ -35,7 +35,6 @@ class AudienceTableBuilder extends TableBuilder
         //                     data-target="#modal">{entry.audience_name}</a>',
         // ],
         'audience_name',      
-        'thrive_sync_status',
         'audience_remote_id' => [
             'wrapper' => '<span class="tag tag-default">{entry.audience_remote_id}</span>',
         ]
