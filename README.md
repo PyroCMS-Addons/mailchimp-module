@@ -7,9 +7,9 @@ PyroCMS Mailchimp Integration Module
 [TOC]
 
 
-#### Version 1.0.0 (Alpha-2)
+#### Version 1.0.0 (Alpha-3)
 
-*thrive.module.subscriptions*
+*thrive.module.mailchimp*
 
 
 #### Requirements
@@ -17,12 +17,17 @@ PyroCMS Mailchimp Integration Module
 - PyroCMS 3.9 
 - PHP 7.2^
 
-#### Build Status
-Please note, while this module is still in alpha, any code updates you receive, please uninstall and reinstall the module. There will be no upgrade path while under heavy development.
-
+#### Important Message
+```
+Please note, while this module is still in alpha, any code updates you receive, 
+please uninstall and reinstall the module. There will be no upgrade path 
+while under heavy development. Many of the fields may undergo name 
+changes and I may not be including an upgrade path 
+until I am in Beta.
+```
 
 ## About
-The Mailchimp Module integrates your Mailchimp Campaigns and allows you to Update campaign, send, and duplicate campaigns all within PyroCMS admin. It also has a Plugin so you can directly subscribe users and keep your subscribers in sync with Mailchimps Audience/List.
+The Mailchimp Module integrates your Mailchimp Campaigns with PyroCMS. The integration allows you to Update, send, and duplicate campaigns all within PyroCMS. It also has a Plugin so you can directly subscribe users and keep your subscribers in sync with Mailchimps Audience/List. Forms Integration is also possible, see below.
 
 
 ## Quick Start
@@ -34,7 +39,7 @@ THRIVE_MAILCHIMP_API=your-api-key-here
 THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
 ```
 4. Follow the installatios steps
-5. Once installed, go to PyroCMS admin, and goto Mailchimp, under each section there will be a button to `Sync`
+
 
 ### Installation
 
@@ -89,26 +94,21 @@ Output:
 ```
 
 
-
-#### Plugin Limitation
-The plugin can send `tags` to Mailchimp during a subscribe, however these tags will not be stored on the local system. Development is planned to integrate the tags locally, however its not yet baked.
-Check back soon.
-
-
-
         
-## Using Forms Module
-Using all three extensions below, you can link the Forms Module with Mailchimp. Just use the `Mailchimp-Form-Extension` and add the `MCAudience` field-type. You can choose to have a hidden field for the Audience or a Select list.
+## Integrating with the *Forms Module*
+If the Mailchimp Plugin is not suited, or you need more fields, you can link Mailchimp to the Forms-Module.
+Using all three extensions below, Just use the `Mailchimp-Form-Extension` (Form Handler) and add the `thrive.field_type.mailchimp` (Field-Type).
+
 
 #### Supported Forms Modules
 - `Anomaly\Forms` (PyroCMS Pro Feature)
 - `Thrive\Forms` (Private Repository)
 
-What                              | Why                                                                                 
---------------------------------- | ---------------
-`thrive.field_type.mcaudience`    | Field Type Listing Available Audiences/List.
-`thrive.extension.mailchimp`      | Linking the Forms Module with Mailchimp Module. This allos you to Subscribe Users using the Forms Module. This will post data to the `MailchimpModule.`
-`thrive.module.mailchimp`         | The Core Mailchimp Integration for PyroCMS  
+Namespace                         | Type                 | Why                                                                
+--------------------------------- | -------------------- | ---------------
+`thrive.field_type.mailchimp`     | Field Type           | Links Mailchimp audience and syncs MC Module with Forms.
+`thrive.extension.mailchimp`      | Forms Handler        | Linking the Forms Module with Mailchimp Module. This allows you to Subscribe Users using the Forms Module. This will post data to the `MailchimpModule.`
+`thrive.module.mailchimp`         | Module               | The Core Mailchimp Integration for PyroCMS  
 
 
 
@@ -116,7 +116,8 @@ What                              | Why
 
 ## Commands & Task Scheduling
 
-What                       | Command
--------------------------- | -------------------------------
-Starts the Task Scheduler  | `php artisan mailchimp:tidy`  
-Sync All Libraries (once)  | `php artisan mailchimp:sync`  
+What                       | Command                         | Options
+-------------------------- | ------------------------------- | -------------------------------
+Starts the Task Scheduler  | `php artisan mailchimp:tidy`    |   
+Sync All Libraries (once)  | `php artisan mailchimp:sync`    |  
+Sync All Libraries (once)  | `php artisan mailchimp:post`    | 
