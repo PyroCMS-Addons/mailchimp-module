@@ -4,11 +4,12 @@
 use Illuminate\Support\Facades\Log;
 
 // Thrive
-use Thrive\MailchimpModule\Support\Mailchimp;
-use Thrive\MailchimpModule\Content\ContentModel;
-use Thrive\MailchimpModule\Campaign\Contract\CampaignInterface;
 use Thrive\MailchimpModule\Automation\Contract\AutomationInterface;
+use Thrive\MailchimpModule\Campaign\Contract\CampaignInterface;
 use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
+use Thrive\MailchimpModule\Content\ContentModel;
+use Thrive\MailchimpModule\Content\Contract\ContentInterface;
+use Thrive\MailchimpModule\Support\Mailchimp;
 
 /**
  * Content
@@ -32,40 +33,68 @@ use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
  */
 class Content
 {
-        
+
     /**
-     * Get
-     * 
-     *  return $html->archive_html;
-     *  return $html->html;
-     *  return $html->plain_text;
+     * Sync
      *
-     * @param  mixed $campaign_id
+     * @param  mixed $campaign
      * @return void
      */
-    public static function Get($campaign_id)
+    public static function Sync(CampaignInterface $campaign)
     {
         if($mailchimp = Mailchimp::Connect())
         {
-            if($content = $mailchimp->getCampaignContent($campaign_id))
+            // 2. ok, well if not then lets download the content
+            if($remote = $mailchimp->getCampaignContent( $campaign->campaign_remote_id ))
             {
-                return $content;
+                if($local = ContentModel::where('content_campaign_id', $campaign->campaign_remote_id)->first())
+                {
+                    // we have a local copy
+                    return self::UpdateLocalFromremote($local, $remote);
+                }
+                else
+                {
+                    //we dont have local copy, lets create
+                    return self::CreateLocalFromremote($remote, $campaign);
+                }
             }
         }
 
         return false;
     }
 
+
+    /**
+     * Push
+     *
+     * @param  mixed $campaign
+     * @return void
+     */
+    public static function Post(ContentInterface $content)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            $content_values = self::PrepareContent($content);
+
+            if($remote = $mailchimp->setCampaignContent( $content->content_campaign_id , $content_values))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
     
+
     /**
      * GetPreview
-     * 
-     * Check status of local repository, and then Check if we 
-     * need to go online for an update if need to update 
+     *
+     * Check status of local repository, and then Check if we
+     * need to go online for an update if need to update
      * from remote, then we download and update local.
-     * Once local if updated we can return the 
+     * Once local if updated we can return the
      * content record.
-     * 
+     *
      * Otherwise, if all good from local copy, deliver local
      * copy to user.
      *
@@ -91,7 +120,7 @@ class Content
                     $local->content_name            = 'Template for ' . $campaign->campaign_name;
                     $local->content_campaign_id     = $campaign->campaign_remote_id;
                     $local->content_plain_text      = (isset($remote->plain_text)) ? $remote->plain_text : '' ;
-                    $local->content_html            = (isset($remote->html)) ? $remote->html : '' ; 
+                    $local->content_html            = (isset($remote->html)) ? $remote->html : '' ;
                     $local->content_archive_html    = (isset($remote->archive_html)) ? $remote->archive_html : '' ;
                     $local->content_fields          = '';
                     $local->save();
@@ -103,6 +132,68 @@ class Content
         }
 
         return false;
-    }    
+    }
 
+
+    /**
+     * UpdateLocalFromremote
+     *
+     * @param  mixed $local
+     * @param  mixed $remote
+     * @return void
+     */
+    public static function UpdateLocalFromremote(ContentInterface $local , $remote)
+    {
+        // Now store the content
+        $local = new ContentModel;
+        $local->content_name            = 'Template for ' . $campaign->campaign_name;
+        $local->content_campaign_id     = $campaign->campaign_remote_id;
+        $local->content_plain_text      = (isset($remote->plain_text)) ? $remote->plain_text : '' ;
+        $local->content_html            = (isset($remote->html)) ? $remote->html : '' ;
+        $local->content_archive_html    = (isset($remote->archive_html)) ? $remote->archive_html : '' ;
+        $local->content_fields          = '';
+        $local->save();
+
+        return true;
+    }
+
+
+    /**
+     * CreateLocalFromremote
+     *
+     * @param  mixed $remote
+     * @return void
+     */
+    public static function CreateLocalFromremote($remote, CampaignInterface $campaign)
+    {
+        // Now store the content
+        $local = new ContentModel;
+        $local->content_name            = 'Template for ' . $campaign->campaign_name;
+        $local->content_campaign_id     = $campaign->campaign_remote_id;
+        $local->content_plain_text      = (isset($remote->plain_text)) ? $remote->plain_text : '' ;
+        $local->content_html            = (isset($remote->html)) ? $remote->html : '' ;
+        $local->content_archive_html    = (isset($remote->archive_html)) ? $remote->archive_html : '' ;
+        $local->content_fields          = '';
+        $local->save();
+
+        return true;
+    }
+
+    
+    /**
+     * PrepareContent
+     *
+     * @param  mixed $local
+     * @return void
+     */
+    public static function PrepareContent(ContentInterface $local)
+    {
+        $data_values = [];
+
+        $data_values['plain_text']      =   $local->content_plain_text;
+        $data_values['html']            =   $local->content_html;
+
+        return $data_values;
+
+    }
 }

@@ -82,14 +82,7 @@ class Campaign
                     if($local = $repository->findBy('campaign_remote_id', $campaign->id))
                     {
                         // Update Local
-                        $local->campaign_name        = $campaign->settings->title;
-                        $local->campaign_type        = $campaign->type;
-                        $local->campaign_list_id     = $campaign->recipients->list_id;  
-                        $local->campaign_sync_status = 'Synchronised';
-                        $local->campaign_status      = $campaign->status;
-                        $local->campaign_remote_id   = $campaign->id;
-                        $local->save();
-    
+                        self::UpdateLocalCampaignFromRemote($local, $campaign);    
                     }
                     else
                     {
@@ -101,15 +94,7 @@ class Campaign
                         }
                         else
                         {
-                            $item = new CampaignModel();
-                            $item->campaign_name        = $campaign->settings->title;
-                            $item->campaign_type        = $campaign->type;
-                            $item->campaign_list_id     = $campaign->recipients->list_id;  
-                            $item->campaign_sync_status = 'Synched';
-                            $item->campaign_status      = $campaign->status;
-                            $item->campaign_remote_id   = $campaign->id;
-                            $item->save();
-                            // $item->update(['thrive_sync_status' => 'Just Created']);
+                            self::CreateLocalCampaignFromRemote($campaign);    
                         }                
                     }
                 }            
@@ -142,7 +127,7 @@ class Campaign
                 }
                 else
                 {
-                    $mailchimp->createCampaign($settings);
+                    return $mailchimp->createCampaign($settings);
                 }
             }
         }
@@ -175,51 +160,6 @@ class Campaign
     }
 
     /**
-     * PostLocalEntryToMailchimp
-     * 
-     * @deprecated - use self::Post
-     *
-     * @param  mixed $entry
-     * @return void
-     */
-    public static function PostLocalEntryToMailchimp(CampaignInterface $entry)
-    {
-        // Connect to Mailchimp
-        if($mailchimp = Mailchimp::Connect())
-        {
-            $settings = [];
-
-            if(isset($entry->campaign_subject_line) && $entry->campaign_subject_line != "")
-            {
-                $settings["subject_line"] = $entry->campaign_subject_line;
-            }
-
-            if(isset($entry->campaign_from_name) && $entry->campaign_from_name != "")
-            {
-                $settings["from_name"] = $entry->campaign_from_name;
-            }
-
-            if(isset($entry->campaign_reply_to) && $entry->campaign_reply_to != "")
-            {
-                $settings["reply_to"] = $entry->campaign_reply_to;
-            }
-
-            if(isset($entry->campaign_name) && $entry->campaign_name != "")
-            {
-                $settings["title"] = $entry->campaign_name;
-            }
-
-            return $mailchimp->updateCampaign(
-                                $entry->campaign_remote_id,
-                                $settings);
-        }
-
-        return false;
-
-    }
-
-
-    /**
      * Copy
      *
      * @param  mixed $entry
@@ -232,18 +172,7 @@ class Campaign
         {
             if($remote_campaign = $mailchimp->copyCampaign($entry->campaign_remote_id))
             {
-                // create local
-                $newcampaign = new CampaignModel;
-                $newcampaign->campaign_name             = $remote_campaign->settings->title;
-                $newcampaign->campaign_type             = $remote_campaign->type;
-                $newcampaign->campaign_list_id          = $remote_campaign->recipients->list_id;
-                $newcampaign->campaign_sync_status      = 'Synchronized';
-                $newcampaign->campaign_status           = $remote_campaign->status;
-                $newcampaign->campaign_remote_id        = $remote_campaign->id;
-                $newcampaign->campaign_subject_line     = $remote_campaign->settings->subject_line;
-                $newcampaign->campaign_from_name        = $remote_campaign->settings->from_name;
-                $newcampaign->campaign_reply_to         = $remote_campaign->settings->reply_to;
-                $newcampaign->save();
+                return self::CreateLocalCampaignFromRemote($remote_campaign);
             }
         }
 
@@ -326,4 +255,51 @@ class Campaign
 
         return $settings;
     }    
+
+    public static function CreateLocalCampaignFromRemote($remote)
+    {
+        try 
+        {
+            $item = new CampaignModel();
+            $item->campaign_name            = $remote->settings->title;
+            $item->campaign_type            = $remote->type;
+            $item->campaign_list_id         = $remote->recipients->list_id;  
+            $item->campaign_status          = $remote->status;
+            $item->campaign_remote_id       = $remote->id;
+            $item->campaign_subject_line    = $remote_campaign->settings->subject_line;
+            $item->campaign_from_name       = $remote_campaign->settings->from_name;
+            $item->campaign_reply_to        = $remote_campaign->settings->reply_to;        
+
+            // @deprecated ststus field
+            $item->campaign_sync_status = 'Synchronized';
+
+            $item->save();
+            // $item->update(['thrive_sync_status' => 'Just Created']);
+
+            return true;
+        }
+        catch(\Exception $e)
+        {
+
+        }
+
+        return false;
+    }
+
+    public static function UpdateLocalCampaignFromRemote($local, $remote)
+    {
+        // Update Local
+        $local->campaign_name        = $remote->settings->title;
+        $local->campaign_type        = $remote->type;
+        $local->campaign_list_id     = $remote->recipients->list_id;  
+        $local->campaign_status      = $remote->status;
+        $local->campaign_remote_id   = $remote->id;
+
+        // @deprecated status field
+        $local->campaign_sync_status = 'Synchronised';
+
+        $local->save();
+
+        return true;
+    }
 }

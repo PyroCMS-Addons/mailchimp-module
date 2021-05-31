@@ -9,6 +9,7 @@ use Thrive\MailchimpModule\Audience\AudienceModel;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Form\AudienceFormBuilder;
 use Thrive\MailchimpModule\Audience\Table\AudienceTableBuilder;
+use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Support\Integration\Audience;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
@@ -89,5 +90,32 @@ class AudiencesController extends AdminController
 
         return redirect()->back();
     }  
+
+
+    
+    /**
+     * delete
+     *
+     * @param  mixed $id
+     * @param  mixed $messages
+     * @param  mixed $subscribers
+     * @return void
+     */
+    public function delete($id = null, MessageBag $messages, SubscriberRepository $subscribers)
+    {
+        if($audience = AudienceModel::find($id))
+        {
+            if(Audience::Delete($audience))
+            {
+                // Now delete all subscribers
+                if($subscribers->deleteByAudienceId($audience->audience_remote_id))
+                {
+                    // set messages
+                }
+            }
+        }
+
+        return redirect()->back();
+    }      
  
 }

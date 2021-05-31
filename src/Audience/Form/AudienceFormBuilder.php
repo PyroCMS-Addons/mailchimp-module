@@ -135,7 +135,7 @@ class AudienceFormBuilder extends FormBuilder
 
         $entry = $this->getFormEntry();
 
-        $audience_name                  = $this->getRequestValue('name');
+        $audience_name                  = $this->getRequestValue('audience_name');
         $audience_list                  = $this->getRequestValue('audience_remote_id');
 
         $this->can_post_to_mailchimp    = true;
@@ -154,7 +154,7 @@ class AudienceFormBuilder extends FormBuilder
 
         if($this->can_post_to_mailchimp)
         {
-            if(Audience::Sync($entry))
+            if(Audience::Post($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
                 $entry->update(['thrive_sync_status' => 'Updated']);

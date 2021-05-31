@@ -1,9 +1,11 @@
 <?php namespace Thrive\MailchimpModule\Support\Mailchimp;
 
 // Laravel
-use Illuminate\Support\Facades\Log;
+// use GuzzleHttp\Exception\ClientException;
 
 // Mailchimp
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
 use MailchimpMarketing;
 use MailchimpMarketing\ApiException;
 
@@ -85,13 +87,41 @@ trait MailchimpAudiencesTrait
      */
     public function deleteList(string $list_id)
     {
-        if($response = $this->mailchimp->lists->deleteList($list_id))
+        try
         {
-            return true;
+            if($response = $this->mailchimp->lists->deleteList($list_id))
+            {
+                return true;
+            }
+        }
+        catch (ApiException $ex) 
+        {
+            Log::error('MailchimpMarketing\ApiException ex, see below export of response.');
+            Log::error(print_r($ex,true));
+        }      
+        catch(RequestException $gex) 
+        {
+            if ($gex->hasResponse()) 
+            {
+                $response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+            }
+            else
+            {
+                Log::error('Error Deleting Audience,  possible restriction applied.');
+            }
+
+        } 
+        catch(\Exception $e)
+        {
+            $json = $e->getResponse()->getBody()->getContents();
+            Log::error('Delete Audience Error : '.print_r($json,true));
         }
 
-        // in future lets check the $response and see what
-        // message it has, we could log it
         return false;
     }
 

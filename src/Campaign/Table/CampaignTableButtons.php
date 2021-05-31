@@ -19,6 +19,7 @@ class CampaignTableButtons extends TableBuilder
             [
                 'type' => 'info',
                 'attributes' => [
+                    'data-icon'    => 'info',
                     'data-toggle'  => 'confirm',
                     'data-message' => 'Are you sure ?'
                 ],

@@ -322,6 +322,42 @@ class Subscriber
 	}
 
 	
+	
+	public static function CreateOrUpdateLocalSubscriber( $email_address, $list_id, $status = 'subscribed' )
+	{
+		try
+		{
+			$subscriber = null;
+
+			if($subscriber = SubscriberModel::where('subscriber_audience_id',$list_id)->where('subscriber_email',$email_address)->first())
+			{
+			
+			}
+			else
+			{
+				$subscriber = new SubscriberModel();
+
+			}
+
+			$subscriber->subscriber_email        	= $email_address;
+			$subscriber->subscriber_audience_id  	= $list_id;
+			$subscriber->subscriber_status       	= $status; 
+			$subscriber->subscriber_subscribed   	= ($status == 'subscribed') ? true: false ;;
+			$subscriber->thrive_contact_synced   	= false;
+			$subscriber->save();
+
+			return $subscriber;
+
+
+		}
+		catch(\Exceeption $e)
+		{
+			//can we delete what we created ?
+		}
+
+		return false;
+	}
+
 	/**
 	 * CreateLocalSubscriber
 	 *

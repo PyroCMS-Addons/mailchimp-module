@@ -24,13 +24,27 @@ use Thrive\MailchimpModule\Support\Integration\Content;
  */
 class ContentController extends AdminController
 {
-
     public function view( $id )
     {
         $campaign = CampaignModel::find($id);
 
-        $html = Content::Get($campaign->campaign_remote_id);
+        if($content = Content::GetPreview($campaign))
+        {
+            return view('thrive.module.mailchimp::admin.content.view')->withContent($content->content_html);
+        }
 
-        return view('thrive.module.mailchimp::admin.content.view')->withContent($html->html);
+        return redirect()->back();
     }
+
+    public function push( $id )
+    {
+        $campaign = CampaignModel::find($id);
+
+        if($content = Content::Push($campaign))
+        {
+            return view('thrive.module.mailchimp::admin.content.view')->withContent($content->content_html);
+        }
+
+        return redirect()->back();
+    }    
 }

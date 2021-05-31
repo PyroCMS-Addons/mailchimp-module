@@ -25,6 +25,14 @@ class AudienceTableButtons extends TableBuilder
                     'data-message' => 'Are you sure ?'
                 ],
             ],   
+            'delete' => 
+            [
+                'type'          => 'danger',
+                'attributes'    => [
+                    'data-toggle'  => 'confirm',
+                    'data-message' => 'Are you sure ?'
+                ],
+            ],              
             // 'push' => 
             // [
             //     'type' => 'danger',

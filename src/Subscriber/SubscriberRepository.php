@@ -22,4 +22,18 @@ class SubscriberRepository extends EntryRepository implements SubscriberReposito
     {
         $this->model = $model;
     }
+
+    
+    /**
+     * deleteByAudienceId
+     *
+     * @param  mixed $audience_id
+     * @return void
+     */
+    public function deleteByAudienceId(string $audience_id)
+    {
+        return $this->model->where('subscriber_audience_id', $audience_id)->forceDelete();
+    }
+
+    
 }

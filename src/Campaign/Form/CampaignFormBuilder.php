@@ -167,7 +167,7 @@ class CampaignFormBuilder extends FormBuilder
         if($this->can_post_to_mailchimp)
         {
             // Change this to Campaign::Post(xx);
-             if($item = Campaign::PostLocalEntryToMailchimp($entry))
+             if($item = Campaign::Post($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
                 $entry->update(['campaign_sync_status' => 'Updated']);

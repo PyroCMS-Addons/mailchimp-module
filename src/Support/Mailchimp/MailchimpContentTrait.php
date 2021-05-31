@@ -45,10 +45,46 @@ trait MailchimpContentTrait
         } 
         catch (\Exception $e) 
         {
-            Log::error('Unable to locate Campaign content.');
+            Log::error('Unable to get Campaign content.');
         }
 
         return false;
     }
- 
+
+     
+    /**
+     * setCampaignContent
+     *
+     * @param  mixed $campaign_id
+     * @return void
+     */
+    public function setCampaignContent($campaign_id, array $content_values)
+    {
+        Log::debug('Content_Values');
+        Log::debug('Campaign ID' . $campaign_id);
+        Log::debug('Campaign ID' . $campaign_id);
+        Log::debug('Campaign ID' . $campaign_id);
+        Log::debug('Campaign ID' . $campaign_id);
+        // Log::debug(print_r($content_values,true));
+        
+        try 
+        {             
+            if($response = $this->mailchimp->campaigns->setContent($campaign_id, $content_values))
+            {
+                if(isset($response->status))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        } 
+        catch (\Exception $e) 
+        {
+            Log::error('Unable to set Campaign content.');
+        }
+
+        return false;
+    }
+
 }

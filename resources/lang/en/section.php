@@ -5,7 +5,7 @@ return [
         'title' => 'Dashboard',
     ],     
     'audiences' => [
-        'title' => 'Audience / List',
+        'title' => 'Audiences',
     ],  
     'automations' => [
         'title' => 'Automations',

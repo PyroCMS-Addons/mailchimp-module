@@ -52,6 +52,7 @@ class Audience
             }
             else
             {
+                Log::notice('Hmm, no remote instance of local object to Sync. Action required was probably Post..');
                 // nope, no remote
                 // we could just flag the local status that
                 // this list does not exist remotly.
@@ -98,7 +99,7 @@ class Audience
                     {
                         // Local List not found, so lets create
                         // one to keep it in sync.
-                        if($item = self::createLocalFromRemote($remote))
+                        if($item = self::CreateLocalFromRemote($remote))
                         {
                             $item->update(['thrive_sync_status' => 'thrive.module.mailchimp::common.sync_success']);
                         }
@@ -119,13 +120,13 @@ class Audience
     
     
     /**
-     * Push
+     * Post
      *
      * @param  mixed $entry
      * @param  mixed $repository
      * @return void
      */
-    public static function Push(AudienceInterface $entry)
+    public static function Post(AudienceInterface $entry)
     {
         if($mailchimp = Mailchimp::Connect())
         {
@@ -152,17 +153,40 @@ class Audience
     }
     
     /**
-     * PushAll
+     * PostAll
      *
      * @param  mixed $repository
      * @return void
      */
-    public static function PushAll(AudienceRepository $repository)
+    public static function PostAll(AudienceRepository $repository)
     {
         foreach($repository->all() as $audience)
         {
             self::Push($audience);
         }
+    }
+
+    
+    /**
+     * Delete
+     *
+     * @param  mixed $audience
+     * @return void
+     */
+    public static function Delete(AudienceInterface $audience)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            if($mailchimp->deleteList($audience->audience_remote_id))
+            {
+                // Delete Local Audience
+                $audience->forceDelete();
+                return true;
+            }
+        }
+
+        return false;
+        
     }
 
     
@@ -299,12 +323,12 @@ class Audience
 
 
     /**
-     * createLocalFromRemote
+     * CreateLocalFromRemote
      *
      * @param  mixed $remote
      * @return void
      */
-    public static function createLocalFromRemote($remote)
+    public static function CreateLocalFromRemote($remote)
     {
         try
         {

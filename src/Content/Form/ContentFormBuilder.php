@@ -110,4 +110,37 @@ class ContentFormBuilder extends FormBuilder
     protected $can_post_to_mailchimp;
 
 
+    public function onSaving(MessageBag $messages)
+    {
+        Log::debug('--- [ Begin ] ---  ContentFormBuilder::onSaving ');
+
+        $this->can_post_to_mailchimp = true;
+
+    }
+
+    public function onSaved(MessageBag $messages)
+    {
+        $entry = $this->getFormEntry();
+
+        Log::debug('--- [ Begin ] ---  ContentFormBuilder::onSaved ');
+
+        Log::debug('  » 00 Pushing Content     : ' . $entry->content_name . ' || '. $entry->content_campaign_id );
+
+
+        if($this->can_post_to_mailchimp)
+        {
+            // Change this to Campaign::Post(xx);
+             if($item = Content::Post($entry))
+            {
+                $messages->info('Successfully POSTED to Mailchimp');
+                // $entry->update(['campaign_sync_status' => 'Updated']);
+            }
+            else 
+            {
+                $messages->error('Failed to POST to Mailchimp');
+                // $entry->update(['campaign_sync_status' => 'Post Failed']);
+            }
+        }
+
+    }    
 }
