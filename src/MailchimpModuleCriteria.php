@@ -16,6 +16,7 @@ class MailchimpModuleCriteria extends PluginCriteria
         $this->options['form_name']         = 'mailchimp'; 
         $this->options['button_text']       = 'Submit'; 
         $this->options['input_class']       = 'form-control'; 
+        $this->options['email_placeholder'] = 'Enter your@email.com'; 
         $this->options['view']              = 'thrive.module.mailchimp::public.subscribe'; 
 
         //

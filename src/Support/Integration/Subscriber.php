@@ -1,15 +1,19 @@
 <?php namespace Thrive\MailchimpModule\Support\Integration;
 
 // Laravel
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 // Thrive
-use Illuminate\Support\Str;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Contract\AudienceInterface;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
+use Thrive\MailchimpModule\Support\Dev\SyncAction;
+use Thrive\MailchimpModule\Support\Dev\SyncUtility;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
@@ -97,7 +101,7 @@ class Subscriber
 				$count          = self::MAX_RECORDS;
 				$fields         = null;
 				$fields         = 'members.id,members.email_address,members.status,members.merge_fields,members.last_changed';			
-				$exfields       = null; //'members.email_address,members.vip,full_name,total_items';
+				$exfields       = null; //'members.vip,full_name,total_items';
 
 				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
 				{
@@ -154,6 +158,27 @@ class Subscriber
 		return false;
 	}
 
+	public static function Pull( SubscriberInterface $subscriber ) : bool
+	{
+		// Connect to Mailchimp
+		if($mailchimp = Mailchimp::Connect())
+		{
+			// update
+			if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
+			{
+				//update values
+				if($local_audience = AudienceModel::where($subscriber->subscriber_audience_id))
+				{
+					if(self::UpdateLocalSubscriberFromRemote($subscriber, $remote, $local_audience))
+					{
+						return self::SyncTimestampsAsCurrent($subscriber);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 
 	/**
 	 * Post
@@ -484,6 +509,69 @@ class Subscriber
 		return false;
 	}
 
+	
+	/**
+	 * TestDates
+	 *
+	 * @param  mixed $repository
+	 * @return void
+	 */
+	public static function TestDates( AudienceRepository $repository )
+	{
+		$output = new ConsoleOutput();
+
+		// Connect to Mailchimp
+		if($mailchimp = Mailchimp::Connect())
+		{
+			foreach(SubscriberModel::all() as $subscriber)
+			{
+				// get the remote users 
+				if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
+				{
+					switch(SyncUtility::Check($subscriber, $remote))
+					{
+						case SyncAction::Pull:
+							self::Pull($subscriber);
+							$subscriber->status_sync_messages = Carbon::now() .' - Pulled User Changes from Mailchimp';
+							$subscriber->save();
+							// Pull
+							break;	
+						case SyncAction::Push:
+							self::Post($subscriber);
+							$subscriber->status_sync_messages = Carbon::now() .' - Pushed User Changes to Mailchimp';
+							$subscriber->save();
+							// Push
+							break;						
+						case SyncAction::ErrResolveSuggestPull:
+							// ErrResolveSuggestPull
+							break;
+						case SyncAction::ErrResolveSuggestPush:
+							// ErrResolveSuggestPush
+							break;
+						case SyncAction::ErrResolveNoSuggestion:
+							// ErrResolveNoSuggestion
+							break;		
+						case SyncAction::NoChange:
+						default:
+							// NoChange
+							break;										
+					}
+				}
+				else
+				{
+					// unable to find online
+					$output->writeln('   === Subscriber      : ' . $subscriber->subscriber_email . '  ===');
+					$output->writeln('            Status     : !!! Unable to locate remotely');
+				}
+			}
+		}
+
+		$output->writeln('');
+		$output->writeln('End of Program <--');
+
+
+		return false;
+	}
 
 
 	/**

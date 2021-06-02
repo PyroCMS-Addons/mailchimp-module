@@ -63,7 +63,14 @@ class SubscriberFormSections
                                 'local_timestamp_sync', 
                                 'local_timestamp_save', 
                             ],
-                        ],                        
+                        ], 
+                        'sync_message' => [
+                            'title'  => 'Sync Messages',
+                            'fields' => [
+                                'status_sync_messages',
+                            ],
+                        ], 
+                        
                     ],
                 ],
             ];

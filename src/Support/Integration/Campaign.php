@@ -35,19 +35,19 @@ class Campaign
     /**
      * Sync
      *
-     * @param  mixed $entry
+     * @param  mixed $campaign
      * @return void
      */
-    public static function Sync(CampaignInterface $entry )
+    public static function Sync(CampaignInterface $campaign )
     {
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            if($settings = self::PrepareCampaign($entry))
+            if($settings = self::PrepareCampaign($campaign))
             {
-                if($mailchimp->hasCampaign($entry->str_id))
+                if($mailchimp->hasCampaign($campaign->campaign_remote_id))
                 {
-                    return $mailchimp->updateCampaign($entry->str_id, $settings);
+                    return $mailchimp->updateCampaign($campaign->campaign_remote_id, $settings);
                 }
                 else
                 {
@@ -119,19 +119,19 @@ class Campaign
      * Post local Campaig  to Mailchimp
      * Override remote
      *
-     * @param  mixed $entry
+     * @param  mixed $campaign
      * @return void
      */
-    public static function Post(CampaignInterface $entry )
+    public static function Post(CampaignInterface $campaign )
     {
         // Connect to Mailchimp
         if($mailchimp = Mailchimp::Connect())
         {
-            if($settings = self::PrepareCampaign($entry))
+            if($settings = self::PrepareCampaign($campaign))
             {
-                if($mailchimp->hasCampaign($entry->str_id))
+                if($mailchimp->hasCampaign($campaign->campaign_remote_id))
                 {
-                    return $mailchimp->updateCampaign($entry->str_id, $settings);
+                    return $mailchimp->updateCampaign($campaign->campaign_remote_id, $settings);
                 }
                 else
                 {
@@ -157,7 +157,7 @@ class Campaign
             {
                 if(!self::Post($campaign))
                 {
-                    Log::info('Unable to Post ' . $campaign->campaign_name . ' [' . $campaign_name->id . ']' );
+                    Log::info('Unable to Post ' . $campaign->campaign_name . ' [' . $campaign->campaign_remote_id . ']' );
                 }
             }
 
@@ -269,22 +269,22 @@ class Campaign
         //Log::debug( print_r($remote,true) );
         try 
         {
-            $item = new CampaignModel();
-            $item->campaign_name            = $remote->settings->title;
-            $item->campaign_type            = $remote->type;
-            $item->campaign_list_id         = $remote->recipients->list_id;  
-            $item->campaign_status          = $remote->status;
-            $item->campaign_remote_id       = $remote->id;
-            $item->campaign_subject_line    = $remote->settings->subject_line;
-            $item->campaign_from_name       = $remote->settings->from_name;
-            $item->campaign_reply_to        = $remote->settings->reply_to;        
+            $local = new CampaignModel();
+            $local->campaign_name            = $remote->settings->title;
+            $local->campaign_type            = $remote->type;
+            $local->campaign_list_id         = $remote->recipients->list_id;  
+            $local->campaign_status          = $remote->status;
+            $local->campaign_remote_id       = $remote->id;
+            $local->campaign_subject_line    = $remote->settings->subject_line;
+            $local->campaign_from_name       = $remote->settings->from_name;
+            $local->campaign_reply_to        = $remote->settings->reply_to;        
 
             // @deprecated ststus field
-            $item->campaign_sync_status = 'Synchronized';
+            $local->campaign_sync_status = ''; //@deprecated
 
-            $item->save();
+            $local->save();
 
-            return $item;
+            return $local;
         }
         catch(\Exception $e)
         {
@@ -297,14 +297,18 @@ class Campaign
     public static function UpdateLocalCampaignFromRemote($local, $remote)
     {
         // Update Local
-        $local->campaign_name        = $remote->settings->title;
-        $local->campaign_type        = $remote->type;
-        $local->campaign_list_id     = $remote->recipients->list_id;  
-        $local->campaign_status      = $remote->status;
-        $local->campaign_remote_id   = $remote->id;
+        $local->campaign_name           = $remote->settings->title;
+        $local->campaign_subject_line   = $remote->settings->subject_line;
+        $local->campaign_subject_line   = $remote->settings->subject_line;
+        $local->campaign_from_name      = $remote->settings->from_name;
+        $local->campaign_reply_to       = $remote->settings->reply_to;            
+        $local->campaign_type           = $remote->type;
+        $local->campaign_list_id        = $remote->recipients->list_id;  
+        $local->campaign_status         = $remote->status;
+        $local->campaign_remote_id      = $remote->id;
 
         // @deprecated status field
-        $local->campaign_sync_status = 'Synchronised';
+        $local->campaign_sync_status = ''; //@deprecated
 
         $local->save();
 

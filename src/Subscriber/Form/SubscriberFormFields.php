@@ -49,7 +49,11 @@ class SubscriberFormFields
                 ],
                 'local_timestamp_save' => [
                     'disabled' => 'edit',
-                ],                
+                ],          
+                'status_sync_messages' => [
+                    'disabled' => 'edit',
+                ],              
+                
 
             ];
         }

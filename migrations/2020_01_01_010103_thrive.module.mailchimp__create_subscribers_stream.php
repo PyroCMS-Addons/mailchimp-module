@@ -2,7 +2,7 @@
 
 use Anomaly\Streams\Platform\Database\Migration\Migration;
 
-class ThriveModuleMailchimpCreateAutomationsStream extends Migration
+class ThriveModuleMailchimpCreateSubscribersStream extends Migration
 {
 
     /**
@@ -19,13 +19,13 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
      * @var array
      */
     protected $stream = [
-        'slug' => 'automations',
-        'title_column' => 'automation_title',
+        'slug' => 'subscribers',
+        'title_column' => 'subscriber_email',
         'translatable'  => false,
         'versionable'   => false,
         'trashable'     => true,
         'searchable'    => true,
-        'sortable'      => true,
+        'sortable'      => false,
     ];
 
     /**
@@ -34,33 +34,31 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
      * @var array
      */
     protected $fields = [
-        "automation_title" => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_workflow_id' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_status' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_start_time' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_create_time' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_emails_sent' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_list_id' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_from_name' => [
-            "type"   => "anomaly.field_type.text",
-        ],
-        'automation_reply_to' => [
+        'subscriber_email'              => [
             "type"   => "anomaly.field_type.email",
+            "config" => [
+                "default_value" => null,
+            ]
         ],
+        "subscriber_remote_id"          => "anomaly.field_type.text",
+        "subscriber_audience_id"        => "anomaly.field_type.text",
+        "subscriber_audience_name"      => "anomaly.field_type.text",
+        "subscriber_subscribed"         => [
+            "type"   => "anomaly.field_type.boolean",
+            "config" => [
+                "default_value" => false,
+                "on_color"      => "success",
+                "off_color"     => "danger",
+                "on_text"       => "YES",
+                "off_text"      => "NO",
+                "mode"          => "switch",
+                "label"         => null,
+            ]
+        ],
+        "subscriber_status"             => "anomaly.field_type.text",
+        "subscriber_fname"              => "anomaly.field_type.text",
+        "subscriber_lname"              => "anomaly.field_type.text",
+
     ];
 
     /**
@@ -69,53 +67,47 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
      * @var array
      */
     protected $assignments = [
-        "automation_title"          => [
+
+        'subscriber_email' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'automation_workflow_id'    => [
+        'subscriber_remote_id' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+        'subscriber_audience_id' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'automation_start_time'     => [
+        'subscriber_audience_name' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_create_time'    => [
+        'subscriber_subscribed' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_emails_sent'    => [
+        'subscriber_fname' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_list_id'        => [
+        'subscriber_lname' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_from_name'      => [
+        'subscriber_status' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'automation_reply_to'       => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        'automation_status'         => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-
-
 
         //
         // New Common Status Fields
@@ -152,6 +144,13 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
             'unique'            => false,
             'required'          => false,
         ],
+        "status_sync_messages"     => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
 
+        
     ];
+
 }

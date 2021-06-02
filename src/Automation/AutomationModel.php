@@ -10,13 +10,13 @@ class AutomationModel extends MailchimpAutomationsEntryModel implements Automati
 {
     
     /**
-     * getStrId
+     * getWorkflowId
      *
      * @return void
      */
-    public function getStrId()
+    public function getWorkflowId()
     {
-        return $this->campaign_str_id;
+        return $this->automation_workflow_id;
     }
 
 

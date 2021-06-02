@@ -30,9 +30,9 @@ class CampaignRepository extends EntryRepository implements CampaignRepositoryIn
      * @param $slug
      * @return null|FormInterface
      */
-    public function findByStrId($str_id)
+    public function findByStrId($campaign_remote_id)
     {
-        return $this->model->where('campaign_remote_id', $str_id)->first();
+        return $this->model->where('campaign_remote_id', $campaign_remote_id)->first();
     }
 
 

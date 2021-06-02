@@ -74,6 +74,10 @@ class SubscriberFormHandler
 
         $email              = $request->input('subscriber_email');
         $strid              = $request->input('strid');
+        
+        //new version
+        //$strid2             = $request->input('campaign_id');
+        
         $action             = $request->input('action');
         $action_bool        = ($action == 'subscribe') ? true : false ;
         $subscribe_flag     = ($action_bool) ? 'subscribed' : 'unsubscribed' ;

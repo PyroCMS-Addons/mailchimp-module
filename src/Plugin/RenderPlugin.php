@@ -39,19 +39,11 @@ class RenderPlugin
 
         $this->handle_tags();
 
-        // if($options->get('tag_year') == true)
-        //     dump('yes to tag year');
-        // else
-        //     dump('no to tag year');
-
-        // dump($options->get('tags'));
-
         return $view->make(
             $options->get('view', 'thrive.module.mailchimp::public.subscribe'),
             compact('options')
         )->render();
     }
-
     
     /**
      * handle_tags

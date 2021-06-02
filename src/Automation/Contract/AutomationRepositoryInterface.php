@@ -5,10 +5,10 @@ use Anomaly\Streams\Platform\Entry\Contract\EntryRepositoryInterface;
 interface AutomationRepositoryInterface extends EntryRepositoryInterface
 {
     /**
-     * Find a form by it's slug.
+     * Find a form by it's workflow_id.
      *
      * @param $slug
      * @return null|FormInterface
      */
-    public function findByStrId($str_id);
+    public function findByWorkflowId($automation_workflow_id);
 }

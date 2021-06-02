@@ -212,6 +212,41 @@ trait MailchimpContactsTrait
         return false;
     }
 
+    
+    /**
+     * getListMember
+     *
+     * @param  mixed $list_id
+     * @param  mixed $email
+     * @return void
+     */
+    public function getListMember($list_id, $email)
+    {
+        $status = true;
+
+        $subscriberHash = $this->getEmailHash($email);
+
+        try
+        {
+            $response = $this->mailchimp->lists->getListMember($list_id, $subscriberHash);
+
+            if(isset($response->id))
+                return $response;
+        }
+        catch (\Exception $e)
+        {
+            $status = false;
+            Log::error($e->getMessage());
+        }
+
+        if($status) {
+            return $response;
+        }
+
+        return false;
+    }
+
+
     /**
      * setListMember
      *

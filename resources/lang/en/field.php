@@ -243,7 +243,7 @@ return [
         'placeholder' => '',
     ],   
     'automation_list_id' => [
-        'name' => 'Audience/List',
+        'name' => 'Audience ID',
         'instructions' => '',
         'placeholder' => '',
     ],    
@@ -252,4 +252,11 @@ return [
         'instructions' => '',
         'placeholder' => '',
     ],    
+    'automation_list_name' => [
+        'name' => 'Audience',
+        'instructions' => '',
+        'placeholder' => '',
+    ],    
+
+    
 ];

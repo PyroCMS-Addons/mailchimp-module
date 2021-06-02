@@ -4,5 +4,6 @@ use Anomaly\Streams\Platform\Entry\Contract\EntryInterface;
 
 interface AutomationInterface extends EntryInterface
 {
+    public function getWorkflowId();
 
 }

@@ -72,7 +72,11 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 */
     protected $commands = [
 		\Thrive\MailchimpModule\Tasks\Sync::class,       
-		\Thrive\MailchimpModule\Tasks\HouseKeeping::class,       
+		\Thrive\MailchimpModule\Tasks\HouseKeeping::class,   
+		
+		// Dev only, remove for final release
+		\Thrive\MailchimpModule\Tasks\Test::class,       
+		\Thrive\MailchimpModule\Tasks\User::class,       
     ];
 
 	

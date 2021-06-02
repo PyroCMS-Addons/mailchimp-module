@@ -30,9 +30,9 @@ class AutomationRepository extends EntryRepository implements AutomationReposito
      * @param $slug
      * @return null|FormInterface
      */
-    public function findByStrId($str_id)
+    public function findByWorkflowId($automation_workflow_id)
     {
-        return $this->model->where('campaign_str_id', $str_id)->first();
+        return $this->model->where('automation_workflow_id', $automation_workflow_id)->first();
     }
 
 

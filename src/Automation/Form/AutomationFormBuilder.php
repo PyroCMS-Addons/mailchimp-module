@@ -15,16 +15,22 @@ class AutomationFormBuilder extends FormBuilder
      */
     protected $fields = [
         '*',
-        'campaign_str_id' => [
+        'automation_workflow_id' => [
             'disabled' => 'edit',
         ],
-        'campaign_sync_status' => [
+        'automation_start_time' => [
             'disabled' => 'edit',
         ],
-        'campaign_type' => [
+        'automation_create_time' => [
             'disabled' => 'edit',
         ],
-        'list_id' => [
+        'automation_emails_sent' => [
+            'disabled' => 'edit',
+        ],
+        'automation_list_id' => [
+            'disabled' => 'edit',
+        ],
+        'automation_status' => [
             'disabled' => 'edit',
         ],
     ];
@@ -79,37 +85,36 @@ class AutomationFormBuilder extends FormBuilder
                 'general' => [
                     'title'  => 'Automation',
                     'fields' => [
-                        'campaign_name',
-                        'campaign_subject_line',
+                        'automation_title',
+                        'automation_workflow_id',
+                        'automation_list_id',
+                        'automation_list_name',
+                        'automation_status',
                     ],
                 ],
                 'details2' => [
                     'title'  => 'Reply To',
                     'fields' => [
-                        'campaign_reply_to',
+                        'automation_from_name',
+                        'automation_reply_to',
+                        'automation_emails_sent',
                     ],
                 ],
                 'details' => [
                     'title'  => 'From',
                     'fields' => [
-                        'audience_campaign_from_name',
+                        'automation_start_time',
+                        'automation_create_time',
                     ],
                 ],
                 'locked_fields' => [
                     'title'  => 'Locked Details',
                     'fields' => [
-                        'campaign_str_id',
-                        'campaign_sync_status',
-                        'campaign_type',
-                        'list_id',
+                        '*'
+ 
                     ],
                 ],
-                'viewtab' => [
-                    'title'  => 'Actions',
-                    'view' => [
-                        'module::admin.tabs.campaign-actions',
-                    ],
-                ],
+
             ],
         ],
     ];
@@ -145,7 +150,6 @@ class AutomationFormBuilder extends FormBuilder
     {
         Log::debug('--- [ Begin ] ---  AutomationFormBuilder::onSaving ');
 
-
         $this->can_post_to_mailchimp = true;
 
     }
@@ -163,20 +167,18 @@ class AutomationFormBuilder extends FormBuilder
 
         Log::debug('--- [ Begin ] ---  AutomationFormBuilder::onSaved ');
 
-        Log::debug('  » 00 Pushing Automation    : ' . $entry->campaign_name . ' || '. $entry->campaign_str_id );
+        Log::debug('  » 00 Pushing Automation    : ' . $entry->automation_title . ' || '. $entry->automation_workflow_id );
 
 
         if($this->can_post_to_mailchimp)
         {
-             if($item = Automation::PostLocalEntryToMailchimp($entry))
+             if($item = Automation::Post($entry))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
-                $entry->update(['campaign_sync_status' => 'Updated']);
             }
             else
             {
                 $messages->error('Failed to POST to Mailchimp');
-                $entry->update(['campaign_sync_status' => 'Post Failed']);
             }
         }
 

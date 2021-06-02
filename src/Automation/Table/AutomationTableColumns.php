@@ -21,30 +21,40 @@ class AutomationTableColumns
     {
         $builder->setColumns( 
             [
-                'automation_title',
+                'automation_title',                
                 'entry.automation_workflow_id'    => [
                     'wrapper' => function (AutomationInterface $entry) {
                         $status_color = 'info';
-                        switch($entry->automation_workflow_id)
+                        switch($entry->automation_status)
                         {
                             case 'sending':
                                 $status_color = 'info';
                                 break;
                             case 'saved':
                                 $status_color = 'success';
-                                break;                                
+                                break;   
+                            case 'paused':
                             default:                               
                                 $status_color = 'default';
                         }
-                        return "<span class='small text-success'>".ucfirst($entry->automation_workflow_id)."</span>";
+                        return "<span class='small text-{$status_color}'>".ucfirst($entry->automation_workflow_id)."</span>";
                     },
                 ],       
                 'entry.automation_list_id'    => [
                     'wrapper' => function (AutomationInterface $entry) {
-                        $status_color = 'info';
-                        return "<span class='small text-{$status_color}'>".ucfirst($entry->automation_list_id)."</span>";
+                        return "<span class='small text-info'>".ucfirst($entry->automation_list_id). "</span>";
                     },
-                ],                              
+                ],    
+                'entry.automation_list_name'    => [
+                    'wrapper' => function (AutomationInterface $entry) {
+                        return "<span class='small text-info'>".ucfirst($entry->automation_list_name). "</span>";
+                    },
+                ],  
+                'entry.automation_emails_sent'    => [
+                    'wrapper' => function (AutomationInterface $entry) {
+                        return "<span class='tag tag-success'>".ucfirst($entry->automation_emails_sent). "</span>";
+                    },
+                ],                  
                 'entry.automation_status'    => [
                     'wrapper' => function (AutomationInterface $entry) {
                         $status_color = 'info';
@@ -55,7 +65,8 @@ class AutomationTableColumns
                                 break;
                             case 'saved':
                                 $status_color = 'success';
-                                break;                                
+                                break;   
+                            case 'paused':
                             default:                               
                                 $status_color = 'default';
                         }

@@ -218,6 +218,7 @@ class Automation
             $local->automation_create_time      = $remote->create_time;
             $local->automation_emails_sent      = $remote->emails_sent;
             $local->automation_list_id          = $remote->recipients->list_id;
+            $local->automation_list_name        = $remote->recipients->list_name;
             $local->automation_from_name        = $remote->settings->from_name;
             $local->automation_reply_to         = $remote->settings->reply_to;
             $local->save();
@@ -249,6 +250,7 @@ class Automation
             $automation->automation_create_time      = $remote->create_time;
             $automation->automation_emails_sent      = $remote->emails_sent;
             $automation->automation_list_id          = $remote->recipients->list_id;
+            $automation->automation_list_name        = $remote->recipients->list_name;
             $automation->automation_from_name        = $remote->settings->from_name;
             $automation->automation_reply_to         = $remote->settings->reply_to;
             $automation->save();

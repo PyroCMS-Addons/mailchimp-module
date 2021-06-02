@@ -129,7 +129,7 @@ class SubscriberFormBuilder extends FormBuilder
         $subscriber->local_timestamp_save    	= $ts; // (now) ISO 8601 date (added in PHP 5)
         $subscriber->save();
 
-
+        $this->can_post_to_mailchimp = false;
 
         if($this->can_post_to_mailchimp)
         {
@@ -141,6 +141,10 @@ class SubscriberFormBuilder extends FormBuilder
             {
                 $messages->error('Failed to POST to Mailchimp');
             }
+        }
+        else
+        {
+            $messages->info(' !! Did not POST to Mailchimp');
         }
 
     }
