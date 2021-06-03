@@ -63,24 +63,58 @@ class SubscribersController extends AdminController
      */
     public function edit(SubscriberFormBuilder $form, $id)
     {
+
         return $form->render($id);
     }
 
+    
+    /**
+     * sync
+     *
+     * @param  mixed $id
+     * @param  mixed $messages
+     * @param  mixed $repository
+     * @return void
+     */
+    public function sync($id = null, MessageBag $messages, SubscriberRepository $repository) 
+    {
+        if($id == null)
+        {
+            if(Subscriber::SyncAll($repository))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
+            }
+        }
+        else
+        {
+            if(Subscriber::Sync($repository->find($id)))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
+            }
+        }
+
+        return redirect()->back();
+    }
 
     /**
      * sync_pull
      *
      * @param  MessageBag           $messages
-     * @param  AudienceRepository   $repository
-     * @param  SubscriberRepository $subscribers
+     * @param  AudienceRepository $subscribers
      * @return void
      */
-    public function sync_pull(MessageBag $messages, AudienceRepository $repository) 
+    public function pull($id = null, MessageBag $messages, SubscriberRepository $repository) 
     {
-        if(Subscriber::SyncAll($repository))
+        if($id != null)
         {
-            $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
+            if(Subscriber::Pull($repository->find($id)))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
+            }
         }
+
+        // no supporet for controller-pull-all
+        // use command line
 
         return redirect()->back();
     }
@@ -94,13 +128,18 @@ class SubscribersController extends AdminController
      *
      * @return void
      */
-    public function sync_push(MessageBag $messages, SubscriberRepository $subscribers)
+    public function push($id = null, MessageBag $messages, SubscriberRepository $repository)
     {
-        if(Subscriber::PostAll($subscribers))
+        if($id != null)
         {
-            $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
+            if(Subscriber::Post($repository->find($id)))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_subscribers');
+            }
         }
-        
+
+        // no supporet for controller-push-all
+        // use command line
         return redirect()->back();
 
     }

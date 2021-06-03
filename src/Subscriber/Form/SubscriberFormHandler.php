@@ -109,7 +109,7 @@ class SubscriberFormHandler
 
         $action = 'Local not found, will CREATE';
 
-        if($subscriber = Subscriber::LocalHasSubscriber($email_address, $strid))
+        if(Subscriber::IsSubscriberLocallyRecorded($email_address, $strid))
         {
             $action = 'Has Local, so will UPDATE';
         }
@@ -158,7 +158,7 @@ class SubscriberFormHandler
             }
             else
             {
-                $contact = Subscriber::PrepareContact($email_adddress, $subscribe );
+                $contact = Subscriber::FormatContact($email_adddress, $subscribe );
 
                 if($mailchimp->addContactToList($strid, $contact, $tags))
                 {

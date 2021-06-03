@@ -16,6 +16,9 @@ return [
     'subscribers' => [
         'title' => 'Subscribers',
     ],
+    'webhooks' => [
+        'title' => 'Web Hooks',
+    ],
     'settings' => [
         'title' => 'Settings',
     ],

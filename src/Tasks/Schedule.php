@@ -16,14 +16,13 @@ use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Support\Integration\Audience;
 use Thrive\MailchimpModule\Support\Integration\Automation;
 use Thrive\MailchimpModule\Support\Integration\Campaign;
-use Thrive\MailchimpModule\Support\Integration\Content;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 
 
 /**
  * Get data from eventbrite
  */
-class Test extends Command implements ShouldQueue
+class Schedule extends Command implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -32,16 +31,42 @@ class Test extends Command implements ShouldQueue
      *
      * @var string
      */
-    protected $signature = 'mailchimp:test';
+    protected $signature = 'mailchimp:schedule {option?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Developer tool to run test when needed';
+    protected $description = 'Some basic house keeping for the modules data';
 
-    
+
+    /**
+     * The number of times the job may 
+     * be attempted.
+     *
+     * @var int
+     */
+    public $tries = 5;
+
+
+    /**
+     * The number of seconds the job can run 
+     * before timing out.
+     *
+     * @var int
+     */
+    public $timeout = 120;
+
+    /**
+     * The maximum number of exceptions to 
+     * allow before failing.
+     *
+     * @var int
+     */
+    public $maxExceptions = 3;
+
+
 
     public function __construct(
         AutomationRepository $automationRepository,
@@ -62,19 +87,51 @@ class Test extends Command implements ShouldQueue
 
     public function handle()
     {
+        $option = $this->argument('option');
+
+        if($option == "" || $option == NULL)
+        {
+            $option = "Default";
+        }
 
         $this->processTasks();
-            
-        Log::info('The command was successfully.');
 
-        $this->info('The command was successfully.');
+        Log::info('The command was successful with the option of: '. $option);
+
+        $this->info('The command was successful with the option of: '. $option);
 
     }
 
     private function processTasks()
     {
-        Subscriber::TestDates($this->audienceRepository);        
-    }
+        if(Audience::SyncAll($this->audienceRepository))
+        {
+            Log::info('Audience Now Synchronised.');
 
+            $this->info('Audiences have been Synchronised.');
+        }
+        
+        if(Automation::SyncAll($this->automationRepository))
+        {
+            Log::info('Automation Now Synchronised.');
+
+            $this->info('Automations have been Synchronised.');
+        }
+
+        if(Campaign::SyncAll($this->campaignRepository))
+        {
+            Log::info('Campaigns Now Synchronised.');
+
+            $this->info('Campaigns have been Synchronised.');
+        }
+
+        if(Subscriber::SyncAll($this->audienceRepository))
+        {
+            Log::info('Subscribers Now Synchronised.');
+
+            $this->info('Subscribers have been Synchronised.');
+        }
+
+    }
 
 }

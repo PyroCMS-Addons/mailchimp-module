@@ -27,12 +27,17 @@ use Thrive\MailchimpModule\Content\Contract\ContentRepositoryInterface;
 
 // Thrive Subscriber
 use Thrive\MailchimpModule\MailchimpModulePlugin;
+use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberRepositoryInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 
+// Thrive Webhooks
+use Thrive\MailchimpModule\Webhook\WebhookRepository;
+use Thrive\MailchimpModule\Webhook\Contract\WebhookRepositoryInterface;
+use Thrive\MailchimpModule\Webhook\WebhookModel;
+
 
 // Thrive Plugin
-use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Support\Mailchimp;
 
 
@@ -71,11 +76,8 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 * @type array|null
 	 */
     protected $commands = [
+		\Thrive\MailchimpModule\Tasks\Schedule::class,   
 		\Thrive\MailchimpModule\Tasks\Sync::class,       
-		\Thrive\MailchimpModule\Tasks\HouseKeeping::class,   
-		
-		// Dev only, remove for final release
-		\Thrive\MailchimpModule\Tasks\Test::class,       
 		\Thrive\MailchimpModule\Tasks\User::class,       
     ];
 
@@ -135,11 +137,20 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 		'admin/mailchimp/campaigns/edit/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@edit',
 		'admin/mailchimp/campaigns/option/{option}/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@option',
 
+
+		// Audiences
+		'admin/mailchimp/webhooks'                 => 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@index',
+		'admin/mailchimp/webhooks/create'          => 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@create',
+		'admin/mailchimp/webhooks/edit/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@edit',
+		
+		
 		// Settings
 		'admin/mailchimp/settings'                  => 'Thrive\MailchimpModule\Http\Controller\Admin\SettingsController@edit',
 
 		// Public Subscriber Handler
 		'mailchimp/handler/subscribe'               => 'Thrive\MailchimpModule\Subscriber\Form\SubscriberFormHandler@handle',
+		'mailchimp/webhooks'               			=> 'Thrive\MailchimpModule\Http\Controller\WebhookController@handle',
+
 
 	];
 

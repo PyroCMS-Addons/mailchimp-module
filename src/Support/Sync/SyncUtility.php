@@ -1,10 +1,10 @@
-<?php namespace Thrive\MailchimpModule\Support\Dev;
+<?php namespace Thrive\MailchimpModule\Support\Sync;
 
 
 // Laravel
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 // Thrive
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -13,8 +13,8 @@ use Thrive\MailchimpModule\Audience\Contract\AudienceInterface;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
-use Thrive\MailchimpModule\Support\Dev\SyncAction;
-use Thrive\MailchimpModule\Support\Dev\SyncUtility;
+use Thrive\MailchimpModule\Support\Sync\SyncAction;
+use Thrive\MailchimpModule\Support\Sync\SyncUtility;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
 

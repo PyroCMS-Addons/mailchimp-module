@@ -25,6 +25,8 @@ class ThriveModuleMailchimpCreateFields extends Migration
         // true when user must resolve sync issue
         'status_sync_err_flag'          => 'anomaly.field_type.boolean',  // was object created locally or remotely
         'status_sync_messages'          => 'anomaly.field_type.textarea',     // Messages from Sync if any
+        'status_sync_last_action'         => 'anomaly.field_type.text',  // last flag for sync
+
 
 
 

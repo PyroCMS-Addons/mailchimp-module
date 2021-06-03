@@ -69,19 +69,66 @@ class Sync extends Command implements ShouldQueue
             $option = "Default";
         }
 
-        if($option =='clean')
-            $this->clean_lists();
-        else
-            $this->processTasks();
-            
+        switch(strtolower($option))
+        {
+            case 'clean':
+                $this->clean_lists();
+                break;
+            case 'audiences':
+                $this->syncAudience();
+                break;                
+            case 'automations':
+                $this->syncAutomations();
+                break;
+            case 'subscribers':
+                $this->syncSubscribers();
+                break;                
+            // case 'reset':
+            //     $this->delete_all_data();
+            //     break;
+            case 'all':
+            default:
+                $this->syncAll();
+                break;
 
+        }
+            
         Log::info('The command was successful with the option of: '. $option);
 
         $this->info('The command was successful with the option of: '. $option);
 
     }
 
-    private function processTasks()
+
+    
+    /**
+     * syncAll
+     *
+     * @return void
+     */
+    private function syncAll()
+    {
+        // Sync Audiences
+        $this->syncAudience();
+
+        // Sync Automations
+        $this->syncAutomations();
+
+        // Sync Campaigns
+        $this->syncCampaigns();
+
+        // Now Sync Subs
+        $this->syncSubscribers();
+
+    }
+     
+        
+    /**
+     * syncAudience
+     *
+     * @return void
+     */
+    private function syncAudience()
     {
         if(Audience::SyncAll($this->audienceRepository))
         {
@@ -89,22 +136,48 @@ class Sync extends Command implements ShouldQueue
 
             $this->info('Audiences have been Synchronised.');
         }
-        
+    }
+
+    /**
+     * syncAutomations
+     *
+     * @return void
+     */
+    private function syncAutomations()
+    {
         if(Automation::SyncAll($this->automationRepository))
         {
             Log::info('Automation Now Synchronised.');
 
             $this->info('Automations have been Synchronised.');
         }
+    }
 
+
+    /**
+     * syncCampaigns
+     *
+     * @return void
+     */
+    private function syncCampaigns()
+    {
         if(Campaign::SyncAll($this->campaignRepository))
         {
             Log::info('Campaigns Now Synchronised.');
 
             $this->info('Campaigns have been Synchronised.');
         }
+    }
 
-        if(Subscriber::SyncAll($this->audienceRepository))
+    /**
+     * syncSubscribers
+     *
+     * @return void
+     */
+    private function syncSubscribers()
+    {
+
+        if(Subscriber::SyncAll($this->subscriberRepository))
         {
             Log::info('Subscribers Now Synchronised.');
 
@@ -112,6 +185,7 @@ class Sync extends Command implements ShouldQueue
         }
 
     }
+
 
     private function clean_lists()
     {
@@ -121,6 +195,14 @@ class Sync extends Command implements ShouldQueue
 
             $this->info('Removed Unwanted Audiences.');
         }
+    }
+
+    private function delete_all_data()
+    {
+        $this->audienceRepository->truncate();
+        $this->campaignRepository->truncate();
+        $this->automationRepository->truncate();
+        $this->subscriberRepository->truncate();
     }
 
 }

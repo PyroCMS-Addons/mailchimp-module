@@ -16,6 +16,7 @@ use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Support\Integration\Audience;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
+use Thrive\MailchimpModule\Support\Mailchimp;
 
 
 /**
@@ -40,7 +41,6 @@ class User extends Command implements ShouldQueue
     protected $description = 'Get User details';
 
     
-
     public function __construct(
         SubscriberRepository $subscriberRepository,
         AudienceRepository $audienceRepository)
@@ -74,12 +74,6 @@ class User extends Command implements ShouldQueue
                 $this->displayUser($user);
             }
         }
-
-
-
-
-
-        $this->processTasks();
             
         Log::info('The command was successfully.');
 
@@ -87,27 +81,53 @@ class User extends Command implements ShouldQueue
 
     }
 
-    private function processTasks()
-    {
-        // if(Subscriber::TestDates($this->audienceRepository))
-        // {
-        //     Log::info('Audience Now Synchronised.');
-
-        //     $this->info('Audiences have been Synchronised.');
-        // }
-        
-    }
-
     private function displayUser(SubscriberInterface $subscriber)
     {
-        $this->info('--------------------------------------------------');
+        $remote = null;
+        $remote_data = 'Unable to Get Remote Record';
 
-        $this->info('User Model     : ' . $subscriber->id);
-        $this->info('     Email     : ' . $subscriber->subscriber_email);
-        $this->info('     List ID   : ' . $subscriber->subscriber_audience_id);
-        $this->info('     RMTE TS   : ' . Carbon::parse($subscriber->status_remote_timestamp));
-        $this->info('     SYNC TS   : ' . Carbon::parse($subscriber->local_timestamp_sync));
-        $this->info('     SAVE TS   : ' . Carbon::parse($subscriber->local_timestamp_save));
+		if($mailchimp = Mailchimp::Connect())
+		{
+			// update
+			if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
+			{
+                
+            }
+        }
+
+        if($remote)
+        {
+            $remote_data = Carbon::parse($remote->last_changed);
+        }
+
+        $this->info('--------------------------------------------------');
+        $this->info('');
+
+        $this->info('User Model           : ' . $subscriber->id);
+        $this->info('     Email           : ' . $subscriber->subscriber_email);
+        $this->info('     List ID         : ' . $subscriber->subscriber_audience_id);
+        $this->info('     LST CHANGED (L) : ' . Carbon::parse($subscriber->status_remote_timestamp));
+
+        if($remote)
+        {
+            $this->info('     LST CHANGED (R) : ' . $remote_data);
+        }
+        else
+        {
+            $this->info('     LST CHANGED (R) : ' . 'Unable to Get Remote Record');
+
+        }
+        $this->info('     SYNC TS         : ' . Carbon::parse($subscriber->local_timestamp_sync));
+        $this->info('     SAVE TS         : ' . Carbon::parse($subscriber->local_timestamp_save));
+        $this->info('');
+        $this->info('     Last Action     : ' . $subscriber->status_sync_last_action);
+        //$this->info('     Messages        : ' . $subscriber->status_sync_messages);
+        $this->info('');
+
+        $this->info('---- end ---');
+        $this->info('');
+
+        
     }
 
     protected function getOptions()

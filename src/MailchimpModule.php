@@ -55,7 +55,7 @@ class MailchimpModule extends Module
                         // 'data-icon'     => 'success',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
-                        'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_aidience_list'
+                        'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_audience_list'
                     ]
                 ]
             ],
@@ -105,30 +105,25 @@ class MailchimpModule extends Module
                         'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_add_subscribers'
                     ]                    
                 ],
-                'sync_contacts_pull' => [
-                    'href' => 'admin/mailchimp/subscribers/sync_pull',
+                'sync_all_contacts' => [
+                    'href' => 'admin/mailchimp/subscribers/sync',
                     'type' => 'primary',
                     'icon' => 'refresh',
                     'attributes' => [
                         'data-icon'     => 'warning',
                         'data-toggle'   => 'confirm',
                         'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
-                        'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_pull_subscribers'
-                    ]
-                ],
-                'sync_contacts_push' => [
-                    'href' => 'admin/mailchimp/subscribers/sync_push',
-                    'type' => 'danger',
-                    'icon' => 'fa fa-server',
-                    'attributes' => [
-                        'data-icon'     => 'warning',
-                        'data-toggle'   => 'confirm',
-                        'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
-                        'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_push_subscribers'
+                        'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_subscribers'
                     ]
                 ],
             ],
         ],
+        'webhooks' => [
+            'href' => 'admin/mailchimp/webhooks',
+            'buttons' => [
+
+            ],
+        ],        
         'settings' => [
             'href' => 'admin/mailchimp/settings',
         ]

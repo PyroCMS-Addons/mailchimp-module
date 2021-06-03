@@ -45,7 +45,7 @@ THRIVE_MAILCHIMP_SERVER_PREFIX=server_prefix
  1. Add to your addons directory as `/addons/default/thrive/mailchimp-module/*`
  2. Dump Autoloader `composer dump-autoload`
  3. Run install `php artisan addon:install thrive.module.mailchimp`
- 4. Once you have connected your API key, run this command: `php artisan mailchimp:sync`
+ 4. Once you have connected your API key, run this command: `php artisan mailchimp:sync all`
 
 
 ## Plugin 
@@ -110,13 +110,24 @@ Namespace                         | Type                 | Why
 `thrive.module.mailchimp`         | Module               | The Core Mailchimp Integration for PyroCMS  
 
 
+## Webhooks
+You can Connect the Mailchimp Module with MC Webhooks.
+When changes are made remotely by the Subscriber, information will be passed to the Webhook instantly to ensure all data is in sync at all times.
 
 
 
 ## Commands & Task Scheduling
 
-What                       | Command                         | Options
--------------------------- | ------------------------------- | -------------------------------
-Starts the Task Scheduler  | `php artisan mailchimp:tidy`    |   
-Sync All Libraries (once)  | `php artisan mailchimp:sync`    |  
-Sync All Libraries (once)  | `php artisan mailchimp:post`    | 
+What                       | Command                                   | Status
+-------------------------- | ---------------------------------------   | -------------------------------
+Starts the Task Scheduler  | `php artisan mailchimp:schedule`          |   Working
+Starts the Task Scheduler  | `php artisan mailchimp:schedule start`    |   `In Development`
+Stops the Task Scheduler   | `php artisan mailchimp:schedule stop`     |   `In Development`
+Display User Details       | `php artisan mailchimp:user`              |   Working
+Sync All Libraries         | `php artisan mailchimp:sync all`          |   Working
+Merge All Downstream       | `php artisan mailchimp:sync push-all`     |   `In Development`
+Merge All Upstream         | `php artisan mailchimp:sync pull-all`     |   `In Development`
+Sync Audiences             | `php artisan mailchimp:sync audiences`    |   Working
+Sync Automations           | `php artisan mailchimp:sync automations`  |   Working
+Sync Subscribers           | `php artisan mailchimp:sync subscribers`  |   Working
+

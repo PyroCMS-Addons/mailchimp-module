@@ -16,6 +16,11 @@ return [
         'write',
         'delete',
     ],
+    'webhooks' => [
+        'read',
+        'write',
+        'delete',
+    ],    
     'settings' => [
         'read',
         'write',

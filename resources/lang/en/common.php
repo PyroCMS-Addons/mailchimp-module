@@ -2,9 +2,10 @@
 
 return [
     'are_you_sure'                      => 'Are you Sure?',
-    'are_you_sure_sync_aidience_list'   => 'You are about to import ALL audiences lists from Mailchimp servers. Please confirm to continue',
+    'are_you_sure_sync_audience_list'   => 'You are about to import ALL audiences lists from Mailchimp servers. Please confirm to continue',
     'are_you_sure_sync_automations'     => 'You are about to import ALL `automations` from Mailchimp servers. Please confirm to continue',
     'are_you_sure_sync_campaigns'       => 'You are about to import ALL `Campaigns` from Mailchimp servers. Please confirm to continue',
+    'are_you_sure_sync_subscribers'     => 'You are about to Sync `Subscribers` from Mailchimp servers. Please confirm to continue',
     'are_you_sure_pull_subscribers'     => 'You are about to import ALL `Subscribers` from Mailchimp servers. Please confirm to continue',
     'are_you_sure_push_subscribers'     => 'You are about to Export ALL Local `Subscribers` to Mailchimp servers. This is irreversable. Please confirm to continue',
     'are_you_sure_add_subscribers'      => 'Are you sure, You need to know the Audience ID before creating a subscriber. ?',

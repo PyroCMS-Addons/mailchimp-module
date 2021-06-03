@@ -120,6 +120,77 @@ class Audience
     
     
     /**
+     * Pull
+     *
+     * @param  mixed $entry
+     * @return void
+     */
+    public static function Pull(AudienceInterface $entry)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            // is there a remote list
+            if($remote = $mailchimp->getList($entry->audience_remote_id))
+            {
+                if(self::updateLocalFromRemote($entry, $remote))
+                {
+
+                }
+            }
+            else
+            {
+                Log::notice('Hmm, no remote instance of local object to Sync. Action required was probably Post..');
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+    
+    /**
+     * PullByAudienceId
+     *
+     * @param  mixed $remote_audience_id
+     * @return void
+     */
+    public static function PullByAudienceId($remote_audience_id)
+    {
+        if($mailchimp = Mailchimp::Connect())
+        {
+            // is there a remote list
+            if($remote = $mailchimp->getList($remote_audience_id))
+            {
+                // Check if we have a local copy
+                if(self::LocalHasAudience($remote_audience_id))
+                {
+                    if($local_audience = AudienceModel::where('audience_remote_id',$remote_audience_id)->first())
+                    {
+                        return self::Pull($local_audience);
+                    }
+                }
+                else
+                {
+                    //else create local copy
+                    if(self::CreateLocalFromRemote($remote))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                Log::notice('Hmm, no remote instance of this Audience found.');
+            }
+
+        }
+
+        return false;
+    }
+    
+
+    
+    /**
      * Post
      *
      * @param  mixed $entry

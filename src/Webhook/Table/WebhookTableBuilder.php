@@ -1,8 +1,8 @@
-<?php namespace Thrive\MailchimpModule\Subscriber\Table;
+<?php namespace Thrive\MailchimpModule\Webhook\Table;
 
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
 
-class SubscriberTableBuilder extends TableBuilder
+class WebhookTableBuilder extends TableBuilder
 {
 
     /**
@@ -17,9 +17,7 @@ class SubscriberTableBuilder extends TableBuilder
      *
      * @var array|string
      */
-    protected $filters = [
-        'subscriber_email'
-    ];
+    protected $filters = [ ];
 
     /**
      * The table columns.
@@ -27,12 +25,12 @@ class SubscriberTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $columns = [
-        'subscriber_email',
-        'subscriber_fname',    
-        'subscriber_lname',    
-        'entry.subscriber_subscribed.toggle' => [
+        'webhook_name',
+        'webhook_id', 
+        'webhook_list_id',   
+        'webhook_url',
+        'entry.webhook_events_subscribe.toggle' => [
             'is_safe' => true,
-            'disabled' => 'disabled'
         ], 
     ];
 

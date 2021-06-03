@@ -2,7 +2,7 @@
 
 use Anomaly\Streams\Platform\Database\Migration\Migration;
 
-class ThriveModuleMailchimpCreateSubscribersStream extends Migration
+class ThriveModuleMailchimpCreateWebhooksStream extends Migration
 {
 
     /**
@@ -19,13 +19,13 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      * @var array
      */
     protected $stream = [
-        'slug' => 'subscribers',
-        'title_column' => 'subscriber_email',
+        'slug'          => 'webhooks',
+        'title_column'  => 'webhook_name',
         'translatable'  => false,
         'versionable'   => false,
         'trashable'     => true,
         'searchable'    => true,
-        'sortable'      => false,
+        'sortable'      => true,
     ];
 
     /**
@@ -34,30 +34,49 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      * @var array
      */
     protected $fields = [
-        'subscriber_email'              => [
-            "type"   => "anomaly.field_type.email",
-            "config" => [
-                "default_value" => null,
-            ]
+        "webhook_name" => [
+            "type"   => "anomaly.field_type.text",
         ],
-        "subscriber_remote_id"          => "anomaly.field_type.text",
-        "subscriber_audience_id"        => "anomaly.field_type.text",
-        "subscriber_audience_name"      => "anomaly.field_type.text",
-        "subscriber_subscribed"         => [
+        "webhook_id" => [
+            "type"   => "anomaly.field_type.text",
+        ],
+        "webhook_url" => [
+            "type"   => "anomaly.field_type.text",
+        ],
+        "webhook_events_subscribe" => [
             "type"   => "anomaly.field_type.boolean",
-            "config" => [
-                "default_value" => false,
-                "on_color"      => "success",
-                "off_color"     => "danger",
-                "on_text"       => "YES",
-                "off_text"      => "NO",
-                "mode"          => "switch",
-                "label"         => null,
-            ]
         ],
-        "subscriber_status"             => "anomaly.field_type.text",
-        "subscriber_fname"              => "anomaly.field_type.text",
-        "subscriber_lname"              => "anomaly.field_type.text",
+        "webhook_events_unsubscribe" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],
+        "webhook_events_profile" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],        
+        "webhook_events_upemail" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],   
+        "webhook_events_cleaned" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],       
+        "webhook_events_campaign" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],    
+        // api should be false
+        "webhook_sources_api" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],   
+        "webhook_sources_admin" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],   
+        "webhook_sources_user" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],   
+        "webhook_enabled" => [
+            "type"   => "anomaly.field_type.boolean",
+        ],   
+        "webhook_list_id" => [
+            "type"   => "anomaly.field_type.text",
+        ],
 
     ];
 
@@ -67,100 +86,76 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
      * @var array
      */
     protected $assignments = [
-
-        'subscriber_email' => [
+        "webhook_name" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
         ],
-        'subscriber_remote_id' => [
+        'webhook_id' => [
+            'translatable'      => false,
+            'unique'            => true,
+            'required'          => false,
+        ],
+        "webhook_list_id" => [
+            'translatable'      => false,
+            'unique'            => true,
+            'required'          => false,
+        ],        
+        'webhook_url' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'subscriber_audience_id' => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => true,
-        ],
-        'subscriber_audience_name' => [
+        'webhook_events_subscribe' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'subscriber_subscribed' => [
+        'webhook_events_unsubscribe' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'subscriber_fname' => [
+        'webhook_events_profile' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'subscriber_lname' => [
+        'webhook_events_upemail' => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
-        'subscriber_status' => [
+        'webhook_events_cleaned' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+        'webhook_events_campaign' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+        'webhook_sources_api' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+        "webhook_sources_admin" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+        "webhook_sources_user" => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
+        ],
+        "webhook_enabled" => [
             'translatable'      => false,
             'unique'            => false,
             'required'          => false,
         ],
 
-        //
-        // New Common Status Fields
-        // These will replace old status
-        // fields.
-        //
-        "status_remote_timestamp"   => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "local_timestamp_sync" => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "local_timestamp_save" => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "status_sync"               => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "status_created_locally"    => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "status_created_source"     => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "status_sync_messages"     => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],
-        "status_sync_err_flag"     => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],    
-        "status_sync_last_action"     => [
-            'translatable'      => false,
-            'unique'            => false,
-            'required'          => false,
-        ],    
-        
-        
     ];
-
 }

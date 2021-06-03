@@ -5,6 +5,7 @@ use Anomaly\Streams\Platform\Ui\Form\Form;
 use Anomaly\Streams\Platform\Ui\Form\FormBuilder;
 use Illuminate\Support\Facades\Log;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormHandler;
+use Thrive\MailchimpModule\Support\Sync\SyncAction;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 
 /**
@@ -54,6 +55,36 @@ class SubscriberFormBuilder extends FormBuilder
      */
     protected $buttons = [
         'cancel',
+        'sync' => [
+            'type' => 'info',
+            'attributes' => [
+                'data-icon'     => 'warning',
+                // 'data-icon'     => 'success',
+                'data-toggle'   => 'confirm',
+                'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
+                'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_subscribers'
+            ]
+        ],
+        'pull' => [
+            'type' => 'info',
+            'attributes' => [
+                'data-icon'     => 'warning',
+                // 'data-icon'     => 'success',
+                'data-toggle'   => 'confirm',
+                'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
+                'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_pull_subscribers'
+            ]            
+        ],      
+        'push' => [
+            'type' => 'danger',
+            'attributes' => [
+                'data-icon'     => 'warning',
+                // 'data-icon'     => 'success',
+                'data-toggle'   => 'confirm',
+                'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
+                'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_push_subscribers'
+            ]            
+        ],            
     ];
 
     /**
@@ -121,19 +152,13 @@ class SubscriberFormBuilder extends FormBuilder
 
         Log::debug('  » 00 Pushing User        : ' . $subscriber->subscriber_email);
 
+        Subscriber::SetCurrentSaveTimestamp($subscriber);
 
-        $ts = date("c");
-		Log::debug('SET TS: onSaved : ' . $ts);
-
-        // Update Local Timestamp
-        $subscriber->local_timestamp_save    	= $ts; // (now) ISO 8601 date (added in PHP 5)
-        $subscriber->save();
-
-        $this->can_post_to_mailchimp = false;
+        $this->can_post_to_mailchimp = true;
 
         if($this->can_post_to_mailchimp)
         {
-            if($item = Subscriber::Post($subscriber))
+            if($item = Subscriber::ExecuteSyncAction($subscriber, SyncAction::Push))
             {
                 $messages->info('Successfully POSTED to Mailchimp');
             }
@@ -144,8 +169,7 @@ class SubscriberFormBuilder extends FormBuilder
         }
         else
         {
-            $messages->info(' !! Did not POST to Mailchimp');
+            //$messages->info(' !! Did not POST to Mailchimp');
         }
-
     }
 }

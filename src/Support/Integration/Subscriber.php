@@ -7,23 +7,16 @@ use Illuminate\Support\Str;
 
 // Thrive
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Thrive\MailchimpModule\Audience\AudienceModel;
 use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Contract\AudienceInterface;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
-use Thrive\MailchimpModule\Support\Dev\SyncAction;
-use Thrive\MailchimpModule\Support\Dev\SyncUtility;
+use Thrive\MailchimpModule\Support\Sync\SyncAction;
+use Thrive\MailchimpModule\Support\Sync\SyncUtility;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 use Thrive\MailchimpModule\Support\Mailchimp;
-
-/*
- * @todo
- * The Subscriber Integration Class needs more work to get Closer to SOLID principles.
- * Timestamps for the entire system need updating but in particular for the
- * Subscriber class.
- * 
- */
 
 
 /**
@@ -52,10 +45,55 @@ class Subscriber
 	const MEMBER_SUBSCRIBED     = 'subscribed';
 	const MEMBER_UNSUBSCRIBED   = 'unsubscribed';
 
-
-	// ??
 	const START_COUNT           = 0;
 	const MAX_RECORDS           = 20;
+
+
+
+	/**
+	 * WebhookSubscribe
+	 * WIP:in dev
+	 *
+	 * @param  mixed $id
+	 * @return void
+	 */
+	public static function WebhookSubscribe($id)
+	{
+		if($subscriber = SubscriberModel::findByRemoteId($id))
+		{
+			//update this subscriber
+			self::Sync($subscriber);
+
+			// Record that a change came from Webhook
+			// SyncBothTimes
+		}
+		else
+		{
+			// fetch for all not imported
+			self::PullAllNotImported();
+		}
+	}
+
+	/**
+	 * WebhookUnSubscribe
+	 * WIP:in dev
+	 *
+	 * @param  mixed $id
+	 * @return void
+	 */
+	public static function WebhookUnSubscribe($id)
+	{
+		if($subscriber = SubscriberModel::findByRemoteId($id))
+		{
+			//update this subscriber
+			self::Sync($subscriber);
+		}
+		else
+		{
+			// fetch for all not imported
+			self::PullAllNotImported();
+		}
+	}
 
 
 	/**
@@ -65,27 +103,120 @@ class Subscriber
 	 * @param  mixed $subscriber
 	 * @return void
 	 */
-	public static function Sync( SubscriberInterface $subscriber )
+	public static function Sync( SubscriberInterface $subscriber ) : bool
 	{
+		// Connect to Mailchimp
+		$output = new ConsoleOutput();
+
 		// Connect to Mailchimp
 		if($mailchimp = Mailchimp::Connect())
 		{
-			return true;
+			// get the remote users
+			if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
+			{
+				$sync_action = SyncUtility::Check($subscriber, $remote);
+
+				self::ExecuteSyncAction($subscriber, $sync_action);
+
+				$output->writeln('Subscriber');
+				$output->writeln('   Email         : ' . $subscriber->subscriber_email);
+				$output->writeln('   Audience Id   : ' . $subscriber->subscriber_audience_id);
+				$output->writeln('   Action        : ' . $sync_action);
+				return true;
+			}
+			else
+			{
+				// unable to find online
+				$output->writeln('   === Subscriber      : ' . $subscriber->subscriber_email . '  ===');
+				$output->writeln('            Status     : !!! Unable to locate remotely');
+			}
 		}
 
 		return false;
 	}
 
 	/**
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * SyncAll
 	 *
-	 * This is a mess, but better than back in the controller class
-	 * Needs rework!
-	 * Still a wip
+	 * Sync all subscribers, negate what action to take
 	 *
-	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 * @param  mixed $repository
+	 * @return void
 	 */
-	public static function SyncAll( AudienceRepository $repository )
+	public static function SyncAll( SubscriberRepository $repository ) : bool
+	{
+		$output = new ConsoleOutput();
+
+		// Connect to Mailchimp
+		if($mailchimp = Mailchimp::Connect())
+		{
+			foreach($repository->all() as $subscriber)
+			{
+				self::Sync( $subscriber );
+			}
+
+			// Retrieve any remote user that
+			// is not already downloaded.
+			self::PullAllNotImported();
+
+			return true;
+		}
+
+		$output->writeln('');
+		$output->writeln('End of Program <--');
+
+		return false;
+	}
+
+
+	/**
+	 * Pull
+	 *
+	 * @param  mixed $subscriber
+	 * @return bool
+	 */
+	public static function Pull( SubscriberInterface $subscriber ) : bool
+	{
+		// Connect to Mailchimp
+		if($mailchimp = Mailchimp::Connect())
+		{
+			// update
+			if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
+			{
+				// We need a Local Audience before we can add the subscriebr
+				//So find the local Audience first
+				if($local_audience = AudienceModel::where('audience_remote_id',$subscriber->subscriber_audience_id)->first())
+				{
+					if(self::UpdateLocalSubscriberFromRemote($subscriber, $remote, $local_audience))
+					{
+						return self::SyncTimestampsAsCurrent($subscriber);
+					}
+				}
+				else
+				{
+					// if we dont have the local Audience
+					// best we sync/pull to get it and
+					// using recursion try again.
+					if(Audience::PullByAudienceId($subscriber->subscriber_audience_id))
+					{
+						Log::debug('Created Audience AdHoc - so subscribers could be imported.');
+						return self::Pull($subscriber);
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * PullAll
+	 *
+	 * @param  mixed $repository
+	 * @return void
+	 */
+	public static function PullAll( AudienceRepository $repository ) : bool
 	{
 		// Error Count while importing/sync
 		$total_errors = 0;
@@ -100,7 +231,7 @@ class Subscriber
 				$offset         = self::START_COUNT;
 				$count          = self::MAX_RECORDS;
 				$fields         = null;
-				$fields         = 'members.id,members.email_address,members.status,members.merge_fields,members.last_changed';			
+				$fields         = 'members.id,members.email_address,members.status,members.merge_fields,members.last_changed';
 				$exfields       = null; //'members.vip,full_name,total_items';
 
 				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
@@ -117,15 +248,11 @@ class Subscriber
 								// Do we have on in our table ?
 								if($subscriber = SubscriberModel::where('subscriber_audience_id',$local_audience->audience_remote_id)->where('subscriber_email',$member->email_address)->first())
 								{
-									if(self::AreSyncChangesRequired($subscriber,$member))
+									// update
+									if($local_subscriber = self::UpdateLocalSubscriberFromRemote($subscriber, $member, $local_audience))
 									{
-										// update
-										if($local_subscriber = self::UpdateLocalSubscriberFromRemote($subscriber, $member, $local_audience))
-										{
-											self::SyncTimestampsAsCurrent($local_subscriber);
-										}
+										self::SyncTimestampsAsCurrent($local_subscriber);
 									}
-
 								}
 								else
 								{
@@ -134,7 +261,6 @@ class Subscriber
 									{
 										self::SyncTimestampsAsCurrent($local_subscriber);
 									}
-
 								}
 							}
 						}
@@ -158,23 +284,69 @@ class Subscriber
 		return false;
 	}
 
-	public static function Pull( SubscriberInterface $subscriber ) : bool
+	/**
+	 * PullAllNotImported\
+	 *
+	 * Gets all Subscribers/Members that have not already been downloaded
+	 *
+	 * @param  mixed $repository
+	 * @return void
+	 */
+	public static function PullAllNotImported() : bool
 	{
+		$audiences = AudienceModel::all();
+
+		// Error Count while importing/sync
+		$total_errors = 0;
+
 		// Connect to Mailchimp
 		if($mailchimp = Mailchimp::Connect())
 		{
-			// update
-			if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
+			foreach($audiences as $local_audience)
 			{
-				//update values
-				if($local_audience = AudienceModel::where($subscriber->subscriber_audience_id))
+				$lists          = $mailchimp->getMembers( $local_audience->audience_remote_id, 'total_items');
+				$max_records    = ($lists->total_items) ?? 0;
+				$offset         = self::START_COUNT;
+				$count          = self::MAX_RECORDS;
+				$fields         = null;
+				$fields         = 'members.id,members.email_address,members.status,members.merge_fields,members.last_changed';
+				$exfields       = null;
+
+				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
 				{
-					if(self::UpdateLocalSubscriberFromRemote($subscriber, $remote, $local_audience))
+					$lists = $mailchimp->getMembers( $local_audience->audience_remote_id, $fields, $exfields, $count, $offset );
+
+					if(isset($lists->members))
 					{
-						return self::SyncTimestampsAsCurrent($subscriber);
+						if($lists->members)
+						{
+							// dd($lists->members);
+							foreach($lists->members as $member)
+							{
+								// Do we have on in our table ?
+								if(!$subscriber = SubscriberModel::where('subscriber_audience_id',$local_audience->audience_remote_id)->where('subscriber_email',$member->email_address)->first())
+								{
+									// create
+									if($local_subscriber = self::CreateLocalSubscriberFromRemote( $member, $local_audience))
+									{
+										self::SyncTimestampsAsCurrent($local_subscriber);
+									}
+								}
+							}
+						}
+						else
+						{
+							//oops we did not expect this.
+						}
+					}
+					else
+					{
+						//oops we did not expect this.
 					}
 				}
 			}
+
+			return true;
 		}
 
 		return false;
@@ -186,7 +358,7 @@ class Subscriber
 	 * @param  mixed $entry
 	 * @return void
 	 */
-	public static function Post(SubscriberInterface $subscriber)
+	public static function Post(SubscriberInterface $subscriber) : bool
 	{
 		// Connect to Mailchimp
 		if($mailchimp = Mailchimp::Connect())
@@ -207,7 +379,7 @@ class Subscriber
 														$subscriber->subscriber_email,
 														$subscriber->subscriber_subscribed,
 														$fname,
-														$lname)) 
+														$lname))
 				{
 					// ok, now keep timestamps in sync
 					return self::SyncTimestampsAsCurrent($subscriber);
@@ -229,7 +401,7 @@ class Subscriber
 	 *
 	 * @return void
 	 */
-	public static function PostAll( SubscriberRepository $repository )
+	public static function PostAll( SubscriberRepository $repository ) : bool
 	{
 		if($mailchimp = Mailchimp::Connect())
 		{
@@ -254,7 +426,7 @@ class Subscriber
 
 
 	/**
-	 * LocalHasSubscriber
+	 * IsSubscriberLocallyRecorded
 	 *
 	 * @comment		Need to asses if we really need this function
 	 * 				It seems this would be much better served
@@ -264,11 +436,11 @@ class Subscriber
 	 * @param  mixed $audience_id
 	 * @return void
 	 */
-	public static function LocalHasSubscriber($email,$audience_id)
+	public static function IsSubscriberLocallyRecorded($email, $audience_id) : bool
 	{
 		if($subscriber = SubscriberModel::where('subscriber_email',$email)->where('subscriber_audience_id',$audience_id)->first())
 		{
-			return $subscriber;
+			return true;
 		}
 
 		return false;
@@ -277,8 +449,6 @@ class Subscriber
 
 	/**
 	 * FormatContact
-	 * Simialr to PrepareContact however FormatContact will be continue to evolve.
-	 * It currently assumes first name if not provided.
 	 *
 	 * @param  mixed $email
 	 * @param  mixed $subscribe
@@ -309,37 +479,7 @@ class Subscriber
 		return $contact;
 	}
 
-	/**
-	 * PrepareContact
-	 *
-	 * @deprecated -
-	 * @see FormatContact.
-	 *
-	 * @param  mixed $email
-	 * @param  mixed $subscribe
-	 * @param  mixed $FNAME
-	 * @param  mixed $LNAME
-	 * @return void
-	 */
-	public static function PrepareContact($email, $subscribe = true, $FNAME = '', $LNAME = '')
-	{
-		$subscribe_string = ($subscribe) ? 'subscribed' : 'unsubscribed';
 
-		$contact =
-		[
-			"email_address"     => $email,
-			"status"            => $subscribe_string,
-			"merge_fields"      =>
-			[
-				"FNAME" => $FNAME,
-				"LNAME" => $LNAME
-			]
-		];
-
-		return $contact;
-	}
-	
-		
 	/**
 	 * CreateOrUpdateLocalSubscriber
 	 *
@@ -366,7 +506,7 @@ class Subscriber
 
 			$subscriber->subscriber_email        	= $email_address;
 			$subscriber->subscriber_audience_id  	= $list_id;
-			$subscriber->subscriber_status       	= $status; 
+			$subscriber->subscriber_status       	= $status;
 			$subscriber->subscriber_subscribed   	= ($status == 'subscribed') ? true: false ;;
 			$subscriber->save();
 
@@ -441,10 +581,10 @@ class Subscriber
 			$subscriber->subscriber_audience_name 		= $list->audience_name;
 			$subscriber->subscriber_fname            	= $remote->merge_fields->FNAME;
 			$subscriber->subscriber_lname            	= $remote->merge_fields->LNAME;
-			
+
 			// Timestamps for keeping in Sync
 			$subscriber->status_remote_timestamp 	= $remote->last_changed;
-				
+
 			$subscriber->save();
 
 			return $subscriber;
@@ -458,10 +598,10 @@ class Subscriber
 		return false;
 	}
 
-		
+
 	/**
 	 * AreSyncChangesRequired
-	 * 
+	 *
 	 * We dont check each field, we check the following;
 	 * 		1. Check remote TS for changes
 	 * 		2. Check local-TS-Save compared to local-TS-Sync
@@ -474,103 +614,6 @@ class Subscriber
 	{
 		// until bugs fixed this will always return true;
 		return true;
-
-		// Log::debug('Date1: ' . $subscriber->status_remote_timestamp);
-		// Log::debug('Date2: ' . $subscriber->local_timestamp_sync);
-		// Log::debug('Date3: ' . $subscriber->local_timestamp_save);
-		// Log::debug('Date3: ' . $remote->last_changed);
-
-
-		try
-		{
-			// Is Local TS less than the remote, then Sync
-			if($subscriber->status_remote_timestamp != "")
-			{
-				if( date('c', $subscriber->status_remote_timestamp) < date('c', $remote->last_changed ) )
-				{
-					return true;
-				}
-			}
-
-			if( ($subscriber->local_timestamp_sync != "") && ($subscriber->local_timestamp_save != ""))
-			{
-				if(date('c', $subscriber->local_timestamp_sync) < date('c', $subscriber->local_timestamp_save))
-				{
-					return true;
-				}
-			}
-
-		}
-		catch(\Exceeption $e)
-		{
-
-		}
-
-		return false;
-	}
-
-	
-	/**
-	 * TestDates
-	 *
-	 * @param  mixed $repository
-	 * @return void
-	 */
-	public static function TestDates( AudienceRepository $repository )
-	{
-		$output = new ConsoleOutput();
-
-		// Connect to Mailchimp
-		if($mailchimp = Mailchimp::Connect())
-		{
-			foreach(SubscriberModel::all() as $subscriber)
-			{
-				// get the remote users 
-				if($remote = $mailchimp->getListMember($subscriber->subscriber_audience_id, $subscriber->subscriber_email))
-				{
-					switch(SyncUtility::Check($subscriber, $remote))
-					{
-						case SyncAction::Pull:
-							self::Pull($subscriber);
-							$subscriber->status_sync_messages = Carbon::now() .' - Pulled User Changes from Mailchimp';
-							$subscriber->save();
-							// Pull
-							break;	
-						case SyncAction::Push:
-							self::Post($subscriber);
-							$subscriber->status_sync_messages = Carbon::now() .' - Pushed User Changes to Mailchimp';
-							$subscriber->save();
-							// Push
-							break;						
-						case SyncAction::ErrResolveSuggestPull:
-							// ErrResolveSuggestPull
-							break;
-						case SyncAction::ErrResolveSuggestPush:
-							// ErrResolveSuggestPush
-							break;
-						case SyncAction::ErrResolveNoSuggestion:
-							// ErrResolveNoSuggestion
-							break;		
-						case SyncAction::NoChange:
-						default:
-							// NoChange
-							break;										
-					}
-				}
-				else
-				{
-					// unable to find online
-					$output->writeln('   === Subscriber      : ' . $subscriber->subscriber_email . '  ===');
-					$output->writeln('            Status     : !!! Unable to locate remotely');
-				}
-			}
-		}
-
-		$output->writeln('');
-		$output->writeln('End of Program <--');
-
-
-		return false;
 	}
 
 
@@ -593,7 +636,7 @@ class Subscriber
 			$subscriber->subscriber_audience_id     = $list->audience_remote_id;
 			$subscriber->subscriber_subscribed      = ($remote->status == 'subscribed') ? true: false ;
 			$subscriber->subscriber_status      	= $remote->status;
-			
+
 			$subscriber->subscriber_audience_name 	= $list->audience_name;
 
 			$subscriber->subscriber_fname           = $remote->merge_fields->FNAME;
@@ -614,17 +657,73 @@ class Subscriber
 		return false;
 	}
 
-	
+
+	/**
+	 * ExecuteSyncAction
+	 *
+	 * @param  mixed $subscriber
+	 * @param  mixed $sync_action
+	 * @return void
+	 */
+	public static function ExecuteSyncAction(SubscriberInterface $subscriber, $sync_action)
+	{
+		$subscriber->status_sync_last_action 	= $sync_action;
+
+		switch($sync_action)
+		{
+			case SyncAction::Pull:
+				self::Pull($subscriber);
+				$subscriber->status_sync_messages 		= "Last Sync Check: " . Carbon::now() . "\r\n\r\nStatus: Pull\r\n\r\nMessage: Subscriber details have been PULLED from Mailchimp.";
+				$subscriber->status_sync_err_flag 		= false;
+				$subscriber->save();
+				// Pull
+				break;
+			case SyncAction::Push:
+				self::Post($subscriber);
+				$subscriber->status_sync_messages 		= "Last Sync Check: " . Carbon::now() . "\r\n\r\nStatus: Push\r\n\r\nMessage: Subscriber details have been PUSHED to Mailchimp.";
+				$subscriber->status_sync_err_flag 		= false;
+				$subscriber->save();
+				// Push
+				break;
+			case SyncAction::ErrResolveSuggestPull:
+				$subscriber->status_sync_messages 		= "Last Sync Check: " . Carbon::now() . "\r\n\r\nStatus: ErrResolveSuggestPull\r\n\r\nMessage: Subscriber is out of Sync \r\n\r\nRecomended Action: Sync(PULL).";
+				$subscriber->status_sync_err_flag 		= true;
+				$subscriber->save();
+				// ErrResolveSuggestPull
+				break;
+			case SyncAction::ErrResolveSuggestPush:
+				$subscriber->status_sync_messages 		= "Last Sync Check: " . Carbon::now() . "\r\n\r\nStatus: ErrResolveSuggestPush\r\n\r\nMessage: Subscriber is out of Sync \r\n\r\nRecomended Action: Sync(PUSH).";
+				$subscriber->status_sync_err_flag 		= true;
+				$subscriber->save();
+				// ErrResolveSuggestPush
+				break;
+			case SyncAction::ErrResolveNoSuggestion:
+				$subscriber->status_sync_messages 		= "Last Sync Check: " . Carbon::now() . "\r\n\r\nStatus: ErrResolveNoSuggestion\r\n\r\nMessage: Subscriber is out of Sync \r\n\r\nRecomended Action: You can either Sync(PULL) or Sync(PUSH).";
+				$subscriber->status_sync_err_flag 		= true;
+				$subscriber->save();
+				// ErrResolveNoSuggestion
+				break;
+			case SyncAction::NoChange:
+			default:
+				$subscriber->status_sync_messages 		= "Last Sync Check: " . Carbon::now() . "\r\n\r\nStatus: OK\r\n\r\nMessage: Subscriber is in Sync. \r\n";
+				$subscriber->status_sync_err_flag 		= false;
+				$subscriber->save();
+				// NoChange
+				break;
+		}
+
+		return true;
+	}
 	/**
 	 * SyncTimestampsAsCurrent
-	 * 
+	 *
 	 * This will set both sync timestamps to current
 	 *
 	 * @param  mixed $subscriber
 	 * @param  mixed $remote
 	 * @return void
 	 */
-	public static function SyncTimestampsAsCurrent(SubscriberInterface $subscriber)
+	public static function SyncTimestampsAsCurrent(SubscriberInterface $subscriber, string $message = '')
 	{
 		$ts = date("c");
 		Log::debug('SET TS: SyncTimestampsAsCurrent : ' . $ts);
@@ -638,7 +737,7 @@ class Subscriber
 		return true;
 	}
 
-		
+
 	/**
 	 * SetCurrentSaveTimestamp
 	 * This will only update the local save timestamp
@@ -650,13 +749,10 @@ class Subscriber
 	{
 		$ts = date("c");
 		Log::debug('SET TS: SetCurrentSaveTimestamp : ' . $ts);
-		// Timestamps for keeping in Sync
-		$subscriber->local_timestamp_save 	= $ts; // (now) ISO 8601 date (added in PHP 5)
-
-		// 'local_timestamp_sync' 
-		// 'local_timestamp_save' 
+		$subscriber->local_timestamp_save 	= $ts;
+		$subscriber->status_sync_messages 	= "Subscriber Updated Locally on :" . Carbon::now() . "\r\n\r\n-------------------\r\n" . $subscriber->status_sync_messages;
 		$subscriber->save();
-	}	
+	}
 
 
 	/**
@@ -665,7 +761,7 @@ class Subscriber
 	public static function GetCurrentSaveTimestamp()
 	{
 		// Timestamps for keeping in Sync
-		return date("c"); 
+		return date("c");
 		// (now) ISO 8601 date (added in PHP 5)
-	}	
+	}
 }

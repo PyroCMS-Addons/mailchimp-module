@@ -41,6 +41,10 @@ return [
         'name'          => 'Created Source',
         'instructions'  => '',
     ],   
+    "status_sync_messages" => [
+        'name'          => 'Messages',
+        'instructions'  => '',
+    ],   
     
     
     //
@@ -258,5 +262,78 @@ return [
         'placeholder' => '',
     ],    
 
+    //
+    // Webhooks
+    //
+    'webhook_name' => [
+        'name' => 'Name',
+        'instructions' => '',
+        'placeholder' => '',
+    ],  
+    'webhook_id' => [
+        'name' => 'Remote ID',
+        'instructions' => '',
+        'placeholder' => '',
+    ], 
+    'webhook_list_id' => [
+        'name' => 'List/Audience',
+        'instructions' => '',
+        'placeholder' => '',
+    ], 
     
+    'webhook_url' => [
+        'name' => 'URL Endpoint',
+        'instructions' => '',
+        'placeholder' => '',
+    ], 
+    'webhook_events_subscribe' => [
+        'name' => 'Subscribe',
+        'instructions' => 'Enable for Subscribe',
+        'placeholder' => '',
+    ], 
+    'webhook_events_unsubscribe' => [
+        'name' => 'UnSubscribe',
+        'instructions' => 'Enable for UnSubscribe',
+        'placeholder' => '',
+    ], 
+    'webhook_events_profile' => [
+        'name' => 'Profile',
+        'instructions' => 'Enable for Profile Changes',
+        'placeholder' => '',
+    ], 
+    'webhook_events_upemail' => [
+        'name' => 'Update Email',
+        'instructions' => 'Enable for Email Changes',
+        'placeholder' => '',
+    ], 
+    'webhook_events_cleaned' => [
+        'name' => 'Cleaned',
+        'instructions' => 'Enable for Cleaned',
+        'placeholder' => '',
+    ], 
+    'webhook_events_campaign' => [
+        'name' => 'Campaign',
+        'instructions' => 'Enable for Campaign Canges',
+        'placeholder' => '',
+    ], 
+    'webhook_sources_api' => [
+        'name' => 'Via API',
+        'instructions' => 'Trigger Via API',
+        'placeholder' => '',
+    ], 
+    'webhook_sources_admin' => [
+        'name' => 'Admin',
+        'instructions' => 'Trigger By a Admin',
+        'placeholder' => '',
+    ], 
+    'webhook_sources_user' => [
+        'name' => 'User',
+        'instructions' => 'Trigger By a Subscriber',
+        'placeholder' => '',
+    ],     
+    'webhook_enabled' => [
+        'name' => 'Enabled',
+        'instructions' => 'Is the Webhook Enabled',
+        'placeholder' => '',
+    ],      
 ];
