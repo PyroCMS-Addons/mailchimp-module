@@ -41,6 +41,7 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
             ]
         ],
         "subscriber_remote_id"          => "anomaly.field_type.text",
+        "subscriber_web_id"             => "anomaly.field_type.integer",
         "subscriber_audience_id"        => "anomaly.field_type.text",
         "subscriber_audience_name"      => "anomaly.field_type.text",
         "subscriber_subscribed"         => [
@@ -72,6 +73,11 @@ class ThriveModuleMailchimpCreateSubscribersStream extends Migration
             'translatable'      => false,
             'unique'            => false,
             'required'          => true,
+        ],
+        'subscriber_web_id' => [
+            'translatable'      => false,
+            'unique'            => false,
+            'required'          => false,
         ],
         'subscriber_remote_id' => [
             'translatable'      => false,

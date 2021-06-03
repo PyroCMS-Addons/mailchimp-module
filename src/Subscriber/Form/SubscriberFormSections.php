@@ -1,5 +1,7 @@
 <?php namespace Thrive\MailchimpModule\Subscriber\Form;
 
+use Anomaly\Streams\Platform\Support\Collection;
+use Anomaly\Streams\Platform\Ui\ControlPanel\ControlPanelBuilder;
 use Thrive\MailchimpModule\Subscriber\Form\SubscriberFormBuilder;
 
 
@@ -17,7 +19,7 @@ class SubscriberFormSections
      * @param  mixed $builder
      * @return void
      */
-    public function handle(SubscriberFormBuilder $builder)
+    public function handle(SubscriberFormBuilder $builder, ControlPanelBuilder $cp)
     {
         $stream = $builder->getForm();
 
@@ -40,6 +42,7 @@ class SubscriberFormSections
                             'fields' => [
                                 'subscriber_email',
                                 'subscriber_subscribed',
+                                //'subscriber_remote_id',
                             ],
                         ],
                         'name' => [
@@ -77,5 +80,10 @@ class SubscriberFormSections
         }
 
         $builder->setSections( $sections );
+
+        // $s = $cp->getControlPanelSections();
+        // $sec = $s->toArray();
+        // unset($sec['subscribers']['buttons']);
+        // $cp->setSections($sec);
     }
 }

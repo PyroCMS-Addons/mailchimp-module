@@ -319,7 +319,6 @@ trait MailchimpContactsTrait
                 [
                     "status_if_new"     => ($subscribed) ? self::MEMBER_SUBSCRIBED : self::MEMBER_UNSUBSCRIBED,
                     "status"            => ($subscribed) ? self::MEMBER_SUBSCRIBED : self::MEMBER_UNSUBSCRIBED,
-                    "status"            => ($subscribed) ? "subscribed" : "unsubscribed",
                     "merge_fields"      => $merg_fields,
                     // "merge_fields"      => [
                     //     isset($fname) ?  "FNAME"         => $fname,

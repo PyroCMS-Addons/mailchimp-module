@@ -1,8 +1,9 @@
 <?php namespace Thrive\MailchimpModule\Support\Mailchimp;
 
-use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Exception\RequestException;
 
 // Mailchimp
+use Illuminate\Support\Facades\Log;
 use MailchimpMarketing;
 use MailchimpMarketing\ApiException;
 
@@ -97,23 +98,36 @@ trait MailchimpWebhooksTrait
      */
     public function updateWebhook($list_id, $webhook_id, array $values = [])
     {
-        $status = true;
-
         try
         {
             $response = $this->mailchimp->lists->updateListWebhook($list_id, $webhook_id, $values);
 
             if(isset($response->id))
-                return $response;
+                return true;
         }
+        catch(RequestException $gex)
+        {
+            Log::error('!! RequestException Error Found');
+
+            if ($gex->hasResponse())
+            {
+                $response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+                Log::error(print_r($decoded_json->errors,true));
+            }
+            else
+            {
+                Log::error('Error Updating Webhook.');
+            }
+        }        
         catch (\Exception $e)
         {
-            $status = false;
+            Log::error('!! Exception Error Found');
             Log::error($e->getMessage());
-        }
-
-        if($status) {
-            return $response;
         }
 
         return false;
@@ -135,8 +149,27 @@ trait MailchimpWebhooksTrait
             $response = $this->mailchimp->lists->createListWebhook($list_id, $values);
 
             if(isset($response->id))
-                return $response;
+                return $response->id;
         }
+        catch(RequestException $gex)
+        {
+            Log::error('!! RequestException Error Found');
+
+            if ($gex->hasResponse())
+            {
+                $response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+                Log::error(print_r($decoded_json->errors,true));
+            }
+            else
+            {
+                Log::error('Error Updating Webhook.');
+            }
+        }          
         catch (\Exception $e)
         {
             $status = false;

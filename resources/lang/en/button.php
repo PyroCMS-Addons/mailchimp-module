@@ -9,6 +9,9 @@ return [
     'sync_automation_pull'     => 'Sync (Pull)',
 
     'sync_webhooks'            => 'Sync',
+    'new_webhooks'              => 'Add Webhook',
+
+    
 
     'sync_campaign_pull'       => 'Sync (Pull)',
     'new_subscriber'           => 'Add Subscriber',
@@ -20,4 +23,7 @@ return [
     'push'                     => 'Merge Push',
     'sync'                     => 'Sync',  
     'send_test'                => 'Send Test',  
+
+    'delete_remote'             => 'Force Delete',
+
 ];

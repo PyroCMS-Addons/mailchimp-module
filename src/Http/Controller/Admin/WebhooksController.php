@@ -6,6 +6,7 @@ use Anomaly\Streams\Platform\Message\MessageBag;
 use Thrive\MailchimpModule\Support\Integration\Webhook;
 use Thrive\MailchimpModule\Webhook\Form\WebhookFormBuilder;
 use Thrive\MailchimpModule\Webhook\Table\WebhookTableBuilder;
+use Thrive\MailchimpModule\Webhook\WebhookModel;
 use Thrive\MailchimpModule\Webhook\WebhookRepository;
 
 // Thrive
@@ -93,7 +94,48 @@ class WebhooksController extends AdminController
             }
         }
 
-
         return redirect()->back();
     }
+
+
+    public function pull( $id = null, MessageBag $messages, WebhookRepository $repository )
+    {
+        if($id == null)
+        {
+            //syncall
+            if(Webhook::PullAll())
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_webhooks');
+            }
+        }
+
+        return redirect()->back();
+    }    
+
+    public function delete_force( $id = null, MessageBag $messages, WebhookRepository $repository )
+    {
+        if($id != null)
+        {
+            //syncall
+            if($webhook = WebhookModel::find($id))
+            {
+                if(Webhook::DeleteFromRemote($webhook))
+                {
+                    $webhook->forceDelete();   
+                }
+                else
+                {
+                    $messages->error('Unable to delete from remote System. The local Webhook has been moved to trash.');
+
+                    $webhook->delete();
+                }
+                
+                $messages->success('thrive.module.mailchimp::common.now_synched_webhooks');
+            }
+        }
+
+        return redirect()->back();
+    }    
+
+    
 }

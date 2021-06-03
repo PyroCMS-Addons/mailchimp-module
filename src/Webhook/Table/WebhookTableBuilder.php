@@ -29,9 +29,9 @@ class WebhookTableBuilder extends TableBuilder
         'webhook_id', 
         'webhook_list_id',   
         'webhook_url',
-        'entry.webhook_events_subscribe.toggle' => [
-            'is_safe' => true,
-        ], 
+        // 'entry.webhook_events_subscribe.toggle' => [
+        //     'is_safe' => true,
+        // ], 
     ];
 
     /**
@@ -40,6 +40,18 @@ class WebhookTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $buttons = [
+        'delete_remote' => [
+            'type' => 'danger',
+            'icon' => 'trash',
+            'href'        => 'admin/mailchimp/webhooks/delete_force/{entry.id}', 
+            'attributes' => [
+
+                'data-toggle'  => 'confirm',
+                'data-icon' => 'warning',
+                'data-title' => 'Are you sure ?',
+                'data-message' => 'This will delete the Item from the Remote Source too!'
+            ],
+        ],
         'edit',
     ];
 

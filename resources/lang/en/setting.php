@@ -22,8 +22,17 @@ return [
         'placeholder' => '',
     ],  
 
+    'mailchimp_http_secure' => [
+        'name' => 'Use HTTPS',
+        'instructions' => 'Use HTTPS for Callback URL',
+        'placeholder' => '',
+    ],  
+    'mailchimp_pro' => [
+        'name' => 'Mailchimp Pro',
+        'instructions' => 'Unlock additional features with Pro. Only set this to true if you do, or you might encounter some erros.',
+        'placeholder' => '',
+    ],  
 
-    
     
     
 ];

@@ -17,6 +17,7 @@ return [
     'now_synched_subscribers'           => 'Subscribers are now Synchronised',
     'now_synched_automations'           => 'Automations are now Synchronised',
     'now_synched_campaigns'             => 'Campaigns are now Synchronised',
+    'now_synched_webhooks'              => 'Webhooks are now Synchronised',
 
 
     'sync_success'                      => 'Sync Success',

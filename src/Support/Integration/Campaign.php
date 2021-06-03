@@ -60,6 +60,44 @@ class Campaign
     }
     
 
+    public static function SyncById($campaign_id)
+    {
+        // Connect to Mailchimp
+        if($mailchimp = Mailchimp::Connect())
+        {
+            Log::debug('Search Remote Mailchimp for Campaign ID :' . $campaign_id);
+
+            if($remote = $mailchimp->getCampaign($campaign_id))
+            {
+                if($local = CampaignModel::where('campaign_remote_id',$campaign_id)->first())
+                {
+                    // do we have a local campaign with that ID ?
+                    // yes -> update/pull
+                    Log::debug('Found Local Campaign, now Updating Local Values');
+
+                    self::UpdateLocalCampaignFromRemote($local, $remote);
+                }
+                else
+                {
+                    //no
+                    //create with remote details
+                    Log::debug('Unable to find Local Campaign, Creating a Local Campaign');
+
+                    self::CreateLocalCampaignFromRemote($remote);
+                }
+
+                return true;
+            }
+            else
+            {
+                //exit, this function requires external campaign
+                return false;
+            }            
+        }
+
+        return false;
+    }
+
     /**
      * SyncAll
      *
@@ -77,28 +115,24 @@ class Campaign
 
             if(isset(($campaigns->campaigns)))
             {
-                // Log::error('Found Some campaigns');
-
                 $campaigns = $campaigns->campaigns;
     
                 foreach($campaigns as $campaign)
                 {
                     if($local = $repository->findBy('campaign_remote_id', $campaign->id))
                     {
-                        // Log::error('Found Local Campaign - Lets Update');
+                        //Log::error('Found Local Campaign - Lets Update ID : ' .$campaign->id);
 
                         // Update Local
                         self::UpdateLocalCampaignFromRemote($local, $campaign);    
                     }
                     else
                     {
-                        // Log::error('Did not Find Local Campaign - Lets Create');
-
                         // Not found
                         //check if exist if deleted
                         if($repository->allWithTrashed()->findBy('campaign_remote_id',$campaign->id))
                         {
-                            $messages->error('You may have some Camapigns not included as we found similar Ids in the trashed area..');
+                            //$messages->error('You may have some Camapigns not included as we found similar Ids in the trashed area..');
                         }
                         else
                         {
@@ -309,7 +343,6 @@ class Campaign
 
         // @deprecated status field
         $local->campaign_sync_status = ''; //@deprecated
-
         $local->save();
 
         return true;

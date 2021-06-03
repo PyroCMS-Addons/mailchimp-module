@@ -29,9 +29,16 @@ class Chooser
 
         $id = $campaign->id;
 
+        $settings = app(\Anomaly\SettingsModule\Setting\Contract\SettingRepositoryInterface::class);
+
+
+        $free_or_pro = $settings->value('thrive.module.mailchimp::mailchimp_pro','free');
+
+
+
         if($campaign->canEdit())
         {
-            $actions['edit'] = 
+            $actions['edit'] =
             [
                 'name'          => 'Edit Camapign',
                 'slug'          => 'edit',
@@ -55,17 +62,21 @@ class Chooser
                 'url'           => 'admin/mailchimp/campaigns/send_test/' . $id,
             ];
 
-            $actions['template'] =
-            [
-                'slug'          => 'template',
-                'name'          => 'Edit HTML Template',
-                'description'   => 'Edit the HTML Template for this campaign',
-                'url'           => 'admin/mailchimp/campaigns/template/' . $id,
-            ];              
-            
+            //if pro
+            if($free_or_pro == 'pro')
+            {
+                $actions['template'] =
+                [
+                    'slug'          => 'template',
+                    'name'          => 'Edit HTML Template',
+                    'description'   => 'Edit the HTML Template for this campaign',
+                    'url'           => 'admin/mailchimp/campaigns/template/' . $id,
+                ];
+            }
+
         }
 
-        $actions['copy'] = 
+        $actions['copy'] =
         [
             'slug'          => 'copy',
             'name'          => 'Duplicate Camapign',
@@ -73,7 +84,7 @@ class Chooser
             'url'           => 'admin/mailchimp/campaigns/copy/' . $id,
         ];
 
-        $actions['preview'] = 
+        $actions['preview'] =
         [
             'slug'          => 'preview',
             'name'          => 'Preview HTML Template',

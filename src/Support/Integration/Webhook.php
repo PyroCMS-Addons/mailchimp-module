@@ -33,7 +33,46 @@ use Thrive\MailchimpModule\Webhook\WebhookRepository;
  */
 class Webhook
 {
+
 	
+	public static function DeleteFromRemote( WebhookInterface $webhook ) : bool
+	{
+		// Connect to Mailchimp
+		if($mailchimp = Mailchimp::Connect())
+		{
+			if($mailchimp->deleteWebhook($webhook->webhook_list_id, $webhook->webhook_id))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static function SetCallbackUrl(WebhookInterface $webhook)
+	{
+		$webhook->webhook_url = self::GetCallbackUrl();
+						
+		$webhook->save();
+	}
+
+
+	public static function GetCallbackUrl()
+	{
+		$settings = app(\Anomaly\SettingsModule\Setting\Contract\SettingRepositoryInterface::class);
+
+		$secure = $settings->value('thrive.module.mailchimp::mailchimp_http_secure','http');
+		
+		$url = env('THRIVE_MAILCHIMP_CALLBACK_URL_HTTP') ?? url('mailchimp/webhooks');
+
+		if($secure == 'https')
+		{
+			$url = env('THRIVE_MAILCHIMP_CALLBACK_URL_HTTPS') ?? secure_url('mailchimp/webhooks');
+		}
+						
+		return $url;
+	}
+
 	/**
 	 * Sync
 	 * @todo - Need to implement Sync check
@@ -42,16 +81,40 @@ class Webhook
 	 * @param  mixed $webhook
 	 * @return bool
 	 */
-	public static function Sync( WebhookInterface $webhook ) : bool
+	public static function Sync( WebhookInterface $webhook , $default_action = 'Push') : bool
 	{
 		// Connect to Mailchimp
 		if($mailchimp = Mailchimp::Connect())
 		{
+			if($webhook->webhook_id =='')
+			{
+				return self::PostCreate($webhook);
+			}
+
+
 			// get the remote webhook
 			if($remote = $mailchimp->getWebhook($webhook->webhook_list_id, $webhook->webhook_id))
 			{
-				//$sync_action = SyncUtility::CheckWebhook($webhook, $remote);
-				//self::ExecuteSyncAction($subscriber, $sync_action);
+				// Log::debug(print_r($remote,true));
+
+				if(self::CompareWithRemote($webhook, $remote))
+				{
+					//they are the same
+					// no need to update
+					return true;
+				}
+				else
+				{
+					if($default_action=='Pull')
+					{
+						self::Pull($webhook);
+					}
+					else
+					{
+						self::Post($webhook);
+					}
+				}
+
 				return true;
 			}
 
@@ -88,7 +151,7 @@ class Webhook
 				{
 					self::PullAll();
 				}
-			}			
+			}
 
 			return true;
 		}
@@ -110,7 +173,10 @@ class Webhook
 		{
 			if($remote = $mailchimp->getWebhook($webhook->webhook_list_id, $webhook->webhook_id))
 			{
-				return self::CreateOrUpdateLocalWebhook($remote, $webhook);
+				if(self::CreateOrUpdateLocalWebhook($remote, $webhook))
+				{
+					return true;
+				}
 			}
 		}
 
@@ -142,6 +208,8 @@ class Webhook
 				{
 					foreach($lists->webhooks as $remote_webhook)
 					{
+						//Log::debug(print_r($remote_webhook,true));
+
 						self::CreateOrUpdateLocalWebhook($remote_webhook);
 					}
 				}
@@ -161,21 +229,73 @@ class Webhook
 	 */
 	public static function Post(WebhookInterface $webhook) : bool
 	{
+		//Log::debug('Post Webhook');
+
 		if($mailchimp = Mailchimp::Connect())
 		{
-			if($mailchimp->getWebhook($webhook->webhook_list_id, $webhook->webhook_id))
-			{
-				$values = self::FormatWebhook($webhook);
+			$values = self::FormatWebhook($webhook);
 
-				if($mailchimp->updateWebhook($webhook->webhook_list_id, $webhook->webhook_id, $values))
+			if($remote = $mailchimp->getWebhook($webhook->webhook_list_id, $webhook->webhook_id))
+			{
+				if($remote->url == $webhook->webhook_url)
 				{
+					unset($values['url']);
+				}
+
+				// compare
+				if(self::CompareWithRemote($webhook, $remote))
+				{
+					// no action required
+					// they are the same
 					return true;
+				}
+				else
+				{
+					// Log::debug('Attempt to Update Webhook');
+					// Log::debug('    Audience ID : ' . $webhook->webhook_list_id);
+					// Log::debug('    WebHook  ID : ' . $webhook->webhook_id);
+					// Log::debug('    Values : ');
+					// Log::debug(print_r($values,true));
+
+					if($mailchimp->updateWebhook($webhook->webhook_list_id, $webhook->webhook_id, $values))
+					{
+						Log::debug('Webhook Updated');
+						return true;
+					}
 				}
 			}
 			else
 			{
-				return false;
+				//add to Mailchimp
+				//Log::debug('Attempt to Add Webhook');
+
+				if($mailchimp->addWebhook($webhook->webhook_list_id, $values))
+				{
+					return true;
+				}		
 			}
+		}
+
+		return false;
+	}
+
+	public static function PostCreate(WebhookInterface $webhook) : bool
+	{
+		if($mailchimp = Mailchimp::Connect())
+		{
+			$values = self::FormatWebhook($webhook);
+
+			Log::debug(' --- FormatValues');
+			Log::debug(print_r($values,true));
+
+
+			//add to Mailchimp
+			if($id = $mailchimp->addWebhook($webhook->webhook_list_id, $values))
+			{
+				$webhook->webhook_id = $id;
+				$webhook->save();
+				return true;
+			}		
 		}
 
 		return false;
@@ -191,17 +311,11 @@ class Webhook
 	{
 		if($mailchimp = Mailchimp::Connect())
 		{
-			Log::debug('--- [ Begin ] ---  Webhook::PostAll ');
-
-			// this is not an effecient way to iterate
 			$local = $repository->all();
 
-			// dd($local);
 			foreach($local as $webhook)
 			{
-				Log::debug('  » 00 Pushing Webhook     : ' . $webhook->webhook_name . ', id: '. $webhook->webhook_id);
-
-				self::PostWebhookToMailchimp($webhook);
+				self::Post($webhook);
 			}
 
 			return true;
@@ -210,7 +324,7 @@ class Webhook
 		return false;
 	}
 
-	
+
 	/**
 	 * FormatWebhook
 	 * NB: API will be forced to FALSE.
@@ -221,8 +335,7 @@ class Webhook
 	{
 		$webhook =
 		[
-			//"url"     			=> '{url}/mailchimp/webhooks/{dyn}/',
-			"url"     			=> 'mailchimp/webhooks',
+			"url"     			=> self::GetCallbackUrl(),
 			"events"      =>
 			[
 				"subscribe" 	=> $webhook->webhook_events_subscribe,
@@ -237,7 +350,7 @@ class Webhook
 				"user" 			=> $webhook->webhook_sources_user,
 				"admin" 		=> $webhook->webhook_sources_admin,
 				"api" 			=> false, //$webhook->webhook_sources_api,
-			]			
+			]
 		];
 
 		return $webhook;
@@ -245,7 +358,7 @@ class Webhook
 
 
 
-	
+
 	/**
 	 * CreateOrUpdateLocalWebhook
 	 *
@@ -258,8 +371,8 @@ class Webhook
 		try
 		{
 			//first try to see if we have on system
-			if(!$webhook == null)
-			{	
+			if($webhook == null)
+			{
 				$webhook = WebhookModel::where('webhook_list_id',$remote_webhook->list_id)->where('webhook_id',$remote_webhook->id)->first();
 			}
 
@@ -272,7 +385,7 @@ class Webhook
 			$webhook->webhook_name        			= 'Webhook [' . $remote_webhook->id . ']';
 			$webhook->webhook_id  					= $remote_webhook->id;
 			$webhook->webhook_list_id  				= $remote_webhook->list_id;
-			$webhook->webhook_url  					= $remote_webhook->url;
+			$webhook->webhook_url  					= self::GetCallbackUrl();
 			$webhook->webhook_events_subscribe 		= $remote_webhook->events->subscribe;
 			$webhook->webhook_events_unsubscribe	= $remote_webhook->events->unsubscribe;
 			$webhook->webhook_events_profile 		= $remote_webhook->events->profile;
@@ -295,5 +408,52 @@ class Webhook
 		}
 
 		return false;
+	}
+
+	
+	/**
+	 * CompareWithRemote
+	 *
+	 * @param  mixed $webhook
+	 * @param  mixed $remote_webhook
+	 * @return void
+	 */
+	public static function CompareWithRemote(WebhookInterface $webhook, $remote_webhook)
+	{
+		$same = true;
+
+		$same = ($webhook->webhook_id == $remote_webhook->id) ? true : false;
+		//Log::debug( 'webhook_id :'. $webhook->webhook_id . ' - ' . $remote_webhook->id);
+		$same = ($webhook->webhook_list_id == $remote_webhook->list_id) ? $same : false;
+		//Log::debug( 'webhook_list_id :'. $webhook->webhook_list_id . ' - ' . $remote_webhook->list_id);
+		$same = ($webhook->webhook_url == $remote_webhook->url) ? $same : false;
+		//Log::debug( 'webhook_url :'. $webhook->webhook_url . ' - ' . $remote_webhook->url);
+		$same = ($webhook->webhook_events_subscribe == $remote_webhook->events->subscribe) ? $same : false;
+		//Log::debug( 'webhook_events_subscribe :'. $webhook->webhook_events_subscribe . ' - ' . $remote_webhook->events->subscribe);
+		$same = ($webhook->webhook_events_unsubscribe == $remote_webhook->events->unsubscribe) ? $same : false;
+		//Log::debug( 'webhook_events_unsubscribe :'. $webhook->webhook_events_unsubscribe . ' - ' . $remote_webhook->events->unsubscribe);
+		$same = ($webhook->webhook_events_profile == $remote_webhook->events->profile) ? $same : false;
+		//Log::debug( 'webhook_events_profile :'. $webhook->webhook_events_profile . ' - ' . $remote_webhook->events->profile);
+		$same = ($webhook->webhook_events_upemail == $remote_webhook->events->upemail) ? $same : false;
+		//Log::debug( 'webhook_events_upemail :'. $webhook->webhook_events_upemail . ' - ' . $remote_webhook->events->upemail);
+		$same = ($webhook->webhook_events_cleaned == $remote_webhook->events->cleaned) ? $same : false;
+		//Log::debug( 'webhook_events_cleaned :'. $webhook->webhook_events_cleaned . ' - ' . $remote_webhook->events->cleaned);
+		$same = ($webhook->webhook_events_campaign == $remote_webhook->events->campaign) ? $same : false;
+		//Log::debug( 'webhook_events_campaign :'. $webhook->webhook_events_campaign . ' - ' . $remote_webhook->events->campaign);
+		$same = ($webhook->webhook_sources_user == $remote_webhook->sources->user) ? $same : false;
+		//Log::debug( 'webhook_sources_user :'. $webhook->webhook_sources_user . ' - ' . $remote_webhook->sources->user);
+		$same = ($webhook->webhook_sources_admin == $remote_webhook->sources->admin) ? $same : false;
+		//Log::debug( 'webhook_sources_admin :'. $webhook->webhook_sources_admin . ' - ' . $remote_webhook->sources->admin);
+		$same = ($webhook->webhook_sources_api == $remote_webhook->sources->api) ? $same : false;
+		//Log::debug( 'webhook_sources_api :'. $webhook->webhook_sources_api . ' - ' . $remote_webhook->sources->api);
+
+		$same_human = ($same)?'The Same':'Not the Same';
+
+		//Log::debug('Compared A with B and thevresults are :' . $same_human);
+		if($same)
+			return true;
+
+		return false;
+
 	}
 }

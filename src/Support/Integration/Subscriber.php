@@ -49,30 +49,17 @@ class Subscriber
 	const MAX_RECORDS           = 20;
 
 
-
-	/**
-	 * WebhookSubscribe
-	 * WIP:in dev
-	 *
-	 * @param  mixed $id
-	 * @return void
-	 */
-	public static function WebhookSubscribe($id)
+	public static function CleanSubscriber( $email, $list_id)
 	{
-		if($subscriber = SubscriberModel::findByRemoteId($id))
+		if($subscriber = SubscriberModel::where('subscriber_email',$email)->where('subscriber_audience_id',$list_id)->first())
 		{
-			//update this subscriber
-			self::Sync($subscriber);
+			$subscriber->subscriber_subscribed = false;
 
-			// Record that a change came from Webhook
-			// SyncBothTimes
-		}
-		else
-		{
-			// fetch for all not imported
-			self::PullAllNotImported();
+			$subscriber->subscriber_status = 'cleaned';
+			$subscriber->save();
 		}
 	}
+
 
 	/**
 	 * WebhookUnSubscribe
@@ -81,17 +68,11 @@ class Subscriber
 	 * @param  mixed $id
 	 * @return void
 	 */
-	public static function WebhookUnSubscribe($id)
+	public static function SyncUserByWebId($webid)
 	{
-		if($subscriber = SubscriberModel::findByRemoteId($id))
+		if($subscriber = SubscriberModel::where('subscriber_web_id',$webid)->first())
 		{
-			//update this subscriber
 			self::Sync($subscriber);
-		}
-		else
-		{
-			// fetch for all not imported
-			self::PullAllNotImported();
 		}
 	}
 
@@ -105,6 +86,9 @@ class Subscriber
 	 */
 	public static function Sync( SubscriberInterface $subscriber ) : bool
 	{
+		//Log::debug('Sync User : ' . $subscriber->subscriber_web_id);
+		//Log::debug('    Email : ' . $subscriber->subscriber_email);
+
 		// Connect to Mailchimp
 		$output = new ConsoleOutput();
 
@@ -309,7 +293,7 @@ class Subscriber
 				$offset         = self::START_COUNT;
 				$count          = self::MAX_RECORDS;
 				$fields         = null;
-				$fields         = 'members.id,members.email_address,members.status,members.merge_fields,members.last_changed';
+				$fields         = 'members.id,members.web_id,members.email_address,members.status,members.merge_fields,members.last_changed';
 				$exfields       = null;
 
 				for($offset = 0; $offset <= $max_records; $offset = $offset + $count)
@@ -371,6 +355,7 @@ class Subscriber
 				$fname = ($subscriber->subscriber_fname != "") ? $subscriber->subscriber_fname : null ;
 				$lname = ($subscriber->subscriber_lname != "") ? $subscriber->subscriber_lname : null ;
 
+
 				// we may haveready updated the sync ts,
 				// however on a succesful Post() we need to update again
 				// to maintain the sync.
@@ -392,7 +377,6 @@ class Subscriber
 		}
 
 		return false;
-
 	}
 
 
@@ -410,7 +394,6 @@ class Subscriber
 			// this is not an effecient way to iterate
 			$local = $repository->all();
 
-			// dd($local);
 			foreach($local as $subscriber)
 			{
 				Log::debug('  » 00 Pushing User        : ' . $subscriber->subscriber_email);
@@ -574,6 +557,7 @@ class Subscriber
 			// create
 			$subscriber = new SubscriberModel();
 			$subscriber->subscriber_email        		= $remote->email_address;
+			$subscriber->subscriber_web_id        		= $remote->web_id;		
 			$subscriber->subscriber_remote_id   		= $remote->id;
 			$subscriber->subscriber_audience_id     	= $list->audience_remote_id;
 			$subscriber->subscriber_subscribed       	= ($remote->status == 'subscribed') ? true: false;
@@ -632,6 +616,8 @@ class Subscriber
 			// update
 			$subscriber->subscriber_email        	= $remote->email_address;
 			$subscriber->subscriber_remote_id   	= $remote->id;
+			$subscriber->subscriber_web_id        	= $remote->web_id;
+
 
 			$subscriber->subscriber_audience_id     = $list->audience_remote_id;
 			$subscriber->subscriber_subscribed      = ($remote->status == 'subscribed') ? true: false ;

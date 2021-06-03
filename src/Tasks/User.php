@@ -54,7 +54,6 @@ class User extends Command implements ShouldQueue
 
     public function handle()
     {
-
         $email = $this->argument('email');
 
         if (!$listid = $this->argument('list')) {
@@ -104,24 +103,26 @@ class User extends Command implements ShouldQueue
         $this->info('');
 
         $this->info('User Model           : ' . $subscriber->id);
-        $this->info('     Email           : ' . $subscriber->subscriber_email);
-        $this->info('     List ID         : ' . $subscriber->subscriber_audience_id);
-        $this->info('     LST CHANGED (L) : ' . Carbon::parse($subscriber->status_remote_timestamp));
+        $this->info('   Email             : ' . $subscriber->subscriber_email);
+        $this->info('   Remote ID (hash)  : ' . $subscriber->subscriber_remote_id);
+        $this->info('   Web ID            : ' . $subscriber->subscriber_web_id);
+        $this->info('   List ID           : ' . $subscriber->subscriber_audience_id);
+        $this->info('   LST CHANGED (L)   : ' . Carbon::parse($subscriber->status_remote_timestamp));
 
         if($remote)
         {
-            $this->info('     LST CHANGED (R) : ' . $remote_data);
+            $this->info('   LST CHANGED (R)   : ' . $remote_data);
         }
         else
         {
-            $this->info('     LST CHANGED (R) : ' . 'Unable to Get Remote Record');
+            $this->info('   LST CHANGED (R)   : ' . 'Unable to Get Remote Record');
 
         }
-        $this->info('     SYNC TS         : ' . Carbon::parse($subscriber->local_timestamp_sync));
-        $this->info('     SAVE TS         : ' . Carbon::parse($subscriber->local_timestamp_save));
+        $this->info('   SYNC TS           : ' . Carbon::parse($subscriber->local_timestamp_sync));
+        $this->info('   SAVE TS           : ' . Carbon::parse($subscriber->local_timestamp_save));
         $this->info('');
-        $this->info('     Last Action     : ' . $subscriber->status_sync_last_action);
-        //$this->info('     Messages        : ' . $subscriber->status_sync_messages);
+        $this->info('   Last Action       : ' . $subscriber->status_sync_last_action);
+        //$this->info('     Messages          : ' . $subscriber->status_sync_messages);
         $this->info('');
 
         $this->info('---- end ---');

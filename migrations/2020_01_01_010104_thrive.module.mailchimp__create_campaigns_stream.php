@@ -109,7 +109,7 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
     protected $assignments = [
         "campaign_name" => [
             'translatable'      => false,
-            'unique'            => true,
+            'unique'            => false,
             'required'          => true,
         ],
         'campaign_remote_id' => [

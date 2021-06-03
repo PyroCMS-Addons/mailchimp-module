@@ -100,7 +100,7 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 */
     protected $schedules = [
         'everySixHours' => [ 
-            \Thrive\MailchimpModule\Tasks\HouseKeeping::class,
+            \Thrive\MailchimpModule\Tasks\Schedule::class,
         ],        				     
     ];
 

@@ -1,6 +1,7 @@
 <?php namespace Thrive\MailchimpModule\Subscriber\Table;
 
 use Anomaly\Streams\Platform\Ui\Table\TableBuilder;
+use Thrive\MailchimpModule\Subscriber\Contract\SubscriberInterface;
 
 class SubscriberTableBuilder extends TableBuilder
 {
@@ -26,24 +27,19 @@ class SubscriberTableBuilder extends TableBuilder
      *
      * @var array|string
      */
-    protected $columns = [
-        'subscriber_email',
-        'subscriber_fname',    
-        'subscriber_lname',    
-        'entry.subscriber_subscribed.toggle' => [
-            'is_safe' => true,
-            'disabled' => 'disabled'
-        ], 
-    ];
+    protected $columns = \Thrive\MailchimpModule\Subscriber\Table\SubscriberTableColumns::class;
+
 
     /**
      * The table buttons.
      *
      * @var array|string
      */
-    protected $buttons = [
-        'edit',
-    ];
+    // protected $buttons = [
+    //     'edit',
+    // ];
+    
+    protected $buttons = \Thrive\MailchimpModule\Subscriber\Table\SubscriberTableButtons::class;
 
     /**
      * The table actions.

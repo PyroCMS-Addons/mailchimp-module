@@ -22,6 +22,7 @@ class CampaignTableColumns
         $builder->setColumns( 
             [
                 'campaign_name',
+                'campaign_remote_id',
                 'entry.campaign_type'    => [
                     'wrapper' => function (CampaignInterface $entry) {
 

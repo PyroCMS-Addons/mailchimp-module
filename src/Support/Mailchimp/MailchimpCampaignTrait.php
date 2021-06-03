@@ -242,7 +242,7 @@ trait MailchimpCampaignTrait
         } 
         catch (\Exception $e) 
         {
-            Log::error('Unable to locate Campaign, campaign not found.');
+            Log::error('Unable to locate Campaign [MC], campaign not found on remote server using [API].');
         }
 
         return false;

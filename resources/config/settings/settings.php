@@ -46,5 +46,35 @@ return [
             "mode"          => "dropdown",
         ]
     ],    
+    'mailchimp_http_secure' => [
+        "type"   => "anomaly.field_type.select",
+        "config" => [
+            "options"       =>
+            [
+                "https"     => "Yes (HTTPS)",
+                "http"      => "No (HTTP)",
+            ],
+            "separator"     => ":",
+            "default_value" => 'weekly',
+            "button_type"   => "info",
+            "handler"       => "options",
+            "mode"          => "dropdown",
+        ]
+    ],   
+    'mailchimp_pro' => [
+        "type"   => "anomaly.field_type.select",
+        "config" => [
+            "options"       =>
+            [
+                "pro"     => "Yes I have Pro Subscription",
+                "free"      => "No I do not have a Pro Subscription",
+            ],
+            "separator"     => ":",
+            "default_value" => 'weekly',
+            "button_type"   => "info",
+            "handler"       => "options",
+            "mode"          => "dropdown",
+        ]
+    ],       
 ];
 
