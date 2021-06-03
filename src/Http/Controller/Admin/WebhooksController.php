@@ -3,8 +3,10 @@
 // Anomaly
 use Anomaly\Streams\Platform\Http\Controller\AdminController;
 use Anomaly\Streams\Platform\Message\MessageBag;
+use Thrive\MailchimpModule\Support\Integration\Webhook;
 use Thrive\MailchimpModule\Webhook\Form\WebhookFormBuilder;
 use Thrive\MailchimpModule\Webhook\Table\WebhookTableBuilder;
+use Thrive\MailchimpModule\Webhook\WebhookRepository;
 
 // Thrive
 
@@ -75,10 +77,22 @@ class WebhooksController extends AdminController
      */
     public function sync( $id = null, MessageBag $messages, WebhookRepository $repository )
     {
-        if(Webhook::SyncAll($repository))
+        if($id == null)
         {
-            $messages->success('thrive.module.mailchimp::common.now_synched_webhooks');
+            //syncall
+            if(Webhook::SyncAll($repository))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_webhooks');
+            }
         }
+        else
+        {
+            if(Webhook::Sync($repository->find($id)))
+            {
+                $messages->success('thrive.module.mailchimp::common.now_synched_webhooks');
+            }
+        }
+
 
         return redirect()->back();
     }

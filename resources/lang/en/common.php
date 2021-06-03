@@ -12,6 +12,7 @@ return [
     'are_you_sure_start_automation'     => 'Are you sure you want to START this automation?',
     'are_you_sure_stop_automation'      => 'Are you sure you want to STOP this automation?',
 
+    'are_you_sure_sync_webhooks'        => 'You are about to Sync ALL `Webhooks` from Mailchimp servers. Please confirm to continue',
     'now_synched_audiences'             => 'Audiences are now Synchronised',
     'now_synched_subscribers'           => 'Subscribers are now Synchronised',
     'now_synched_automations'           => 'Automations are now Synchronised',

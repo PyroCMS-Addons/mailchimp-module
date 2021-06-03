@@ -20,6 +20,7 @@ use Thrive\MailchimpModule\Support\Mailchimp\MailchimpCampaignTrait;
 use Thrive\MailchimpModule\Support\Mailchimp\MailchimpContactsTrait;
 use Thrive\MailchimpModule\Support\Mailchimp\MailchimpContentTrait;
 use Thrive\MailchimpModule\Support\Mailchimp\MailchimpStatsTrait;
+use Thrive\MailchimpModule\Support\Mailchimp\MailchimpWebhooksTrait;
 
 /**
  * Mailchimp
@@ -72,6 +73,12 @@ class Mailchimp
     // Content
     //
     use MailchimpContentTrait;
+
+
+    //
+    // Webhook
+    //
+    use MailchimpWebhooksTrait;
 
 
     /**

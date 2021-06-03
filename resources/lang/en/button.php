@@ -8,7 +8,8 @@ return [
     'sync_contacts_push'       => 'Sync All (Push)',
     'sync_automation_pull'     => 'Sync (Pull)',
 
-    
+    'sync_webhooks'            => 'Sync',
+
     'sync_campaign_pull'       => 'Sync (Pull)',
     'new_subscriber'           => 'Add Subscriber',
     'copy'                     => 'Copy',

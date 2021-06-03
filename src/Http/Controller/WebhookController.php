@@ -22,14 +22,17 @@ class WebhookController extends PublicController
 
         // $variable = \Request::input('type');
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
         {
             $type = $_POST['type'];
             $id = $_POST['data']['id'];
-          
+            $data = $_POST['data'];
+
+            //Check Source, if API, then block
+
             switch (strtolower($type))
             {
-                case 'subscribe': 
+                case 'subscribe':
                     Log::debug('Request Subscribe of User : ' . $id);
                     $this->subscribe($id);
                     break;
@@ -39,20 +42,38 @@ class WebhookController extends PublicController
                     break;
                 case 'profile':
                     Log::debug('profile Event Not Currently Supported : ' . $id);
-                    break;  
+                    break;
                 case 'cleaned':
                     Log::debug('cleaned Event Not Currently Supported : ' . $id);
-                    break;      
+                    break;
                 case 'upemail':
                     Log::debug('upemail Event Not Currently Supported : ' . $id);
-                    break;            
+                    break;
                 case 'campaign':
                     Log::debug('campaign Event Not Currently Supported : ' . $id);
-                    break;   
-                default: 
+                    break;
+                default:
                     Log::debug('Unknown response');
                     break;
-            } 
+            }
+
+
+            switch (strtolower($type))
+            {
+                case 'profile':
+                case 'cleaned':
+                case 'upemail':
+                case 'campaign':
+                    Log::debug('Dump Data : ' . $type );
+                    Log::debug('--------------');
+                    Log::debug(print_r($id,true));
+                    Log::debug(print_r($type,true));
+                    Log::debug(print_r($data,true));
+                    break;
+                default:
+                    Log::debug('');
+                    break;
+            }
 
           }
 

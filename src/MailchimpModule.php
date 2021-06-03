@@ -121,7 +121,17 @@ class MailchimpModule extends Module
         'webhooks' => [
             'href' => 'admin/mailchimp/webhooks',
             'buttons' => [
-
+                'sync_webhooks' => [
+                    'href' => 'admin/mailchimp/webhooks/sync',
+                    'type' => 'primary',
+                    'icon' => 'refresh',
+                    'attributes' => [
+                        'data-icon'     => 'warning',
+                        'data-toggle'   => 'confirm',
+                        'data-title'    => 'thrive.module.mailchimp::common.are_you_sure',
+                        'data-message'  => 'thrive.module.mailchimp::common.are_you_sure_sync_webhooks'
+                    ]
+                ],
             ],
         ],        
         'settings' => [

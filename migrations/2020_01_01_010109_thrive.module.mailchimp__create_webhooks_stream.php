@@ -40,6 +40,9 @@ class ThriveModuleMailchimpCreateWebhooksStream extends Migration
         "webhook_id" => [
             "type"   => "anomaly.field_type.text",
         ],
+        "webhook_list_id" => [
+            "type"   => "anomaly.field_type.text",
+        ],        
         "webhook_url" => [
             "type"   => "anomaly.field_type.text",
         ],
@@ -74,9 +77,7 @@ class ThriveModuleMailchimpCreateWebhooksStream extends Migration
         "webhook_enabled" => [
             "type"   => "anomaly.field_type.boolean",
         ],   
-        "webhook_list_id" => [
-            "type"   => "anomaly.field_type.text",
-        ],
+
 
     ];
 
