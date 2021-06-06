@@ -5,6 +5,7 @@ use Anomaly\Streams\Platform\Addon\AddonServiceProvider;
 
 // Anomaly
 use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpAudiencesEntryModel;
+use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpAutomationsEntryModel;
 use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpCampaignsEntryModel;
 use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpContentsEntryModel;
 use Anomaly\Streams\Platform\Model\Mailchimp\MailchimpSubscribersEntryModel;
@@ -16,29 +17,30 @@ use Thrive\MailchimpModule\Audience\AudienceRepository;
 use Thrive\MailchimpModule\Audience\Contract\AudienceRepositoryInterface;
 
 // Thrive Audience
+use Thrive\MailchimpModule\Automation\AutomationModel;
 use Thrive\MailchimpModule\Campaign\CampaignModel;
 use Thrive\MailchimpModule\Campaign\CampaignRepository;
-use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
 
 // Thrive Content
+use Thrive\MailchimpModule\Campaign\Contract\CampaignRepositoryInterface;
 use Thrive\MailchimpModule\Content\ContentModel;
 use Thrive\MailchimpModule\Content\ContentRepository;
-use Thrive\MailchimpModule\Content\Contract\ContentRepositoryInterface;
 
 // Thrive Subscriber
+use Thrive\MailchimpModule\Content\Contract\ContentRepositoryInterface;
 use Thrive\MailchimpModule\MailchimpModulePlugin;
-use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
 use Thrive\MailchimpModule\Subscriber\Contract\SubscriberRepositoryInterface;
 use Thrive\MailchimpModule\Subscriber\SubscriberModel;
 
 // Thrive Webhooks
-use Thrive\MailchimpModule\Webhook\WebhookRepository;
+use Thrive\MailchimpModule\Subscriber\SubscriberRepository;
+use Thrive\MailchimpModule\Support\Mailchimp;
 use Thrive\MailchimpModule\Webhook\Contract\WebhookRepositoryInterface;
-use Thrive\MailchimpModule\Webhook\WebhookModel;
 
 
 // Thrive Plugin
-use Thrive\MailchimpModule\Support\Mailchimp;
+use Thrive\MailchimpModule\Webhook\WebhookModel;
+use Thrive\MailchimpModule\Webhook\WebhookRepository;
 
 
 
@@ -117,40 +119,27 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 * @type array|null
 	 */
 	protected $routes = [
-		// Admin Dashboard
-		'admin/mailchimp'                           => 'Thrive\MailchimpModule\Http\Controller\Admin\DashboardController@index',
-		'admin/mailchimp/dashboard/{option?}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\DashboardController@action',
-
-		// Subscribers
-		'admin/mailchimp/subscribers'               => 'Thrive\MailchimpModule\Http\Controller\Admin\SubscribersController@index',
-		'admin/mailchimp/subscribers/create'        => 'Thrive\MailchimpModule\Http\Controller\Admin\SubscribersController@create',
-		'admin/mailchimp/subscribers/edit/{id}'     => 'Thrive\MailchimpModule\Http\Controller\Admin\SubscribersController@edit',
-
-		// Audiences
-		'admin/mailchimp/audiences'                 => 'Thrive\MailchimpModule\Http\Controller\Admin\AudiencesController@index',
-		'admin/mailchimp/audiences/create'          => 'Thrive\MailchimpModule\Http\Controller\Admin\AudiencesController@create',
-		'admin/mailchimp/audiences/edit/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\AudiencesController@edit',
-
-		// Campaigns
-		'admin/mailchimp/campaigns'                 => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@index',
-		'admin/mailchimp/campaigns/create'          => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@create',
-		'admin/mailchimp/campaigns/edit/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@edit',
-		'admin/mailchimp/campaigns/option/{option}/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@option',
-
-
-		// Audiences
-		'admin/mailchimp/webhooks'                 => 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@index',
-		'admin/mailchimp/webhooks/create'          => 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@create',
-		'admin/mailchimp/webhooks/edit/{id}'       => 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@edit',
-		
-		
-		// Settings
-		'admin/mailchimp/settings'                  => 'Thrive\MailchimpModule\Http\Controller\Admin\SettingsController@edit',
+		'admin/mailchimp'                           		=> 'Thrive\MailchimpModule\Http\Controller\Admin\DashboardController@index',
+		'admin/mailchimp/dashboard/{option?}'       		=> 'Thrive\MailchimpModule\Http\Controller\Admin\DashboardController@action',
+		'admin/mailchimp/subscribers'               		=> 'Thrive\MailchimpModule\Http\Controller\Admin\SubscribersController@index',
+		'admin/mailchimp/subscribers/create'        		=> 'Thrive\MailchimpModule\Http\Controller\Admin\SubscribersController@create',
+		'admin/mailchimp/subscribers/edit/{id}'     		=> 'Thrive\MailchimpModule\Http\Controller\Admin\SubscribersController@edit',
+		'admin/mailchimp/audiences'                 		=> 'Thrive\MailchimpModule\Http\Controller\Admin\AudiencesController@index',
+		'admin/mailchimp/audiences/create'          		=> 'Thrive\MailchimpModule\Http\Controller\Admin\AudiencesController@create',
+		'admin/mailchimp/audiences/edit/{id}'       		=> 'Thrive\MailchimpModule\Http\Controller\Admin\AudiencesController@edit',
+		'admin/mailchimp/campaigns'                 		=> 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@index',
+		'admin/mailchimp/campaigns/create'          		=> 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@create',
+		'admin/mailchimp/campaigns/edit/{id}'       		=> 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@edit',
+		'admin/mailchimp/campaigns/option/{option}/{id}' 	=> 'Thrive\MailchimpModule\Http\Controller\Admin\CampaignsController@option',
+		'admin/mailchimp/webhooks'                 			=> 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@index',
+		'admin/mailchimp/webhooks/create'          			=> 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@create',
+		'admin/mailchimp/webhooks/edit/{id}'       			=> 'Thrive\MailchimpModule\Http\Controller\Admin\WebhooksController@edit',
+		'admin/mailchimp/settings'                 			=> 'Thrive\MailchimpModule\Http\Controller\Admin\SettingsController@edit',
 
 		// Public Subscriber Handler
-		'mailchimp/handler/subscribe'               => 'Thrive\MailchimpModule\Subscriber\Form\SubscriberFormHandler@handle',
-		'mailchimp/webhooks'               			=> 'Thrive\MailchimpModule\Http\Controller\WebhookController@handle',
-
+		'mailchimp/handler/subscribe'               		=> 'Thrive\MailchimpModule\Http\Controller\PublicSubscriberController@handle',
+		'mailchimp/handler/unsubscribe'             		=> 'Thrive\MailchimpModule\Http\Controller\PublicSubscriberController@handle',
+		'mailchimp/webhooks/{listid}'               		=> 'Thrive\MailchimpModule\Http\Controller\WebhookController@handle',
 
 	];
 
@@ -208,6 +197,7 @@ class MailchimpModuleServiceProvider extends AddonServiceProvider
 	 * @type array|null
 	 */
 	protected $bindings = [
+		MailchimpAutomationsEntryModel::class 	=> AutomationModel::class,
 		MailchimpSubscribersEntryModel::class   => SubscriberModel::class,
 		MailchimpAudiencesEntryModel::class     => AudienceModel::class,
 		MailchimpCampaignsEntryModel::class     => CampaignModel::class,

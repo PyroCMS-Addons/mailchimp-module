@@ -49,16 +49,28 @@ class CampaignTableColumns
                         switch($entry->campaign_status)
                         {
                             case 'sent':
-                                $status_color = 'danger';
-                                $status_text  = 'Completed (Sent)';
+                                $status_color = 'default';
+                                $status_text  = 'Sent';
                                 break;
+                            case 'sending':
+                                $status_color = 'info';
+                                $status_text  = 'Sending';
+                                break;                                      
+                            case 'schedule':
+                                $status_color = 'default';
+                                $status_text  = 'Schedule';
+                                break;                                  
+                            case 'paused':
+                                $status_color = 'danger';
+                                $status_text  = 'Paused';
+                                break;                                
                             case 'save':
                                 $status_color = 'success';
-                                $status_text  = 'Active (Saved)';
+                                $status_text  = 'Draft';
                                 break; 
                             default:                               
                                 $status_color = 'success';
-                                $status_text  = 'Active (Draft)' . $entry->campaign_status;
+                                $status_text  = ucfirst($entry->campaign_status);
                         }
 
                         return "<span class='tag tag-{$status_color}'>{$status_text}</span>";

@@ -1,8 +1,9 @@
 <?php namespace Thrive\MailchimpModule\Support\Mailchimp;
 
-use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Exception\RequestException;
 
 // Mailchimp
+use Illuminate\Support\Facades\Log;
 use MailchimpMarketing;
 use MailchimpMarketing\ApiException;
 
@@ -33,44 +34,23 @@ trait MailchimpContactsTrait
      * @param  mixed $list_id
      * @return void
      */
-    public function getMembers($list_id,
-                                $fields         = null,
-                                $exclude_fields = null,
-                                $count          = '10',
-                                $offset         = '0',
-                                $email_type     = null,
-                                $status         = null,
-                                $since_timestamp_opt = null,
-                                $before_timestamp_opt = null,
-                                $since_last_changed = null,
-                                $before_last_changed = null,
-                                $unique_email_id = null,
-                                $vip_only       = null,
-                                $interest_category_id = null,
-                                $interest_ids   = null,
-                                $interest_match = null,
-                                $sort_field     = null,
-                                $sort_dir       = null,
-                                $since_last_campaign = null,
-                                $unsubscribed_since = null)
+    public function getMembers($list_id, $fields = null, $exclude_fields = null, $count = '10', $offset = '0')
     {
-        //assume good from start
-        $status = true;
-        $response = false;
-
         try
         {
-            $response = $this->mailchimp->lists->getListMembersInfo( $list_id, $fields, $exclude_fields, $count, $offset );
-            // $response = $this->mailchimp->lists->getListMembersInfo( $list_id, $fields, $exclude_fields, $count, $offset, $email_type, $status, $since_timestamp_opt, $before_timestamp_opt, $since_last_changed , $before_last_changed , $unique_email_id, $vip_only, $interest_category_id, $interest_ids, $interest_match, $sort_field, $sort_dir, $since_last_campaign, $unsubscribed_since );
+            $lists = $this->mailchimp->lists->getListMembersInfo( $list_id, $fields, $exclude_fields, $count, $offset );
+
+            if(isset($lists->members))
+            {
+                return $lists;
+            }
         }
         catch (\Exception $e)
         {
-            $status = false;
             Log::error($e->getMessage());
         }
 
-        //need to rework status return
-        return $response;
+        return false;
     }
 
     /**
@@ -82,6 +62,9 @@ trait MailchimpContactsTrait
      */
     public function checkContactStatus($list_id, $email)
     {
+        Log::debug('List ID : ' . $list_id);
+        Log::debug('Email : ' . $email);
+
         $found = false;
         $subscriber_hash   = $this->getEmailHash($email);
         $response = '';
@@ -178,40 +161,6 @@ trait MailchimpContactsTrait
 
 
     
-    /**
-     * addContactToList
-     *
-     * @param  mixed $list_id
-     * @param  mixed $contact
-     * @param  mixed $tags
-     * @return void
-     */
-    public function addContactToList($list_id, $contact, $tags = [])
-    {
-        $status = true;
-
-        $contact["tags"]              = $tags;
-
-        try
-        {
-            $response = $this->mailchimp->lists->addListMember(
-                $list_id,
-                $contact,
-            );
-        }
-        catch (\Exception $e)
-        {
-            $status = false;
-            //echo $e->getMessage();
-        }
-
-        if($status) {
-            return $response;
-        }
-
-        return false;
-    }
-
     
     /**
      * getListMember
@@ -247,6 +196,107 @@ trait MailchimpContactsTrait
     }
 
 
+    public function addContactTags($list_id, $email, $tags = [])
+    {
+		Log::debug('--- [ Begin ] ---  Mailchimp::addContactToList() ');
+
+        $subscriberHash = $this->getEmailHash($email);
+
+        //tags status = inactive| active
+
+        try
+        {
+            // $response = $client->lists->updateListMemberTags("list_id", "subscriber_hash", [
+            //     "tags" => [["name" => "name", "status" => "active"]],
+            // ]);
+
+            $response = $this->mailchimp->lists->updateListMemberTags(
+                $list_id,
+                $subscriberHash,
+                $tags,
+                //"tags" => [["name" => "name", "status" => "active"]],
+            );
+
+            return $response;
+        }
+        catch(RequestException $gex)
+        {
+            Log::error('!! RequestException Error Found');
+
+            if ($gex->hasResponse())
+            {
+                //$response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+                Log::error(print_r($decoded_json->errors,true));
+            }
+            else
+            {
+                Log::error('Error Updating Subscriber.');
+            }
+        }   
+        catch (\Exception $e)
+        {
+            Log::error($e->getMessage());
+        }
+
+        return false;
+    }
+
+    /**
+     * addContactToList
+     *
+     * @param  mixed $list_id
+     * @param  mixed $contact
+     * @param  mixed $tags
+     * @return void
+     */
+    public function addContactToList($list_id, $contact, $tags = [])
+    {
+		Log::debug('--- [ Begin ] ---  Mailchimp::addContactToList() ');
+
+
+        $contact["tags"]              = $tags;
+
+        try
+        {
+            $response = $this->mailchimp->lists->addListMember(
+                $list_id,
+                $contact,
+            );
+
+            return $response;
+        }
+        catch(RequestException $gex)
+        {
+            Log::error('!! RequestException Error Found');
+
+            if ($gex->hasResponse())
+            {
+                //$response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+                Log::error(print_r($decoded_json->errors,true));
+            }
+            else
+            {
+                Log::error('Error Updating Subscriber.');
+            }
+        }   
+        catch (\Exception $e)
+        {
+            Log::error($e->getMessage());
+        }
+
+        return false;
+    }
+        
     /**
      * setListMember
      *
@@ -257,6 +307,9 @@ trait MailchimpContactsTrait
      */
     public function setListMember($list_id, $email, $subscribed = true)
     {
+		Log::debug('--- [ Begin ] ---  Mailchimp::setListMember() ');
+
+
         $status = true;
 
         $subscriberHash = $this->getEmailHash($email);
@@ -269,10 +322,29 @@ trait MailchimpContactsTrait
                 [
                     "status_if_new"     => ($subscribed) ? self::MEMBER_SUBSCRIBED : self::MEMBER_UNSUBSCRIBED,
                     "status"            => ($subscribed) ? self::MEMBER_SUBSCRIBED : self::MEMBER_UNSUBSCRIBED,
-                    // "status"            => ($subscribed) ? "subscribed" : "unsubscribed",
+                    "status"            => ($subscribed) ? "subscribed" : "unsubscribed",
                 ]
             );
         }
+        catch(RequestException $gex)
+        {
+            Log::error('!! RequestException Error Found');
+
+            if ($gex->hasResponse())
+            {
+                //$response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+                Log::error(print_r($decoded_json->errors,true));
+            }
+            else
+            {
+                Log::error('Error adding Subscriber.');
+            }
+        }           
         catch (\Exception $e)
         {
             $status = false;
@@ -299,7 +371,8 @@ trait MailchimpContactsTrait
      */
     public function setListMemberWithMergeFields($list_id, $email, $subscribed = true, $fname = null, $lname = null)
     {
-        $status = true;
+		Log::debug('--- [ Begin ] ---  Mailchimp::setListMemberWithMergeFields() ');
+
 
         $subscriberHash = $this->getEmailHash($email);
 
@@ -326,15 +399,31 @@ trait MailchimpContactsTrait
                     // ],
                 ]
             );
+
+            return $response;
         }
+        catch(RequestException $gex)
+        {
+            Log::error('!! setListMemberWithMergeFields()->RequestException Error Found');
+
+            if ($gex->hasResponse())
+            {
+                //$response = $gex->getResponse();
+                $json = $gex->getResponse()->getBody()->getContents();
+                $decoded_json = json_decode($json);
+
+                Log::error($decoded_json->title);
+                Log::error($decoded_json->detail);
+                Log::error(print_r($decoded_json->errors,true));
+            }
+            else
+            {
+                Log::error('Error Updating Subscriber.');
+            }
+        }         
         catch (\Exception $e)
         {
-            $status = false;
             Log::error($e->getMessage());
-        }
-
-        if($status) {
-            return $response;
         }
 
         return false;

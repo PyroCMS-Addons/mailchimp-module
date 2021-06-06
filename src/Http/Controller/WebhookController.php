@@ -5,6 +5,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+use Thrive\MailchimpModule\Audience\AudienceModel;
 use Thrive\MailchimpModule\Support\Integration\Campaign;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
 
@@ -17,10 +18,14 @@ class WebhookController extends PublicController
 
     }
 
-    public function handle(Request $request)
+    public function handle( $listid = '', Request $request)
     {
         Log::debug('[Entry] WebhookController  --------------------------------------------');
         Log::debug('');
+
+        if(!$this->do_we_have_list($listid)) {
+            return;
+        }
 
         // $variable = \Request::input('type');
 
@@ -28,15 +33,6 @@ class WebhookController extends PublicController
         {
 
             $type = $_POST['type'];
-            // $id = $_POST['data']['id'];
-            // $data = $_POST['data'];
-
-            // Log::debug('Dump Data : ' . $type );
-            // Log::debug('--------------');
-            // Log::debug(print_r($id,true));
-            // Log::debug(print_r($type,true));
-            // Log::debug(print_r($data,true));
-
 
             //Check Source, if API, then block
             switch (strtolower($type))
@@ -186,6 +182,22 @@ class WebhookController extends PublicController
 
         Log::debug(print_r($data,true));
 
+    }
+
+    
+    private function do_we_have_list($list_id)
+    {
+        Log::debug('[Entry] WebhookController@do_we_have_list----------------------------');
+        Log::debug('        List ID : ' . $list_id);
+
+        if($list = AudienceModel::where('audience_remote_id',$list_id)->first()) {
+            Log::debug('        List ID : Yes');
+            return true;
+        }
+
+        Log::debug('        List ID : No');
+
+        return false;
     }
     
 }

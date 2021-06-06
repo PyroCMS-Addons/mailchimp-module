@@ -26,22 +26,22 @@ class WebhookFormBuilder extends FormBuilder
         ],
         'webhook_id' => [
             'disabled' => 'create',
-        ],        
+        ],
         'webhook_list_id' => [
             'disabled' => 'edit',
-        ],       
+        ],
         'webhook_sources_api' => [
             'disabled' => 'edit',
-        ],           
+        ],
         'webhook_url' => [
             'disabled' => 'edit',
-        ],  
+        ],
         'webhook_url' => [
             'disabled' => 'create',
-        ],  
+        ],
         'webhook_sources_api' => [
             'disabled' => 'create',
-        ],          
+        ],
     ];
 
 
@@ -96,9 +96,8 @@ class WebhookFormBuilder extends FormBuilder
                         'webhook_id',
                         'webhook_list_id',
                         'webhook_url',
-                        'webhook_enabled',
                     ],
-                ],   
+                ],
                 'events' => [
                     'title'  => 'Events',
                     'fields' => [
@@ -109,7 +108,7 @@ class WebhookFormBuilder extends FormBuilder
                         'webhook_events_cleaned',
                         'webhook_events_campaign',
                     ],
-                ],   
+                ],
                 'sources' => [
                     'title'  => 'Sources',
                     'fields' => [
@@ -117,9 +116,9 @@ class WebhookFormBuilder extends FormBuilder
                         'webhook_sources_admin',
                         'webhook_sources_user',
                     ],
-                ],                                                                                                
+                ],
             ],
-        ],        
+        ],
     ];
 
 
@@ -158,7 +157,7 @@ class WebhookFormBuilder extends FormBuilder
     {
         $webhook = $this->getFormEntry();
 
- 
+
 
 
         // Ensure to save the webhook with the right URL endpoint
@@ -169,12 +168,11 @@ class WebhookFormBuilder extends FormBuilder
         //do we have a remote id, if not then its a create and post
         if($webhook->webhook_id == '')
         {
-            Log::debug(' --- attempt to Create: ');
-
+            //Log::debug(' --- attempt to Create: ');
 
             if(Webhook::PostCreate($webhook))
             {
-                Log::debug(' --- Create Success');
+                //Log::debug(' --- Create Success');
 
                 $messages->success('Created Webhook');
 
@@ -194,7 +192,7 @@ class WebhookFormBuilder extends FormBuilder
         }
 
 
-        
+
         // Log::debug('onSaved for Webhook');
     }
 }

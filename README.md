@@ -7,7 +7,7 @@ PyroCMS Mailchimp Integration Module
 [TOC]
 
 
-#### Version 1.0.0 (Alpha-3)
+#### Version 0.0.4 (Alpha-4)
 
 *thrive.module.mailchimp*
 
@@ -73,10 +73,12 @@ a FNAME for mailchimp.
 {{ mailchimp('subscribe')
         .list('list-id')
         .tag('single tag')
-        .tags(['more tags', 'third-tag string', 'of arrays'])
+        .tags(['more tags', 'third-tag string', 'of arrays'])        
+        .tag_year(true)
+        .tag_month(true)
         .title('Newsletter Signup')
-        .view('thrive.module.mailchimp::public.subscribe')
-        .useFname(false)|raw }}
+        .redirect_url('contact')
+        .view('thrive.module.mailchimp::public.subscribe')|raw }}
 
 ```
 

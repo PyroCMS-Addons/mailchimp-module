@@ -40,9 +40,27 @@ class ThriveModuleMailchimpCreateAutomationsStream extends Migration
         'automation_workflow_id' => [
             "type"   => "anomaly.field_type.text",
         ],
+        // 'automation_status' => [
+        //     "type"   => "anomaly.field_type.text",
+        // ],
         'automation_status' => [
-            "type"   => "anomaly.field_type.text",
-        ],
+            "type"   => "anomaly.field_type.select",
+            "config" => [
+                "options"       =>
+                [
+                    "save"          => "Draft",
+                    "paused"        => "Paused",
+                    "sending"       => "Sending",
+                    // "sent"          => "Sent",
+                    // "schedule"      => "Schedule",
+                ],
+                "separator"     => ":",
+                "default_value" => 'regular',
+                "button_type"   => "info",
+                "handler"       => "options",
+                "mode"          => "dropdown",
+            ]
+        ],        
         'automation_start_time' => [
             "type"   => "anomaly.field_type.text",
         ],

@@ -17,12 +17,12 @@ class SubscriberTableButtons extends TableBuilder
         $builder->setButtons([
             'edit' =>
             [
-                'type' => 'success',
-                'disabled'    => function (EntryInterface $entry) {
+                'type' => 'success',             
+                'enabled'    => function (EntryInterface $entry) {
                     if ($entry->subscriber_status == 'cleaned') {
-                        return true;
+                        return false;
                     }                
-                    return false;
+                    return true;
                 },
             ],
                         

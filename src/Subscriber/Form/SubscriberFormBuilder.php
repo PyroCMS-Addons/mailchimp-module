@@ -152,7 +152,7 @@ class SubscriberFormBuilder extends FormBuilder
 
         Log::debug('  » 00 Pushing User        : ' . $subscriber->subscriber_email);
 
-        Subscriber::SetCurrentSaveTimestamp($subscriber);
+        Subscriber::UpdateSubscriberTimestamp($subscriber);
 
         $this->can_post_to_mailchimp = true;
 

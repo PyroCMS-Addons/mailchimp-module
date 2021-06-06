@@ -18,6 +18,8 @@ use Thrive\MailchimpModule\Support\Integration\Automation;
 use Thrive\MailchimpModule\Support\Integration\Campaign;
 use Thrive\MailchimpModule\Support\Integration\Content;
 use Thrive\MailchimpModule\Support\Integration\Subscriber;
+use Thrive\MailchimpModule\Support\Integration\Webhook;
+use Thrive\MailchimpModule\Webhook\WebhookRepository;
 
 
 /**
@@ -48,13 +50,15 @@ class Sync extends Command implements ShouldQueue
         ContentRepository $contentRepository,
         CampaignRepository $campaignRepository,
         SubscriberRepository $subscriberRepository,
-        AudienceRepository $audienceRepository)
+        AudienceRepository $audienceRepository,
+        WebhookRepository $webhookRepository)
     {
         $this->automationRepository = $automationRepository;
         $this->audienceRepository = $audienceRepository;
         $this->contentRepository = $contentRepository;
         $this->campaignRepository = $campaignRepository;
         $this->subscriberRepository = $subscriberRepository;
+        $this->webhookRepository = $webhookRepository;
 
         parent::__construct();
     }
@@ -82,7 +86,10 @@ class Sync extends Command implements ShouldQueue
                 break;
             case 'subscribers':
                 $this->syncSubscribers();
-                break;                
+                break;            
+            case 'webhooks':
+                $this->syncWebhooks();
+                break;                       
             // case 'reset':
             //     $this->delete_all_data();
             //     break;
@@ -119,6 +126,9 @@ class Sync extends Command implements ShouldQueue
 
         // Now Sync Subs
         $this->syncSubscribers();
+
+        // and webhooks
+        $this->syncWebhooks();
 
     }
      
@@ -187,6 +197,17 @@ class Sync extends Command implements ShouldQueue
     }
 
 
+    private function syncWebhooks()
+    {
+        if(Webhook::SyncAll($this->webhookRepository))
+        {
+            Log::info('Webhooks Now Synchronised.');
+
+            $this->info('Webhooks have been Synchronised.');
+        }
+
+    }
+
     private function clean_lists()
     {
         if(Audience::CleanVagrantLists($this->audienceRepository))
@@ -196,6 +217,9 @@ class Sync extends Command implements ShouldQueue
             $this->info('Removed Unwanted Audiences.');
         }
     }
+
+
+
 
     private function delete_all_data()
     {

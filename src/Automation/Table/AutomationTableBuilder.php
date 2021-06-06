@@ -21,7 +21,12 @@ class AutomationTableBuilder extends TableBuilder
      *
      * @var array|string
      */
-    protected $filters = [];
+    protected $filters = [
+        'automation_status',
+        'automation_list_id',
+        'automation_list_name',
+        'automation_reply_to',
+    ];
 
     /**
      * The table columns.

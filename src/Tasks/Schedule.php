@@ -125,7 +125,7 @@ class Schedule extends Command implements ShouldQueue
             $this->info('Campaigns have been Synchronised.');
         }
 
-        if(Subscriber::SyncAll($this->audienceRepository))
+        if(Subscriber::SyncAll($this->subscriberRepository))
         {
             Log::info('Subscribers Now Synchronised.');
 

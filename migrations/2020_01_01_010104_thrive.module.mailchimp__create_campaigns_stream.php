@@ -88,8 +88,26 @@ class ThriveModuleMailchimpCreateCampaignsStream extends Migration
                 "default_value" => null,
             ]
         ],
+        // 'campaign_status' => [
+        //     "type"   => "anomaly.field_type.text",
+        // ],
         'campaign_status' => [
-            "type"   => "anomaly.field_type.text",
+            "type"   => "anomaly.field_type.select",
+            "config" => [
+                "options"       =>
+                [
+                    "save"          => "Draft",
+                    "paused"        => "Paused",
+                    "schedule"      => "Schedule",
+                    "sending"       => "Sending",
+                    "sent"          => "Sent",
+                ],
+                "separator"     => ":",
+                "default_value" => 'regular',
+                "button_type"   => "info",
+                "handler"       => "options",
+                "mode"          => "dropdown",
+            ]
         ],
 
         // @deprecated status fields

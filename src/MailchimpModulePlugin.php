@@ -55,10 +55,16 @@ class MailchimpModulePlugin extends Plugin
                     return (new MailchimpModuleCriteria(
                         'render',
                         function (Collection $options) use ($root) {
-
-                            if ($root) {
-                                //add subscribe or unsubscribe
-                                $options->put('action', $root);
+                            
+                            switch($root)
+                            {
+                                case 'subscribe': 
+                                case 'unsubscribe': 
+                                    $options->put('action', $root);
+                                    break;
+                                default:
+                                    $options->put('action', 'subscribe');
+                                    break;
                             }
 
                             return $this->dispatch(new RenderPlugin($options));

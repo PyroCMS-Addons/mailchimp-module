@@ -19,7 +19,13 @@ class CampaignTableBuilder extends TableBuilder
      *
      * @var array|string
      */
-    protected $filters = [];
+    protected $filters = [
+        'campaign_remote_id',
+        'campaign_type',
+        'campaign_list_id',
+        'campaign_status',
+
+    ];
 
     /**
      * The table columns.

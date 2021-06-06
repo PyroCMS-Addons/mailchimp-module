@@ -19,7 +19,10 @@ class SubscriberTableBuilder extends TableBuilder
      * @var array|string
      */
     protected $filters = [
-        'subscriber_email'
+        'subscriber_email',
+        'subscriber_fname',
+        'subscriber_lname',
+        'subscriber_subscribed',
     ];
 
     /**

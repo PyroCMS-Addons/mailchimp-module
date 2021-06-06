@@ -21,25 +21,21 @@ class SubscriberTableColumns
     {
         $builder->setColumns( 
             [
-            'subscriber_email',
-            'subscriber_status' => [
-                'wrapper' => function (SubscriberInterface $entry) {
-                    if($entry->subscriber_status == 'subscribed') {
-                        return "<span class='tag tag-info'>".ucfirst($entry->subscriber_status)."</span>";
-                    }
-                    if($entry->subscriber_status == 'unsubscribed') {
-                        return "<span class='tag tag-default'>".ucfirst($entry->subscriber_status)."</span>";
-                    }      
+                'subscriber_email',
+                'subscriber_fname',    
+                'subscriber_lname',    
+                'subscriber_status' => [
+                    'wrapper' => function (SubscriberInterface $entry) {
+                        if($entry->subscriber_status == 'subscribed') {
+                            return "<span class='tag tag-info'>".ucfirst($entry->subscriber_status)."</span>";
+                        }
+                        if($entry->subscriber_status == 'unsubscribed') {
+                            return "<span class='tag tag-default'>".ucfirst($entry->subscriber_status)."</span>";
+                        }      
 
-                    return "<span class='small text-danger'>".ucfirst($entry->subscriber_status)."</span>";
-                },
-            ],  
-            'subscriber_fname',    
-            'subscriber_lname',    
-            'entry.subscriber_subscribed.toggle' => [
-                'is_safe' => true,
-                'disabled' => 'disabled'
-            ], 
+                        return "<span class='small text-danger'>".ucfirst($entry->subscriber_status)."</span>";
+                    },
+                ],  
             ]
         );
     }

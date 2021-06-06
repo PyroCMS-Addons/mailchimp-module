@@ -1,0 +1,33 @@
+
+{% if options.title %}
+<h2>{{ options.title }}</h2>
+{% endif %}
+
+<form 
+    method="POST" 
+    action="{{ url(options.handler) }}" 
+    name="{{ options.form_name }}" 
+    > 
+
+    {{ csrf_field()|raw }}
+
+    <input class="{{ options.input_class }}" type="email"  name="subscriber_email"  placeholder="{{ options.email_placeholder }}" >
+
+
+    {# {% for field in options.merge_fields  %}
+        <input type="{{ field[1] }}" name="{{ field[0] }}" value="{{ tag }}">
+    {% endfor %} #}
+
+    <input type="hidden" name="audience_id"  value="{{ options.list }}">
+    {% if options.redirect_url != ''  %}
+        <input type="hidden" name="redirect_url"  value="{{ options.redirect_url }}">
+    {% endif %}
+
+    {% for tag in options.tags  %}
+        <input type="hidden" name="mc_tags[]" value="{{ tag }}">
+    {% endfor %}
+
+    <input type="hidden" name="action"  value="{{ options.action }}">
+    <input type="submit" name="submit"  value="{{ options.button_text ??  'Submit' }}" >
+
+</form>

@@ -51,23 +51,23 @@ class Webhook
 
 	public static function SetCallbackUrl(WebhookInterface $webhook)
 	{
-		$webhook->webhook_url = self::GetCallbackUrl();
+		$webhook->webhook_url = self::GetCallbackUrl($webhook->webhook_list_id);
 						
 		$webhook->save();
 	}
 
 
-	public static function GetCallbackUrl()
+	public static function GetCallbackUrl($list_id)
 	{
 		$settings = app(\Anomaly\SettingsModule\Setting\Contract\SettingRepositoryInterface::class);
 
 		$secure = $settings->value('thrive.module.mailchimp::mailchimp_http_secure','http');
 		
-		$url = env('THRIVE_MAILCHIMP_CALLBACK_URL_HTTP') ?? url('mailchimp/webhooks');
+		$url = env('THRIVE_MAILCHIMP_CALLBACK_URL_HTTP') ?? url('mailchimp/webhooks/' . $list_id);
 
 		if($secure == 'https')
 		{
-			$url = env('THRIVE_MAILCHIMP_CALLBACK_URL_HTTPS') ?? secure_url('mailchimp/webhooks');
+			$url = env('THRIVE_MAILCHIMP_CALLBACK_URL_HTTPS') ?? secure_url('mailchimp/webhooks/' . $list_id);
 		}
 						
 		return $url;
@@ -285,9 +285,8 @@ class Webhook
 		{
 			$values = self::FormatWebhook($webhook);
 
-			Log::debug(' --- FormatValues');
-			Log::debug(print_r($values,true));
-
+			//Log::debug(' --- FormatValues');
+			//Log::debug(print_r($values,true));
 
 			//add to Mailchimp
 			if($id = $mailchimp->addWebhook($webhook->webhook_list_id, $values))
@@ -335,7 +334,7 @@ class Webhook
 	{
 		$webhook =
 		[
-			"url"     			=> self::GetCallbackUrl(),
+			"url"     			=> self::GetCallbackUrl($webhook->webhook_list_id),
 			"events"      =>
 			[
 				"subscribe" 	=> $webhook->webhook_events_subscribe,
@@ -385,7 +384,7 @@ class Webhook
 			$webhook->webhook_name        			= 'Webhook [' . $remote_webhook->id . ']';
 			$webhook->webhook_id  					= $remote_webhook->id;
 			$webhook->webhook_list_id  				= $remote_webhook->list_id;
-			$webhook->webhook_url  					= self::GetCallbackUrl();
+			$webhook->webhook_url  					= self::GetCallbackUrl($remote_webhook->list_id);
 			$webhook->webhook_events_subscribe 		= $remote_webhook->events->subscribe;
 			$webhook->webhook_events_unsubscribe	= $remote_webhook->events->unsubscribe;
 			$webhook->webhook_events_profile 		= $remote_webhook->events->profile;
@@ -395,7 +394,6 @@ class Webhook
 			$webhook->webhook_sources_user 			= $remote_webhook->sources->user;
 			$webhook->webhook_sources_admin 		= $remote_webhook->sources->admin;
 			$webhook->webhook_sources_api 			= $remote_webhook->sources->api;
-			$webhook->webhook_enabled  				= true;
 
 			$webhook->save();
 

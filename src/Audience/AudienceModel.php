@@ -19,4 +19,9 @@ class AudienceModel extends MailchimpAudiencesEntryModel implements AudienceInte
         return $this->audience_remote_id;
     }
 
+    public function findByAudienceId($audience_id)
+    {
+        return $this->where->where('audience_remote_id', $audience_id)->first();
+    }
+
 }
